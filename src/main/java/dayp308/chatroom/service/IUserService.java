@@ -1,0 +1,29 @@
+package dayp308.chatroom.service;
+import dayp308.chatroom.bean.User;
+import com.github.pagehelper.PageInfo;
+
+import java.util.List;
+
+public interface IUserService {
+    boolean addUser(User user);
+
+    PageInfo<User> searchUserByText(Integer page, String text, Integer serverId);
+
+    void delUserById(Integer id);
+
+    Integer updateUserById(Integer id, User newUser);
+
+    User getUserLogin(String username, String password);
+
+    PageInfo<User> searchUserByText(Integer page, String text);
+
+    User getUserById(Integer id);
+
+    List<User> getAllUsers();
+
+    PageInfo<User> getPagedUsers(Integer page);
+
+	User getUserByToken(String token);
+
+    PageInfo<User> getPagedUsers(Integer page, Integer serverId);
+}

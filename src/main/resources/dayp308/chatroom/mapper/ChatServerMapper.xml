@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dayp308.chatroom.mapper.ChatServerMapper">
+
+	<resultMap id="chatServerMap" type="ChatServer" autoMapping="true">
+		<collection property="channelList" ofType="Channel" select="getChannelInServer" column="server_id"/>
+		<collection property="memberMap" javaType="HashMap" select="getMemberMap" column="{}"/>
+	</resultMap>
+
+	<select id="getMemberMap" resultType="java.util.HashMap">
+		SELECT user_id, user_identity FROM server_member
+	</select>
+
+	<select id="getServerByName" resultType="ChatServer">
+        select * from server where server_name like concat("%", #{text}, "%")
+	</select>
+
+	<select id="getChannelInServer" resultType="Channel">
+		SELECT * FROM channel WHERE server_id = #{server_id}
+	</select>
+
+	<select id="getServerById" resultType="ChatServer">
+		SELECT * FROM server WHERE server_id = #{server_id}
+	</select>
+
+	<insert id="createServer" useGeneratedKeys="true" keyProperty="server.id">
+		INSERT INTO server (server_name, server_avatar, server_desc, server_banner) 
+		VALUES (#{server.name}, #{server.avatar}, #{server.description}, #{server.banner})
+	</insert>
+
+	<update id="updateServerById">
+		UPDATE server
+		<set>
+			<if test="server.name != null">
+				server_name = #{server.name}
+			</if>
+			<if test="server.avatar != null">
+				server_avatar = #{server.avatar}
+			</if>
+			<if test="server.description != null">
+				server_desc = #{server.description}
+			</if>
+			<if test="server.banner != null">
+				server_banner = #{server.banner}
+			</if>
+		</set>
+		WHERE server_id = #{server_id}
+	</update>
+
+	<insert id="addUser">
+		INSERT INTO server_member (server_id, user_id)
+		VALUES (#{server_id}, #{user_id})
+	</insert>
+
+	<delete id="removeUser">
+		DELETE FROM server_member WHERE server_id = #{server_id} AND user_id = #{user_id}
+	</delete>
+
+	<update id="updateUserIdentity">
+		UPDATE server_member
+		<set>
+			user_identity = #{identity}
+		</set>
+		WHERE server_id = #{server_id} AND user_id = #{user_id}
+	</update>
+
+	<select id="getUserIdentityOfServer" resultType="String">
+		SELECT user_identity FROM server_member WHERE server_id = #{server_id} AND user_id = #{user_id}
+	</select>
+
+	<select id="getUserNicknameOfServer" resultType="String">
+		SELECT nickname FROM server_member WHERE server_id = #{server_id} AND user_id = #{user_id}
+	</select>
+</mapper>

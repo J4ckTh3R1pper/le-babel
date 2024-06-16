@@ -1,0 +1,122 @@
+.channels {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  background-color: #2B2D31;
+  .banner {
+    height: 100px;
+    background-image: url("/static/assets/img/chatroom-header.jpg");
+  };
+  .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    height: 48px;
+    border-bottom: #00000055 1px solid;
+    text-align: center;
+    line-height: 40px;
+    color: white;
+    background-color: #2B2D31;
+  };
+  .channel-list {
+    flex:1;
+    display: flex;
+    flex-direction: column;
+    //align-items: center;
+    overflow-y: scroll;
+    %channelBtn {
+      color: #FFFFFF;
+      line-height: 36px;
+      height: 36px;
+      margin: 5px 10px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      &::before {
+        content: "#";
+      }
+      &:hover {
+        background-color: #FFFFFF38;
+      }
+    }
+    .channel {
+      @extend %channelBtn;
+    }
+    .active-channel {
+      @extend %channelBtn;
+      background-color: #FFFFFF38;
+    }
+  }
+  .user-console {
+    height: 48px;
+    padding: 3px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #232428;
+
+    .user-card {
+      display: flex;
+      flex-direction: row;
+      height: 36px;
+      width: 128px;
+      border-radius: 4px;
+      padding: 4px;
+      cursor: pointer;
+      transition: {
+        property: all;
+        duration: 50ms;
+      }
+
+      .avatar {
+        background-image: url("/static/assets/img/dg_face.png");
+        width: 36px;
+        height: 36px;
+        border-radius: 100%;
+        background-size: cover;
+        margin-right: 5px;
+      }
+      .user-name {
+        display: flex;
+        flex-direction: column;
+        .nickname {
+          overflow: hidden;
+          text-align: left;
+          font-size: 14px;
+          font-weight: normal;
+          color: #FFFFFF;
+        }
+        .user-id {
+          overflow: hidden;
+          text-align: left;
+          font-size: 10px;
+          font-weight: normal;
+          color: #808080;
+        }
+      }
+      &:hover {
+        background-color: #FFFFFF55;
+        transition: inherit;
+        .user-id {
+          color: #232428;
+        }
+      }
+    }
+    #logout {
+      padding: 4px 8px;
+      color: #FFFFFF;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: {
+        property: all;
+        duration: 50ms;
+      }
+      &:hover {
+        background-color: rgba(255, 80, 80, 0.71);
+        transition: inherit;
+      }
+    }
+  }
+}

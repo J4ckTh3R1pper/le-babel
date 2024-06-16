@@ -1,0 +1,106 @@
+.chatarea {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    height: 48px;
+    background-color: #313338;
+    border-bottom: 1px #00000055 solid;
+    text-align: center;
+    line-height: 40px;
+    color: white;
+  };
+  li, ul {
+    list-style: none;
+  };
+  .messages {
+    text-align: center;
+    flex:1;
+    overflow-y: scroll;
+    padding: 0 10px;
+    margin: 0;
+  };
+  .get-history {
+    text-align: center;
+    cursor: pointer;
+    background-color: #8EA9FF;
+    color: #FFFFFF;
+    border-radius: 0 0 8px 8px;
+  }
+  .myMessage, .otherMessage {
+    display:flex;
+    flex-direction: row;
+    text-align: left;
+    margin: 15px 0;
+    .timeAndName { flex-direction: row; };
+  };
+  .myMessage .msgText {
+      @extend %msgText;
+      background-color: #8EA9FF;
+  };
+  .otherMessage .msgText {
+      @extend %msgText;
+      background-color: #FFFFFF;
+  };
+  .systemMessage {
+    text-align: center;
+    color: gray;
+    cursor: pointer;
+  };
+  .timeAndName {
+    display: flex;
+    align-items: center;
+    font-size: large;
+    color:#FFFFFF;
+  };
+  %msgText {
+    border-radius: 15px;
+    display: inline-block;
+    word-wrap: break-word;
+    max-width: 500px;
+    min-height: 30px;
+    max-height: 1000px;
+    padding: 5px 20px;
+    line-height: 30px;
+    text-align: left;
+    border: 1px solid grey;
+    box-shadow: black 0 1px 5px;
+  };
+  .avatar {
+    border-radius: 100%;
+    border: 1px solid grey;
+    width: 60px;
+    height: 60px;
+    box-shadow: 0 1px 2px black;
+  };
+  .literalMsg {
+    margin: 0 10px;
+  };
+  .time {
+    color: grey;
+    font-size: small;
+    margin: 0 5px;
+  };
+  .footer {
+    text-align: center;
+    height: 80px;
+    padding: 0 10px;
+    .input-bar {
+      border-radius: 8px;
+      height: 40px;
+      line-height: 40px;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      textarea {
+        all: unset;
+        width: 100%;
+        margin: 0 10px;
+        text-align: left;
+      }
+    }
+  }
+}
