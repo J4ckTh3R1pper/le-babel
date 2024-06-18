@@ -18,6 +18,8 @@ import java.io.IOException;
 @Component
 public class AuthHandlerInterceptor implements HandlerInterceptor {
 
+    private User loginUser;
+
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         try {
@@ -25,16 +27,19 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
             req.setCharacterEncoding("utf-8");
             resp.setCharacterEncoding("utf-8");
 
-            Object user = session.getAttribute("user");
+            loginUser = (User) session.getAttribute("user");
 
-            if (user != null) {
-                return true;
-            }
-            resp.sendRedirect("/login");
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
+        return true;
     }
 
+    @Override
+    public void afterCompletion(HttpServletRequest req, HttpServletResponse resp, Object handler, Exception ex) throws Exception {
+        if (loginUser != null)
+            resp.sendRedirect("/chat");
+        else resp.sendRedirect("/auth");
+    }
 }

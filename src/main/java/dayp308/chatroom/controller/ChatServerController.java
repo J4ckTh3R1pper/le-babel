@@ -37,11 +37,13 @@ public class ChatServerController {
                                 HttpServletResponse resp
                                 ) throws IOException {
         User user = (User) req.getSession().getAttribute("user");
-        if ( chatServerService.getUserIdentityOfServer(serverId, user.getUserId()).getIndex() < 1 )
-            resp.sendRedirect("/chat");
-        else if ( chatServerService.getUserIdentityOfServer(serverId, userId).getIndex() >= 0 )
-            resp.sendRedirect("/list_users?server=" + serverId);
-        else chatServerService.addUser(serverId, userId);
+		Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
+        Identity targetUserIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
+		if (
+				selfIdentity.getIndex() > 0 && targetUserIdentity.getIndex() < 1
+
+				)
+			chatServerService.addUser(serverId, userId);
         resp.sendRedirect("/list_users?server=" + serverId);
     }
 
@@ -72,12 +74,13 @@ public class ChatServerController {
     @RequestMapping(value = "/list_users")
     public String toList(@RequestParam(name = "page", defaultValue = "1") @Nullable Integer page,
                          @RequestParam("searchText") @Nullable String searchText,
-                         @RequestParam("server") Integer serverId,
+                         @RequestParam("serverId") Integer serverId,
                          ModelMap modelMap,
                          HttpServletRequest req) {
         User user = (User) req.getSession().getAttribute("user");
-        if ( chatServerService.getUserIdentityOfServer(serverId, user.getUserId()).getIndex() < 1 )
-            return "chat";
+		Identity userIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
+		if ( userIdentity.getIndex() >= 0 )
+		    modelMap.addAttribute("permission", userIdentity.getIndex());
 
         if (page == null)
             page = 1;
@@ -92,4 +95,41 @@ public class ChatServerController {
         return "list";
     }
 
+	@RequestMapping(value = "/set_admin")
+	public void setAdmin(@RequestParam("serverId") Integer serverId, @RequestParam("userId") Integer userId, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = (User) req.getSession().getAttribute("user");
+        Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
+        Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
+		if ( selfIdentity == Identity.OWNER && selfIdentity.getIndex() > targetIdentity.getIndex() ) {
+			this.chatServerService.updateUserIdentity(serverId, userId, Identity.ADMIN, null);
+		}
+		
+		resp.sendRedirect("/list_users?serverId=" + serverId);
+	}
+
+	@RequestMapping(value = "/unset_admin")
+	public void unsetAdmin(@RequestParam("serverId") Integer serverId, @RequestParam("userId") Integer userId, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = (User) req.getSession().getAttribute("user");
+        Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
+        Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
+		if ( selfIdentity == Identity.OWNER && selfIdentity.getIndex() > targetIdentity.getIndex() ) {
+			this.chatServerService.updateUserIdentity(serverId, userId, Identity.MEMBER, null);
+		}
+		
+		resp.sendRedirect("/list_users?serverId=" + serverId);
+	
+	}
+
+	@RequestMapping(value = "/set_nickname")
+	public void setNickname(@RequestParam("serverId") Integer serverId, @RequestParam("userId") Integer userId, @RequestParam("nickname") String nickname, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = (User) req.getSession().getAttribute("user");
+        Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
+        Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
+		if ( selfIdentity.getIndex() > 0 && user.getUserId().equals(userId) || selfIdentity.getIndex() > targetIdentity.getIndex() ) {
+			this.chatServerService.updateUserIdentity(serverId, userId, null, nickname);
+		}
+		
+		resp.sendRedirect("/list_users?serverId=" + serverId);
+	
+	}
 }
