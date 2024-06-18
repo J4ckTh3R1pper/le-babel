@@ -12,7 +12,6 @@ public class AuthHandlerInterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         InterceptorRegistration registration = registry.addInterceptor(new AuthHandlerInterceptor());
-        registration.addPathPatterns("/chat");
-        registration.excludePathPatterns("/login", "/register", "/static/**");
+        registration.addPathPatterns("/**").excludePathPatterns("/login", "/register", "/static/**");
     }
 }

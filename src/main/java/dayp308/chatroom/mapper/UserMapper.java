@@ -21,7 +21,4 @@ public interface UserMapper {
     List<User> getAllUsers();
 
 	User getUserByToken(@Param("token") String token);
-    List<User> getAllUsersInServer(@Param("server_id") int serverId);
-
-    List<User> searchUserByTextInServer(@Param("server_id") int serverId, @Param("text") String text);
 }

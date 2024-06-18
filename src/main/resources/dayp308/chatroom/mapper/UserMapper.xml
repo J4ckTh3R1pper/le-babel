@@ -15,21 +15,6 @@
         select * from user
     </select>
 
-    <select id="getAllUsersInServer" resultType="User">
-        SELECT * FROM   user u
-            INNER JOIN  server_member m
-                ON      m.server_id = #{server_id}
-                AND     m.user_id = u.user_id
-    </select>
-
-    <select id="searchUserByTextInServer" resultType="User">
-        SELECT * FROM   user u
-            INNER JOIN  server_member m
-                ON      m.server_id = #{server_id}
-                AND     m.user_id = u.user_id
-                AND     u.username like concat("%", #{text}, "%")
-    </select>
-
     <select id="getUserByUsername" resultType="User">
         select * from user where username = #{username}
     </select>
@@ -50,7 +35,6 @@
     <update id="updateUserById">
         update user
             <set>
-                username = #{user.username},
                 <if test="user.password != null">
                     password = #{user.password},
                 </if>

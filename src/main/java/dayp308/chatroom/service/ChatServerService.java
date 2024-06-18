@@ -1,7 +1,10 @@
 package dayp308.chatroom.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import dayp308.chatroom.bean.ChatServer;
 import dayp308.chatroom.bean.Identity;
+import dayp308.chatroom.bean.ServerMember;
 import dayp308.chatroom.bean.User;
 import dayp308.chatroom.mapper.ChatServerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,7 @@ public class ChatServerService implements IChatServerService{
     public void createServer(ChatServer server, int ownerId) {
         this.chatServerMapper.createServer(server, ownerId);
         this.chatServerMapper.addUser(server.getId(), ownerId);
-        this.chatServerMapper.updateUserIdentity(server.getId(), ownerId, Identity.OWNER);
+        this.chatServerMapper.updateUserIdentity(server.getId(), ownerId, Identity.OWNER, "");
     }
 
     @Override
@@ -50,9 +53,9 @@ public class ChatServerService implements IChatServerService{
     }
 
     @Override
-    public void updateUserIdentity(int id, int user_id, Identity identity) {
+    public void updateUserIdentity(int id, int user_id, Identity identity, String nickname) {
         if (identity != Identity.OWNER)
-            this.chatServerMapper.updateUserIdentity(id, user_id, identity);
+            this.chatServerMapper.updateUserIdentity(id, user_id, identity, nickname);
     }
     public Identity getUserIdentityOfServer(int serverId, int userId) {
         String identityStr = this.chatServerMapper.getUserIdentityOfServer(serverId, userId);
@@ -64,5 +67,21 @@ public class ChatServerService implements IChatServerService{
         if ( nickname == null || nickname.equals("") )
             return user.getUsername();
         return nickname;
+    }
+    @Override
+    public PageInfo<ServerMember> searchUserByText(Integer page, String text, Integer serverId) {
+        PageHelper.startPage(page, 5);
+        List<ServerMember> users = chatServerMapper.searchUserByTextInServer(serverId, text);
+        PageInfo<ServerMember> pageInfo = new PageInfo<>(users);
+        PageHelper.clearPage();
+        return pageInfo;
+    }
+    @Override
+    public PageInfo<ServerMember> getPagedUsers(Integer page, Integer serverId) {
+        PageHelper.startPage(page, 5);
+        List<ServerMember> list = chatServerMapper.getAllUsersInServer(serverId);
+        PageInfo<ServerMember> pageInfo = new PageInfo<>(list);
+        PageHelper.clearPage();
+        return pageInfo;
     }
 }

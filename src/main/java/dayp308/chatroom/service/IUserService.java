@@ -7,8 +7,6 @@ import java.util.List;
 public interface IUserService {
     boolean addUser(User user);
 
-    PageInfo<User> searchUserByText(Integer page, String text, Integer serverId);
-
     void delUserById(Integer id);
 
     Integer updateUserById(Integer id, User newUser);
@@ -25,5 +23,4 @@ public interface IUserService {
 
 	User getUserByToken(String token);
 
-    PageInfo<User> getPagedUsers(Integer page, Integer serverId);
 }

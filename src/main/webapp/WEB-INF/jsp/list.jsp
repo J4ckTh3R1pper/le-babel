@@ -1,5 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="dayp308.chatroom.bean.Identity" %>
 <%--
   Created by IntelliJ IDEA.
   User: dayp308
@@ -36,23 +37,27 @@
             <tr>
                 <th>用户ID</th>
                 <th>用户名</th>
-                <th>生日</th>
+                <th>身份</th>
+                <th>群内昵称</th>
                 <th>选项</th>
             </tr>
             <c:forEach
-                items="${users.list}" var="user" varStatus="userStatus">
+                    items="${serverMembers.list}" var="member" varStatus="userStatus">
                 <tr class="search_result">
-                    <td>${user.userId}</td>
-                    <td>${user.username}</td>
-                    <td><fmt:formatDate value="${user.birthday}" pattern="yyyy-MM-dd"/></td>
+                    <td>${member.user.userId}</td>
+                    <td>${member.user.username}</td>
+                    <!--<td><fmt:formatDate value="${member.user.birthday}" pattern="yyyy-MM-dd"/></td> -->
+
+                    <td>${member.identity == Identity.OWNER ? "群主" : member.identity == Identity.ADMIN ? "管理员" : "普通成员" }</td>
+                    <td>${member.nickname}</td>
                     <td>
                         <%-- <a href="${pageContext.request.contextPath}/edit_user?id=${user.userId}">修改</a> --%>
-                        <button id="banishUser" data-user-id="${user.userId}" data-username="${user.username}" data-href="${pageContext.request.contextPath}/banish_user?userId=${user.userId}&server=${serverId}">踢出</button>
+                        <button id="banishUser" data-user-id="${member.user.userId}" data-username="${member.user.username}" data-href="${pageContext.request.contextPath}/banish_user?userId=${member.user.userId}&server=${serverId}">踢出</button>
                     </td>
                 </tr>
             </c:forEach>
         </table>
-        <div class="bottom">共${users.total}条结果 <button id="prevPage">上一页</button> <button id="nextPage">下一页</button> <button id="jumpPage">跳转至</button>第<input id="goToPage" type="number" value="${users.pageNum}">/${users.pages}页</div>
+        <div class="bottom">共${serverMembers.total}条结果 <button id="prevPage">上一页</button> <button id="nextPage">下一页</button> <button id="jumpPage">跳转至</button>第<input id="goToPage" type="number" value="${serverMembers.pageNum}">/${serverMembers.pages}页</div>
         <div>
             <label>
                 添加新成员：<input id="userIdToAdd" type="text">
@@ -87,11 +92,11 @@
                 })
                 $("#prevPage").on("click", (e) => {
                     e.preventDefault()
-                    let hasPrevPage = ${users.hasPreviousPage};
+                    let hasPrevPage = ${serverMembers.hasPreviousPage};
                     if ( hasPrevPage )
                         $(location).attr("href",
                                 "${pageContext.request.contextPath}/list_users?"
-                            +   "page=${users.pageNum - 1}"
+                            +   "page=${serverMembers.pageNum - 1}"
                             +   "&searchText=" + "${searchText}"
                             +   "&server=" + ${serverId}
                         )
@@ -99,11 +104,11 @@
 
                 $("#nextPage").on("click", (e) => {
                     e.preventDefault()
-                    let hasNextPage = ${users.hasNextPage};
+                    let hasNextPage = ${serverMembers.hasNextPage};
                     if ( hasNextPage )
                         $(location).attr("href",
                                 "${pageContext.request.contextPath}/list_users?"
-                            +   "page=${users.pageNum + 1}"
+                            +   "page=${serverMembers.pageNum + 1}"
                             +   "&searchText=" + "${searchText}"
                             +   "&server=" + ${serverId}
                         )

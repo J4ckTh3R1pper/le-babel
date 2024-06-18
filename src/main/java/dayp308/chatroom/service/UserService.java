@@ -13,6 +13,7 @@ import java.util.List;
 public class UserService implements IUserService {
     private final UserMapper userMapper;
 
+
     @Autowired
     public UserService(UserMapper userMapper) {
         this.userMapper = userMapper;
@@ -49,14 +50,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public PageInfo<User> searchUserByText(Integer page, String text, Integer serverId) {
-        PageHelper.startPage(page, 5);
-        List<User> users = userMapper.searchUserByTextInServer(serverId, text);
-        PageInfo<User> pageInfo = new PageInfo<>(users);
-        PageHelper.clearPage();
-        return pageInfo;
-    }
-    @Override
     public void delUserById(Integer id) {
         if (userMapper.getUserById(id) != null)
             userMapper.delUserById(id);
@@ -90,12 +83,5 @@ public class UserService implements IUserService {
         return pageInfo;
     }
 
-    @Override
-    public PageInfo<User> getPagedUsers(Integer page, Integer serverId) {
-        PageHelper.startPage(page, 5);
-        List<User> list = userMapper.getAllUsersInServer(serverId);
-        PageInfo<User> pageInfo = new PageInfo<>(list);
-        PageHelper.clearPage();
-        return pageInfo;
-    }
+
 }

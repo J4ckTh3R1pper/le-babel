@@ -2,6 +2,7 @@ package dayp308.chatroom.controller;
 
 import com.github.pagehelper.PageInfo;
 import dayp308.chatroom.bean.Identity;
+import dayp308.chatroom.bean.ServerMember;
 import dayp308.chatroom.bean.User;
 import dayp308.chatroom.service.ChatServerService;
 import dayp308.chatroom.service.UserService;
@@ -50,9 +51,11 @@ public class ChatServerController {
                                      HttpServletRequest req,
                                      HttpServletResponse resp) throws IOException {
         User user = (User) req.getSession().getAttribute("user");
-        if ( chatServerService.getUserIdentityOfServer(serverId, user.getUserId()).getIndex() < 1 )
-            resp.sendRedirect("/chat");
-        else if ( chatServerService.getUserIdentityOfServer(serverId, userId) == Identity.OWNER )
+        Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
+        Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
+        if ( selfIdentity.getIndex() < targetIdentity.getIndex() )
+            resp.sendRedirect("/list_users?server=" + serverId);
+        else if ( selfIdentity == Identity.OWNER )
             resp.sendRedirect("/list_users?server=" + serverId);
         else chatServerService.removeUser(serverId, userId);
         resp.sendRedirect("/list_users?server=" + serverId);
@@ -79,11 +82,11 @@ public class ChatServerController {
         if (page == null)
             page = 1;
 
-        PageInfo<User> users;
+        PageInfo<ServerMember> serverMembers;
         if (searchText == null)
-            users = userService.getPagedUsers(page, serverId);
-        else users = userService.searchUserByText(page, searchText, serverId);
-        modelMap.addAttribute("users", users);
+            serverMembers = chatServerService.getPagedUsers(page, serverId);
+        else serverMembers = chatServerService.searchUserByText(page, searchText, serverId);
+        modelMap.addAttribute("serverMembers", serverMembers);
         modelMap.addAttribute("searchText", searchText);
         modelMap.addAttribute("serverId", serverId);
         return "list";

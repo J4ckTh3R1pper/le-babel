@@ -9,6 +9,15 @@
 		<collection property="memberMap" javaType="HashMap" select="getMemberMap" column="{}"/>
 	</resultMap>
 
+	<resultMap id="serverMemberMap" type="ServerMember">
+		<id column="user_id"/>
+		<result property="identity" column="user_identity" javaType="Identity" typeHandler="dayp308.chatroom.typehandler.IdentityTypeHandler"/>
+		<result property="nickname" column="nickname" javaType="String"/>
+		<association property="user" javaType="User" autoMapping="true">
+			<id property="userId" column="user_id"/>
+		</association>
+	</resultMap>
+
 	<select id="getMemberMap" resultType="java.util.HashMap">
 		SELECT user_id, user_identity FROM server_member
 	</select>
@@ -29,6 +38,47 @@
 		INSERT INTO server (server_name, server_avatar, server_desc, server_banner) 
 		VALUES (#{server.name}, #{server.avatar}, #{server.description}, #{server.banner})
 	</insert>
+
+	<sql id="selectServerMember">
+		SELECT 	u.user_id,
+				u.username,
+				u.birthday,
+				u.avatar,
+				m.user_identity,
+				m.nickname
+		FROM   	user u
+		JOIN  server_member m
+		ON      m.server_id = #{server_id}
+		AND     m.user_id = u.user_id
+		ORDER BY user_id
+	</sql>
+
+	<select id="getAllUsersInServer" resultType="ServerMember" resultMap="serverMemberMap">
+		SELECT 	u.user_id,
+		u.username,
+		u.birthday,
+		u.avatar,
+		m.user_identity,
+		m.nickname
+		FROM   	user u
+		JOIN  server_member m
+		ON      m.server_id = #{server_id}
+		AND     m.user_id = u.user_id
+	</select>
+
+	<select id="searchUserByTextInServer" resultType="ServerMember" resultMap="serverMemberMap">
+		SELECT 	u.user_id,
+		u.username,
+		u.birthday,
+		u.avatar,
+		m.user_identity,
+		m.nickname
+		FROM   	user u
+		JOIN  	server_member m
+		ON      m.server_id = #{server_id}
+		AND     m.user_id = u.user_id
+		AND     u.username like concat("%", #{text}, "%")
+	</select>
 
 	<update id="updateServerById">
 		UPDATE server
@@ -61,7 +111,13 @@
 	<update id="updateUserIdentity">
 		UPDATE server_member
 		<set>
-			user_identity = #{identity}
+			<if test="identity != null" >
+				user_identity = #{identity}
+			</if>
+
+			<if test="nickname != null">
+				nickname = #{nickname}
+			</if>
 		</set>
 		WHERE server_id = #{server_id} AND user_id = #{user_id}
 	</update>

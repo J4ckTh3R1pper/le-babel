@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.pagehelper.PageInfo;
 import dayp308.chatroom.bean.ChatServer;
 import dayp308.chatroom.bean.Message;
+import dayp308.chatroom.bean.ServerMember;
 import dayp308.chatroom.bean.User;
 import dayp308.chatroom.configuration.ChatServerEndpointExporter;
 import dayp308.chatroom.service.ChatServerService;
@@ -71,16 +72,16 @@ class ChatSpringbootApplicationTests {
 
     @Test
     void testListUser() {
-        PageInfo<User> userPageInfo = userService.getPagedUsers(1, 1);
-        for ( User u : userPageInfo.getList() ) {
-            System.out.println(u);
-        }
+        PageInfo<ServerMember> userPageInfo = chatServerService.getPagedUsers(2, 1);
+            for ( ServerMember u : userPageInfo.getList() ) {
+                System.out.println(u);
+            }
     }
 
     @Test
     void testListUserSearchByName() {
-        PageInfo<User> userPageInfo = userService.searchUserByText(1, "i" ,1);
-        for ( User u : userPageInfo.getList() ) {
+        PageInfo<ServerMember> userPageInfo = chatServerService.searchUserByText(1, "i" ,1);
+        for ( ServerMember u : userPageInfo.getList() ) {
             System.out.println(u);
         }
 
