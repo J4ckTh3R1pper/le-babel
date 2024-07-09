@@ -50,32 +50,4 @@ public class AuthController {
         }
     }
 
-    @RequestMapping(value = "/auth")
-    public void auth(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String token = null;
-        User loginUser = null;
-        HttpSession session = req.getSession();
-        if (session.getAttribute("user") != null)
-            loginUser = (User) session.getAttribute("user");
-        else {
-            Cookie[] cookie = req.getCookies();
-            if (cookie != null) {
-                for (Cookie c : cookie) {
-                    if (c.getName().equals("token")) {
-                        token = c.getValue();
-                        break;
-                    }
-                }
-            }
-        }
-        if (token == null) {
-            resp.sendRedirect("/login");
-        }
-        else {
-            loginUser = userService.getUserByToken(token);
-//          System.out.println(user);
-            if ( loginUser != null)
-                req.getSession().setAttribute("user", loginUser);
-        }
-    }
 }

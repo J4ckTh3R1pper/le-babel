@@ -21,7 +21,7 @@ public interface ChatServerMapper {
 	public boolean addUser(@Param("server_id") int id, @Param("user_id") int userId);
 	public boolean removeUser(@Param("server_id") int id, @Param("user_id") int userId);
 	public void updateUserIdentity(@Param("server_id") int id, @Param("user_id") int userId, @Param("identity") Identity identity, @Param("nickname") String nickname);
-
+	public ServerMember getServerMemberById(@Param("server_id") int serverId, @Param("user_id") int userId);
 	public String getUserIdentityOfServer(@Param("server_id") int serverId, @Param("user_id") int userId);
 	public String getUserNicknameOfServer(@Param("server_id") int serverId, @Param("user_id") int userId);
 

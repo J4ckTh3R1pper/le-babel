@@ -119,8 +119,11 @@
                       "<li class='" + ( owner === id ? "myMessage" : "otherMessage" ) + "'>"
                     +   "<img class='avatar' src='" + avatar + "' alt='浏览器不支持!'>"
                     +   "<div class='literalMsg'>"
-                    +     "<div class='timeAndName'>" + "" +
-                            "<span class='username'>" + msgObj.nickname + "</span>"
+                    +     "<div class='timeAndName'>"
+					+		"<span class='user-title " + msgObj.identity + "'>"
+					+			( msgObj.identity == "owner" ? "群主" :
+								msgObj.identity == "admin" ? "管理员" : "" ) + " </span>"
+                    +       "<span class='username'>" + msgObj.nickname + "</span>"
                     +	    "<span class='time'>" + dateFmt.format(date) + "</span>"
                     +     "</div>"
                     +     "<div class='msgText'>" + text + "</div>"

@@ -57,6 +57,7 @@ public class ChatServerService implements IChatServerService{
         if (identity != Identity.OWNER)
             this.chatServerMapper.updateUserIdentity(id, user_id, identity, nickname);
     }
+
     public Identity getUserIdentityOfServer(int serverId, int userId) {
         String identityStr = this.chatServerMapper.getUserIdentityOfServer(serverId, userId);
         return Identity.getIdentity(identityStr);
@@ -68,6 +69,11 @@ public class ChatServerService implements IChatServerService{
             return user.getUsername();
         return nickname;
     }
+
+	public ServerMember getServerMemberById(int serverId, int userId) {
+		return this.chatServerMapper.getServerMemberById(serverId, userId);
+	}
+
     @Override
     public PageInfo<ServerMember> searchUserByText(Integer page, String text, Integer serverId) {
         PageHelper.startPage(page, 5);

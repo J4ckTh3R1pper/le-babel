@@ -7,10 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.lang.Nullable;
+
 import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapter;
 
 import java.io.IOException;
@@ -20,14 +23,48 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 
     private User loginUser;
 
+	@Autowired
+	private UserService userService;
+
     @Override
-    public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest req, @NonNull HttpServletResponse resp, @NonNull Object handler) throws Exception {
         try {
             HttpSession session = req.getSession();
             req.setCharacterEncoding("utf-8");
             resp.setCharacterEncoding("utf-8");
+			String token = null;
+			if ( session.getAttribute("user") instanceof User )
+				token = ( (User) session.getAttribute("user") ).getToken();
+			else resp.sendRedirect("/login");
 
-            loginUser = (User) session.getAttribute("user");
+			loginUser = userService.getUserByToken(token);
+
+            if (loginUser != null)
+                return true;
+            else {
+				Cookie[] cookie = req.getCookies();
+				if (cookie != null) {
+					for (Cookie c : cookie) {
+		                if (c.getName().equals("token")) {
+							token = c.getValue();
+							break;
+						}
+					}
+				}
+		        if ( token == null || token.equals("") ) {
+				    resp.sendRedirect("/login");
+		        }
+			    else {
+				    loginUser = userService.getUserByToken(token);
+//				    System.out.println(user);
+					if ( loginUser != null) {
+		                req.getSession().setAttribute("user", loginUser);
+                        return true;
+					}
+					else resp.sendRedirect("/login");
+				}
+
+			}
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,9 +74,6 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest req, HttpServletResponse resp, Object handler, Exception ex) throws Exception {
-        if (loginUser != null)
-            resp.sendRedirect("/chat");
-        else resp.sendRedirect("/auth");
+    public void postHandle(HttpServletRequest req, HttpServletResponse resp, Object handler, @Nullable ModelAndView view) throws Exception {
     }
 }

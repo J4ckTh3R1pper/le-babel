@@ -66,9 +66,11 @@ public class ChatServerController {
     @PostMapping(value = "/get_username", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String getUname(@RequestParam("userId") String userId, @RequestParam("serverId") String serverId) {
-        User user = userService.getUserById(Integer.parseInt(userId));
-        String nickname = chatServerService.getUserNicknameOfServer(Integer.parseInt(serverId), user);
-        return "{\"user_id\":\"" + user.getUserId() + "\",\"nickname\":\"" + nickname + "\",\"avatar\":\"" + user.getAvatar() + "\"}";
+		ServerMember memberMap = chatServerService.getServerMemberById(Integer.parseInt(serverId), Integer.parseInt(userId));
+        return "{\"user_id\":\"" + memberMap.getUser().getUserId() +
+			"\",\"nickname\":\"" + ( memberMap.getNickname() == null || memberMap.getNickname().isBlank() ? memberMap.getUser().getUsername() : memberMap.getNickname() ) +
+			"\",\"avatar\":\"" + memberMap.getUser().getAvatar() +
+			"\",\"identity\":\"" + memberMap.getIdentity().getName() + "\"}";
     }
 
     @RequestMapping(value = "/list_users")

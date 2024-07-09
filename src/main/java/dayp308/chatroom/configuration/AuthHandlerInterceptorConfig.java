@@ -11,7 +11,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class AuthHandlerInterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        InterceptorRegistration registration = registry.addInterceptor(new AuthHandlerInterceptor());
-        registration.addPathPatterns("/**").excludePathPatterns("/login", "/register", "/static/**");
+        InterceptorRegistration registration = registry.addInterceptor(getAuthHandlerInterceptor());
+        registration.addPathPatterns("/**").excludePathPatterns("/login", "/auth" ,"/register", "/static/**");
     }
+
+	@Bean
+	public AuthHandlerInterceptor getAuthHandlerInterceptor() {
+		return new AuthHandlerInterceptor();
+	}
 }

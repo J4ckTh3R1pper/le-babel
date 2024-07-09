@@ -37,6 +37,18 @@
     text-align: left;
     margin: 15px 0;
     .timeAndName { flex-direction: row; };
+	.user-title .owner {
+		font-size: 8px;
+		color: #FFFFFF;
+		background-color: gold;
+		border-radius: 4px;
+	}
+	.user-title .admin {
+		font-size: 8px;
+		color: #FFFFFF;
+		background-color: cyan;
+		border-radius: 4px;
+	}
   };
   .myMessage .msgText {
       @extend %msgText;

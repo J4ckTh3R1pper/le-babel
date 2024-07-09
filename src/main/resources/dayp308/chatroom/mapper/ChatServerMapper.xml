@@ -18,10 +18,6 @@
 		</association>
 	</resultMap>
 
-	<select id="getMemberMap" resultType="java.util.HashMap">
-		SELECT user_id, user_identity FROM server_member
-	</select>
-
 	<select id="getServerByName" resultType="ChatServer">
         select * from server where server_name like concat("%", #{text}, "%")
 	</select>
@@ -47,35 +43,23 @@
 				m.user_identity,
 				m.nickname
 		FROM   	user u
-		JOIN  server_member m
+		JOIN	server_member m
 		ON      m.server_id = #{server_id}
-		AND     m.user_id = u.user_id
-		ORDER BY user_id
 	</sql>
+	
+	<select id="getServerMemberById" resultType="ServerMember" resultMap="serverMemberMap">
+		<include refid="selectServerMember"/>
+		AND		m.user_id = #{user_id}
+		AND		u.user_id = #{user_id}
+	</select>
 
 	<select id="getAllUsersInServer" resultType="ServerMember" resultMap="serverMemberMap">
-		SELECT 	u.user_id,
-		u.username,
-		u.birthday,
-		u.avatar,
-		m.user_identity,
-		m.nickname
-		FROM   	user u
-		JOIN  server_member m
-		ON      m.server_id = #{server_id}
+		<include refid="selectServerMember"/>
 		AND     m.user_id = u.user_id
 	</select>
 
 	<select id="searchUserByTextInServer" resultType="ServerMember" resultMap="serverMemberMap">
-		SELECT 	u.user_id,
-		u.username,
-		u.birthday,
-		u.avatar,
-		m.user_identity,
-		m.nickname
-		FROM   	user u
-		JOIN  	server_member m
-		ON      m.server_id = #{server_id}
+		<include refid="selectServerMember"/>
 		AND     m.user_id = u.user_id
 		AND     u.username like concat("%", #{text}, "%")
 	</select>
