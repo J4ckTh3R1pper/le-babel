@@ -31,7 +31,7 @@ public class AuthController {
                       HttpServletRequest req,
                       HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession();
-        System.out.println(remember);
+        System.out.println("remember: " + remember);
         try {
             User user = userService.getUserLogin(username, password);
             if (user != null) {

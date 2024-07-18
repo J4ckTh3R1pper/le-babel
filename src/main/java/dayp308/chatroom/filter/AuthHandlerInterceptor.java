@@ -29,18 +29,18 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NonNull HttpServletRequest req, @NonNull HttpServletResponse resp, @NonNull Object handler) throws Exception {
         try {
+			boolean bl = false;
             HttpSession session = req.getSession();
             req.setCharacterEncoding("utf-8");
             resp.setCharacterEncoding("utf-8");
 			String token = null;
 			if ( session.getAttribute("user") instanceof User )
 				token = ( (User) session.getAttribute("user") ).getToken();
-			else resp.sendRedirect("/login");
 
 			loginUser = userService.getUserByToken(token);
 
             if (loginUser != null)
-                return true;
+				bl = true;
             else {
 				Cookie[] cookie = req.getCookies();
 				if (cookie != null) {
@@ -52,17 +52,21 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 					}
 				}
 		        if ( token == null || token.equals("") ) {
-				    resp.sendRedirect("/login");
+					bl = false;
 		        }
 			    else {
 				    loginUser = userService.getUserByToken(token);
 //				    System.out.println(user);
-					if ( loginUser != null) {
-		                req.getSession().setAttribute("user", loginUser);
-                        return true;
-					}
-					else resp.sendRedirect("/login");
 				}
+
+				if ( loginUser != null) {
+					bl = true;
+				}
+
+				if (bl) {
+					session.setAttribute("user", loginUser);
+				}
+				else resp.sendRedirect("/login");
 
 			}
 

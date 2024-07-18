@@ -44,31 +44,31 @@ public class ChatServerController {
 
 				)
 			chatServerService.addUser(serverId, userId);
-        resp.sendRedirect("/list_users?server=" + serverId);
+        resp.sendRedirect("/list_users?serverId=" + serverId);
     }
 
     @RequestMapping(value = "/banish_user")
     public void removeUserFromServer(@RequestParam("userId") Integer userId,
-                                     @RequestParam("server") Integer serverId,
+                                     @RequestParam("serverId") Integer serverId,
                                      HttpServletRequest req,
                                      HttpServletResponse resp) throws IOException {
         User user = (User) req.getSession().getAttribute("user");
         Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
         Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
         if ( selfIdentity.getIndex() < targetIdentity.getIndex() )
-            resp.sendRedirect("/list_users?server=" + serverId);
+            resp.sendRedirect("/list_users?serverId=" + serverId);
         else if ( selfIdentity == Identity.OWNER )
-            resp.sendRedirect("/list_users?server=" + serverId);
+            resp.sendRedirect("/list_users?serverId=" + serverId);
         else chatServerService.removeUser(serverId, userId);
-        resp.sendRedirect("/list_users?server=" + serverId);
+        resp.sendRedirect("/list_users?serverId=" + serverId);
     }
 
     @PostMapping(value = "/get_username", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String getUname(@RequestParam("userId") String userId, @RequestParam("serverId") String serverId) {
-		ServerMember memberMap = chatServerService.getServerMemberById(Integer.parseInt(serverId), Integer.parseInt(userId));
-        return "{\"user_id\":\"" + memberMap.getUser().getUserId() +
-			"\",\"nickname\":\"" + ( memberMap.getNickname() == null || memberMap.getNickname().isBlank() ? memberMap.getUser().getUsername() : memberMap.getNickname() ) +
+    public String getUname(@RequestParam("userId") Integer userId, @RequestParam("serverId") Integer serverId) {
+		ServerMember memberMap = chatServerService.getServerMemberById(serverId, userId);
+        return "{\"userId\":" + memberMap.getUser().getUserId() +
+			",\"nickname\":\"" + ( memberMap.getNickname() == null || memberMap.getNickname().isBlank() ? memberMap.getUser().getUsername() : memberMap.getNickname() ) +
 			"\",\"avatar\":\"" + memberMap.getUser().getAvatar() +
 			"\",\"identity\":\"" + memberMap.getIdentity().getName() + "\"}";
     }

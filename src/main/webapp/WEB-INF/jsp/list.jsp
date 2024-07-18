@@ -68,7 +68,7 @@
                                     id="banishUser_${member.user.userId}"
                                     data-user-id="${member.user.userId}"
                                     data-username="${member.user.username}"
-                                    data-href="${pageContext.request.contextPath}/banish_user?userId=${member.user.userId}&server=${serverId}">
+                                    data-href="${pageContext.request.contextPath}/banish_user?userId=${member.user.userId}&serverId=${serverId}">
                                 踢出
                             </button>
 						</c:if>
