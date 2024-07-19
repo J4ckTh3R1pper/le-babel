@@ -12,7 +12,7 @@ public class AuthHandlerInterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         InterceptorRegistration registration = registry.addInterceptor(getAuthHandlerInterceptor());
-        registration.addPathPatterns("/**").excludePathPatterns("/login", "/auth" ,"/register", "/static/**");
+        registration.addPathPatterns("/**").excludePathPatterns("/login", "/check_login", "/auth" ,"/register", "/static/**");
     }
 
 	@Bean

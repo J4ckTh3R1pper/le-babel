@@ -104,16 +104,15 @@ public class ChatServerEndpoint implements ApplicationContextAware {
         if ( ch == null )
             return;
 
-        Message msg = messageService.insertMessage(
-                new Message(
+        Message msg = new Message(
                     json.get("text"),
                     this.userId,
                     channel,
                     "",
                     Timestamp.from(Instant.now()),
-                    0,
-                        "user")
-        );
+                    0, "user")
+        ;
+        messageService.insertMessage(msg);
 //        System.out.println(msg);
 //        String msgStr = String.format("{\"type\":\"chat\",\"text\":\"%s\",\"user\":\"%s\",\"date\":\"%s\" }", s, this.userId, new Date().getTime());
         String msgStr = objectMapper.writeValueAsString(msg);

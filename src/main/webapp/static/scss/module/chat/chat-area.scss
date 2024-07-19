@@ -2,6 +2,15 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  .msg-window {
+    display: flex;
+    flex-direction: column;
+  }
+  .msg-component {
+    display: flex;
+    flex-direction: column;
+    flex: 1
+  }
   .header {
     display: flex;
     flex-direction: row;

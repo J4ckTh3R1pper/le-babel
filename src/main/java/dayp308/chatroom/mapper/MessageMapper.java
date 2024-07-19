@@ -2,6 +2,7 @@ package dayp308.chatroom.mapper;
 
 import dayp308.chatroom.bean.Message;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Repository
 public interface MessageMapper {
     public List<Message> getAllMessage();
+    @Options(useGeneratedKeys = true, keyProperty = "ind", keyColumn = "ind")
     public int insertMessage(@Param("msg") Message msg);
     public Message getMessageById(@Param("ind") int index);
     public List<Message> getMessageInChannelByTime(@Param("channel_id") int channel, @Param("start_time") long start_time, @Param("end_time") long end_time);

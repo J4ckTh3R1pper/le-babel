@@ -27,10 +27,12 @@
 			System.out.println(user);
 	    %>
 		<script>
+			// TODO: 从数据库获取频道列表
 			const username = "<%=user.getUsername()%>";
 			const userId = "<%=user.getUserId()%>" * 1;
-			const avatar = "<%=user.getAvatar()%>" ? "<%=user.getAvatar()%>" : ( getContextPath() + "/static/img/default_avatar.png" );
+			const avatar = "<%=user.getAvatar()%>" ? "<%=user.getAvatar()%>" : ( self.location.host + "/static/img/default_avatar.png" );
 			const token = "<%=user.getToken()%>"
+			const channelList = <%=request.getAttribute("channelList")%>
 			const server = 1;
 			const channel = 2;
 		</script>
@@ -40,10 +42,50 @@
 		<script type="importmap">
 			{	"imports": {
 					"vue": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/vue.esm-browser.js",
-					"axios": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/axios.esm.min.js"
+					"axios": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/axios.esm.min.js",
+					"main-component": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/component/main-component.js"
 				}
 			}
 		</script>
-		<script src="<c:url value="/static/js/chat-main.js"/>" type="module"></script>
+<%--		<script src="<c:url value="/static/js/chat-main.js"/>" type="module"></script>--%>
+		<script type="module">
+			import axios from 'axios';
+			import { createApp } from 'vue';
+			import MainComponent from 'main-component'
+
+			const main = MainComponent;
+			main.created = function () {
+				this.url = "ws://" + self.location.host + "/server/" + server + "/" + token;
+				this.channels = channelList;
+				this.channels.forEach((e) => {
+					this.cachedInputs.push({id: e.id, text: ""});
+				});
+				this.activeChannel = channelList[0].id;
+				this.cachedInput = this.cachedInputs[0]['text'];
+				console.log(this.channels);
+				console.log("app successfully created");
+			}
+			main.mounted = function() {
+				this.ws = new WebSocket(this.url);
+				this.ws.onmessage = (e) => {
+					const dataObj = JSON.parse(e.data);
+					console.log(dataObj);
+					this.$refs['msgWindows'].forEach((e) => {
+						if (e.channelId === dataObj.inChannel)
+							e.showUsrText(dataObj);
+					})
+				}
+				console.log("app successfully mounted");
+			}
+
+			const app = createApp(main)
+			app.config.globalProperties = {
+				dateFmt : new Intl.DateTimeFormat('zh-CN', {dateStyle: "short", timeStyle: "medium"}),
+				serverId: server,
+				userId: userId,
+			}
+
+			app.mount("#app-chat");
+		</script>
 	</body>
 </html>

@@ -1,8 +1,8 @@
 import axios from 'axios'
 import Message from './message.js'
 export default {
-	expose: ['showUsrText'],
-	props: ['channelId', 'serverId'],
+	expose: ['showUsrText', 'channelId'],
+	props: ['channelId', 'channelName'],
 	components: {
 		Message
 	},
@@ -40,22 +40,6 @@ export default {
 				console.log(error);
 			})
 		},
-        submitText() {
-            const inputBar = this.$refs['inputBar']
-            const text = inputBar.value.trim()
-            const json = JSON.stringify({
-                text: text,
-                file:"",
-                channel: channel,
-                server: server
-            });
-            if (text !== "") {
-                // console.log(text);
-                this.ws.send(json);
-                inputBar.value = "";
-            }
-            else alert("文本不能为空！");
-        },
 		//TODO: 储存最后消息的时间戳,根据储存时间戳请求历史记录
         getHistory() {
             console.log(this.timestamp);
@@ -90,13 +74,13 @@ export default {
 			this.$refs['msgWindow'].scrollTop = 0;
 		},
 		goBottom() {
-			let e = $refs['msgWindow'];
-			e.scrollTop = scrollHeight;
+			let e = this.$refs['msgWindow'];
+			e.scrollTop = e.scrollHeight;
 		}
 
 	},
 	template: `
-		<div class="header">#这是频道名</div>
+		<div class="header">{{channelName}}</div>
 		<div class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up"></i></div>
 		<ul class="messages" ref="msgWindow">
 			<Message
@@ -111,12 +95,6 @@ export default {
 				:msg-text="msg.msgText"
 				>
 			</Message>
-			<div class="footer">
-				<div class="input-bar">
-				<!--TODO:为输入框占位符匹配频道名-->
-					<textarea @keyup.enter="submitText" ref="inputBar" class="text" id="input-text" placeholder="给#others 发消息"></textarea>
-				</div>
-			</div>
 		</ul>
 	`
 }

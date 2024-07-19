@@ -23,7 +23,8 @@ public class MessageService implements IMessageService{
 
     @Override
     public Message insertMessage(Message msg) {
-       msg.setInd(this.messageMapper.insertMessage(msg));
+       this.messageMapper.insertMessage(msg);
+       System.out.println("from jdbc:" + msg.toString());
        return msg;
     }
 
