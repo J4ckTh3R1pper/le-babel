@@ -23,7 +23,3 @@ app.config.globalProperties = {
 }
 
 app.mount("#app-chat");
-
-function getContextPath() {
-    return self.location.host;
-}	

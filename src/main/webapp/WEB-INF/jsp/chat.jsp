@@ -27,7 +27,6 @@
 			System.out.println(user);
 	    %>
 		<script>
-			// TODO: 从数据库获取频道列表
 			const username = "<%=user.getUsername()%>";
 			const userId = "<%=user.getUserId()%>" * 1;
 			const avatar = "<%=user.getAvatar()%>" ? "<%=user.getAvatar()%>" : ( self.location.host + "/static/img/default_avatar.png" );
