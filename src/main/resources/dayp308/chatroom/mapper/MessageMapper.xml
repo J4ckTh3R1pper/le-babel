@@ -17,8 +17,14 @@
     </select>
 
     <select id="getMessageInChannelByTime" resultType="Message">
-        SELECT * FROM history WHERE in_channel = #{channel_id} AND UNIX_TIMESTAMP(date) BETWEEN #{start_time} AND #{end_time} ORDER BY ind DESC
-    </select>
+        SELECT * FROM history
+            WHERE in_channel = #{channel_id}
+            AND UNIX_TIMESTAMP(date) BETWEEN #{start_time} AND #{end_time} ORDER BY ind DESC
+	</select>
+
+    <select id="getLastMessageInChannel" resultType="Message">
+        SELECT * FROM history WHERE in_channel = #{channel_id} AND UNIX_TIMESTAMP(date) &lt; #{timestamp} ORDER BY ind DESC LIMIT 49
+	</select>
 
     <delete id="deleteMessageById">
         DELETE FROM history WHERE ind = #{ind}

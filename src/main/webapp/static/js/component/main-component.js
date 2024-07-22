@@ -45,7 +45,7 @@ export default {
     methods: {
         logout() {
             if (confirm("确定要登出吗？")) {
-                const d = Date.now();
+                const d = new Date();
                 document.cookie = "token=;expires=" + d.toUTCString() + ";path=/;";
                 window.location = "/login"
             }
@@ -95,7 +95,6 @@ export default {
 				<button id="logout" @click="logout">登出</button>
 			</div>
 		</div>
-        <!--TODO: 根据频道列表挂载多个聊天窗组件-->
 		<div class="chat-area">
 		    <div v-for="channel in channels" v-show="activeChannel === channel.id" class="msg-component">
 	    	        <MessageWindow

@@ -67,10 +67,23 @@ public class ChatServerController {
     @ResponseBody
     public String getUname(@RequestParam("userId") Integer userId, @RequestParam("serverId") Integer serverId) {
 		ServerMember memberMap = chatServerService.getServerMemberById(serverId, userId);
-        return "{\"userId\":" + memberMap.getUser().getUserId() +
-			",\"nickname\":\"" + ( memberMap.getNickname() == null || memberMap.getNickname().isBlank() ? memberMap.getUser().getUsername() : memberMap.getNickname() ) +
-			"\",\"avatar\":\"" + memberMap.getUser().getAvatar() +
-			"\",\"identity\":\"" + memberMap.getIdentity().getName() + "\"}";
+        if ( memberMap != null )
+            return "{\"userId\":" + memberMap.getUser().getUserId() +
+		    	",\"nickname\":\"" + ( memberMap.getNickname() == null || memberMap.getNickname().isBlank() ? memberMap.getUser().getUsername() : memberMap.getNickname() ) +
+			    "\",\"avatar\":\"" + memberMap.getUser().getAvatar() +
+			    "\",\"identity\":\"" + memberMap.getIdentity().getName() + "\"}";
+        else {
+            User user = userService.getUserById(userId);
+            if ( user != null)
+                return "{\"userId\":" + user.getUserId() +
+                        ",\"nickname\":\"" + user.getUsername() +
+                        "\",\"avatar\":\"" + user.getAvatar() +
+                        "\",\"identity\":\"" + Identity.NON_MEMBER.getName() + "\"}";
+            else return "{\"userId\":" + 0 +
+                    ",\"nickname\":\"" + "ghost" +
+                    "\",\"avatar\":" + "null" +
+                    ",\"identity\":\"" + Identity.NON_MEMBER.getName() + "\"}";
+        }
     }
 
     @RequestMapping(value = "/list_users")

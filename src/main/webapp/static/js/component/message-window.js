@@ -12,6 +12,13 @@ export default {
 			timestamp: Date.now()
 		}
 	},
+	computed: {
+		sortedMessages() {
+			return this.messages.toSorted(function(a, b) {
+				return a.ind - b.ind;
+			})
+		}
+	},
 	methods: {
 		showUsrText(message) {
 			axios.post("/get_username", {
@@ -24,10 +31,10 @@ export default {
 				}
 			).then( (resp) => {
 				console.log(resp.data);
-				let avatar = resp.data.avatar ? resp.data.avatar : ( self.location.host + "/static/img/default_avatar.png" )
+				let avatar = resp.data.avatar ? resp.data.avatar : ( "/static/img/default_avatar.png" )
 				let date = this.dateFmt.format(message.date)
 				this.messages.push({
-					"ind": message.index,
+					"ind": message.ind,
 					"type": message.type,
 					"owner": resp.data.userId,
 					"avatar": avatar,
@@ -40,34 +47,29 @@ export default {
 				console.log(error);
 			})
 		},
-		//TODO: 储存最后消息的时间戳,根据储存时间戳请求历史记录
+		//TODO: 根据ind而不是timestamp来检索历史消息
+		//TODO: 缓存最后消息的ind用于刷新后检索历史消息
         getHistory() {
             console.log(this.timestamp);
-            axios.post("/get_msg_history",
-                {   channel: this.channelId,
+            axios.post("/get_last_messages",
+                {   channelId: this.channelId,
                     timestamp: this.timestamp,
                 }, {
 					headers: {
 						'Content-Type': 'multipart/form-data'
 					}
 				}
-            ).then(function(resp) {
+            ).then(resp => {
                 // console.log(data);
                 // console.log("current timestamp is: " + this.timestamp);
-                resp.data.forEach((msg)=>{
-                    this.showUsrText(msg);
-                });
+                resp.data.forEach( msg => this.showUsrText(msg) );
 
                 if (resp.data.at(-1)) {
                     this.timestamp = resp.data.at(-1).date - 1000;
-                    // console.log("timestamp changed to: " + this.timestamp);
+                    console.log("timestamp changed to: " + this.timestamp);
                 }
-                else {
-                    this.timestamp = this.timestamp - 30 * 60 * 1000;
-                }
-            }).catch(function(error) {
-                this.timestamp = this.timestamp - 30 * 60 * 1000;
-                // console.log("error data: " + error + ", timestamp changed to: " + this.timestamp);
+            }).catch(error => {
+                console.log("error data: " + error + ", timestamp changed to: " + this.timestamp);
             })
         },
 		goTop() {
@@ -84,7 +86,7 @@ export default {
 		<div class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up"></i></div>
 		<ul class="messages" ref="msgWindow">
 			<Message
-				v-for="msg in messages"
+				v-for="msg in sortedMessages"
 				:key="msg.ind"
 				:msg-type="msg.type"
 				:owner-id="msg.owner"

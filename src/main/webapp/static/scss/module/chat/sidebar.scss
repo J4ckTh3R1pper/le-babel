@@ -1,6 +1,7 @@
 .sidebar {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
   width: 300px;
   background-color: #2B2D31;
   .banner {

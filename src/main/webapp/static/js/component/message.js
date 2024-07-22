@@ -5,7 +5,7 @@ export const UserMessage = {
 			<img class='avatar' :src='this.avatar' alt='浏览器不支持!'>
 			<div class='literalMsg'>
 				<div class='timeAndName'>
-					<span :class="'user-title' + this.identity">
+					<span v-if="this.identity" :class="'user-title ' + this.identity">
 						{{ identity == 'owner' ? '群主' : identity == 'admin' ? '管理员' : '' }}
 					</span>
 					<span class='username'> {{ nickname }} </span>

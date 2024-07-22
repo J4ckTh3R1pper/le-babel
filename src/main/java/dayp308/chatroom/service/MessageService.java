@@ -34,10 +34,14 @@ public class MessageService implements IMessageService{
     }
 
     @Override
-    public List<Message> getMessageInChannelByTime(int channel, long timestamp) {
-        timestamp = timestamp / 1000;
-        return this.messageMapper.getMessageInChannelByTime(channel, timestamp - 1800, timestamp);
+    public List<Message> getMessageInChannelByTime(int channel, long startTime, long endTime) {
+        return this.messageMapper.getMessageInChannelByTime(channel, startTime / 1000, endTime / 1000);
     }
+
+	@Override
+	public List<Message> getLastMessageInChannel(int channelId, long timestamp) {
+		return this.messageMapper.getLastMessageInChannel(channelId, timestamp);
+	}
 
     @Override
     public void deleteMessageById(int index) {

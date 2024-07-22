@@ -50,7 +50,7 @@ class ChatSpringbootApplicationTests {
     @Test
     void testMessageToJson() throws JsonProcessingException, ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<Message> listMsg = messageService.getMessageInChannelByTime(2, format.parse("2023-07-28 15:05:42").getTime());
+        List<Message> listMsg = messageService.getMessageInChannelByTime(2, format.parse("2023-07-28 15:05:42").getTime(), format.parse("2023-07-28 00:00:42").getTime());
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         String str = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(listMsg);
