@@ -41,9 +41,22 @@ public class MessageController {
 	@PostMapping(value = "/get_last_messages", produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public String getLastMessages(@RequestParam("channelId") int channelId,
-								  @RequestParam("timestamp") long timestamp) throws JsonProcessingException {
-		List<Message> listMsg = messageService.getLastMessageInChannel(channelId, timestamp);
-		String outMsg = objectMapper.writeValueAsString(listMsg);
+								  @Nullable @RequestParam("index") String index,
+								  @Nullable @RequestParam("timestamp") String timestamp
+								  ) throws Exception {
+		if ( ( index != null && timestamp != null ) || ( index == null && timestamp == null ) ) {
+			throw new Exception();
+		}
+		List<Message> listMsg;
+		String outMsg = "no result";
+		if ( index != null) {
+			listMsg = messageService.getLastMessageInChannel(channelId, Integer.parseInt(index));
+			outMsg = objectMapper.writeValueAsString(listMsg);
+		}
+		if (timestamp != null) {
+			listMsg = messageService.getLastMessageInChannelByTimestamp(channelId, Long.parseLong(timestamp));
+			outMsg = objectMapper.writeValueAsString(listMsg);
+		}
 		System.out.println("out: " + outMsg);
 		return outMsg;
 	}

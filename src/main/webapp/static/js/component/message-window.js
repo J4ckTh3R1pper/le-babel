@@ -9,7 +9,8 @@ export default {
 	data() {
 		return {
 			messages: [],
-			timestamp: Date.now()
+			timestamp: Date.now(),
+			historyIndex: null
 		}
 	},
 	computed: {
@@ -51,9 +52,11 @@ export default {
 		//TODO: 缓存最后消息的ind用于刷新后检索历史消息
         getHistory() {
             console.log(this.timestamp);
+			console.log(this.historyIndex);
             axios.post("/get_last_messages",
                 {   channelId: this.channelId,
-                    timestamp: this.timestamp,
+					timestamp: !this.historyIndex ? this.timestamp : null,
+					index: this.historyIndex
                 }, {
 					headers: {
 						'Content-Type': 'multipart/form-data'
@@ -65,11 +68,11 @@ export default {
                 resp.data.forEach( msg => this.showUsrText(msg) );
 
                 if (resp.data.at(-1)) {
-                    this.timestamp = resp.data.at(-1).date - 1000;
-                    console.log("timestamp changed to: " + this.timestamp);
+                    this.historyIndex = resp.data.at(-1).ind;
+                    console.log("historyIndex changed to: " + this.historyIndex);
                 }
             }).catch(error => {
-                console.log("error data: " + error + ", timestamp changed to: " + this.timestamp);
+                console.log("error data: " + error);
             })
         },
 		goTop() {

@@ -16,7 +16,8 @@ public interface MessageMapper {
     public int insertMessage(@Param("msg") Message msg);
     public Message getMessageById(@Param("ind") int index);
     public List<Message> getMessageInChannelByTime(@Param("channel_id") int channel, @Param("start_time") long start_time, @Param("end_time") long end_time);
-	public List<Message> getLastMessageInChannel(@Param("channel_id") int channelId, @Param("timestamp") long timestamp);
+	public List<Message> getLastMessageInChannel(@Param("channel_id") int channelId, @Param("index") int index);
+	public List<Message> getLastMessageInChannelByTimestamp(@Param("channel_id") int channelId, @Param("timestamp") long timestamp);
     public void deleteMessageById(@Param("ind") int index);
 
 }

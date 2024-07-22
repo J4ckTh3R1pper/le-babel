@@ -39,8 +39,13 @@ public class MessageService implements IMessageService{
     }
 
 	@Override
-	public List<Message> getLastMessageInChannel(int channelId, long timestamp) {
-		return this.messageMapper.getLastMessageInChannel(channelId, timestamp);
+	public List<Message> getLastMessageInChannel(int channelId, int index) {
+		return this.messageMapper.getLastMessageInChannel(channelId, index);
+	}
+
+	@Override
+	public List<Message> getLastMessageInChannelByTimestamp(int channelId, long timestamp) {
+		return this.messageMapper.getLastMessageInChannelByTimestamp(channelId, timestamp);
 	}
 
     @Override

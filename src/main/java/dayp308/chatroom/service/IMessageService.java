@@ -9,5 +9,6 @@ public interface IMessageService {
     public Message getMessageById(int index);
     public List<Message> getMessageInChannelByTime(int channel, long startTime, long endTime);
     public void deleteMessageById(int index);
-	public List<Message> getLastMessageInChannel(int channelId, long timestamp);
+	public List<Message> getLastMessageInChannel(int channelId, int index);
+	public List<Message> getLastMessageInChannelByTimestamp(int channelId, long timestamp);
 }
