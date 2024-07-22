@@ -16,6 +16,22 @@ public class ChatServer {
 	private HashMap<Integer, Identity> memberMap;
 	private List<Channel> channelList;
 
+	public HashMap<Integer, Identity> getMemberMap() {
+		return this.memberMap;
+	}
+
+	public void setMemberMap(HashMap<Integer, Identity> memberMap) {
+		this.memberMap = memberMap;
+	}
+	
+	public List<Channel> getChannelList() {
+		return this.channelList;
+	}
+	
+	public void setChannelList(List<Channel> channelList) {
+		this.channelList = channelList;
+	}
+
     public int getId() {
         return id;
     }

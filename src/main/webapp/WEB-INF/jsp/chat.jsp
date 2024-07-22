@@ -32,8 +32,7 @@
 			const avatar = "<%=user.getAvatar()%>" ? "<%=user.getAvatar()%>" : ( self.location.host + "/static/img/default_avatar.png" );
 			const token = "<%=user.getToken()%>"
 			const channelList = <%=request.getAttribute("channelList")%>
-			const server = 1;
-			const channel = 2;
+			const server = <%=request.getAttribute("serverId")%>;
 		</script>
 	</head>
 	<body>
@@ -55,13 +54,14 @@
 			const main = MainComponent;
 			main.created = function () {
 				this.url = "ws://" + self.location.host + "/server/" + server + "/" + token;
-				this.channels = channelList;
-				this.channels.forEach((e) => {
-					this.cachedInputs.push({id: e.id, text: ""});
-				});
+				channelList.forEach(e => {
+					this.channels.set(e.id, e.name);
+					this.cachedInputs.set(e.id, "")
+				})
 				this.activeChannel = channelList[0].id;
-				this.cachedInput = this.cachedInputs[0]['text'];
+				this.cachedInput = [this.cachedInputs.values()];
 				console.log(this.channels);
+				console.log(this.cachedInput);
 				console.log("app successfully created");
 			}
 			main.mounted = function() {

@@ -9,8 +9,8 @@ export default {
         username: username,
         avatar: avatar,
         activeChannel: null,
-        channels: [],
-        cachedInputs: [],
+        channels: new Map(),
+        cachedInputs: new Map(),
         cachedInput: "",
         url: null,
         ws: null
@@ -26,21 +26,18 @@ export default {
     watch: {
         cachedInput: {
             handler(newValue) {
-                this.cachedInputs.forEach((e) => {
-                    if (e.id === this.activeChannel)
-                        e.text = newValue;
-                });
-            }
+                if ( this.cachedInputs.has(this.activeChannel) )
+					this.cachedInputs.set(this.activeChannel, newValue);
+			}
         },
         activeChannel: {
             //FIXME: 这个侦听器会在activeChannel更新时同时触发一次cachedInput的侦听器
             handler(newValue) {
-                this.cachedInputs.forEach((e) => {
-                    if (e.id === newValue)
-                        this.cachedInput = e.text;
-                });
-            },
-        }
+                if ( this.cachedInputs.has(newValue) ) {
+					this.cachedInput = this.cachedInputs.get(newValue)
+				}
+			},
+        },
     },
     methods: {
         logout() {
@@ -76,12 +73,12 @@ export default {
 			<div class="header">这是服务器名字</div>
             <!--TODO: 获取频道列表-->
 			<div class="channel-list">
-				<div v-for="channel in channels"
-				     class="channel"
-				     :key="channel.id"
-				     @click="setActive(channel.id)"
+				<div v-for="[key, value] in channels"
+				     :class="'channel ' + (key == this.activeChannel ? 'active' : '')"
+				     :key="key"
+				     @click="setActive(key)"
 				     >
-				     {{channel.name}}
+				     {{value}}
 				</div>
 			</div>
 			<div class="user-console">
@@ -96,11 +93,11 @@ export default {
 			</div>
 		</div>
 		<div class="chat-area">
-		    <div v-for="channel in channels" v-show="activeChannel === channel.id" class="msg-component">
+		    <div v-for="[key, value] in channels" v-show="activeChannel == key" class="msg-component">
 	    	        <MessageWindow
 	    	            ref="msgWindows"
-	    		        :channel-id="channel.id"
-	    		        :channel-name="channel.name"
+	    		        :channel-id="key"
+	    		        :channel-name="value"
 	    		    >
 	    		    </MessageWindow>
 		    </div>
@@ -113,7 +110,7 @@ export default {
 				        class="text"
 				        id="input-text" 
 				        v-model="this.cachedInput"
-				        placeholder="给#others 发消息"
+				        :placeholder="'给 #' + channels.get(activeChannel) + ' 发消息'"
 				    >
 				    </textarea>
 			    </div>

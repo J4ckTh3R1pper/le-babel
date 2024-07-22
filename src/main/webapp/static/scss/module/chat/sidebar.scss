@@ -43,6 +43,9 @@
     }
     .channel {
       @extend %channelBtn;
+	  &.active {
+        background-color: #FFFFFF38;
+	  }
     }
     .active-channel {
       @extend %channelBtn;
