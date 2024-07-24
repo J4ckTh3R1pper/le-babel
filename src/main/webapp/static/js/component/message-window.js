@@ -10,15 +10,15 @@ export default {
 	},
 	data() {
 		return {
-			messages: [],
+			messages: new Map(),
 			timestamp: Date.now(),
 			historyIndex: null
 		}
 	},
 	computed: {
 		sortedMessages() {
-			return this.messages.toSorted(function(a, b) {
-				return a.ind - b.ind;
+			return [...this.messages].toSorted(function(a, b) {
+				return a[0] - b[0];
 			})
 		}
 	},
@@ -39,8 +39,7 @@ export default {
 			else setMember(this.members.get(message.owner))
 			let date = this.dateFmt.format(message.date)
 			let avatar = member.avatar ? member.avatar : ( "/static/img/default_avatar.png" )
-			this.messages.push({
-				"ind": message.ind,
+			this.messages.set(message.ind, {
 				"type": message.type,
 				"owner": message.owner,
 				"avatar": avatar,
@@ -100,15 +99,15 @@ export default {
 		<div class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up">获取历史记录</i></div>
 		<ul class="messages" ref="msgWindow">
 			<Message
-				v-for="msg in sortedMessages"
-				:key="msg.ind"
-				:msg-type="msg.type"
-				:owner-id="msg.owner"
-				:avatar="msg.avatar"
-				:date="msg.date"
-				:identity="msg.identity"
-				:nickname="msg.nickname"
-				:msg-text="msg.msgText"
+				v-for="[key, value] in sortedMessages"
+				:key="key"
+				:msg-type="value.type"
+				:owner-id="value.owner"
+				:avatar="value.avatar"
+				:date="value.date"
+				:identity="value.identity"
+				:nickname="value.nickname"
+				:msg-text="value.msgText"
 				>
 			</Message>
 		</ul>

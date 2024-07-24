@@ -69,6 +69,7 @@ export default {
             if (text !== "") {
                 // console.log(text);
                 this.ws.send(json);
+                this.cachedInput = "";
                 inputBar.value = "";
             }
             else alert("文本不能为空！");
@@ -116,7 +117,7 @@ export default {
 				        ref="inputBar"
 				        class="text"
 				        id="input-text" 
-				        v-model="this.cachedInput"
+				        v-model="cachedInput"
 				        :placeholder="'给 #' + channels.get(activeChannel) + ' 发消息'"
 				    >
 				    </textarea>

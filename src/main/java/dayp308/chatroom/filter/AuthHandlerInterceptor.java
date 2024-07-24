@@ -21,8 +21,6 @@ import java.io.IOException;
 @Component
 public class AuthHandlerInterceptor implements HandlerInterceptor {
 
-    private User loginUser;
-
 	@Autowired
 	private UserService userService;
 
@@ -37,7 +35,7 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 			if ( session.getAttribute("user") instanceof User )
 				token = ( (User) session.getAttribute("user") ).getToken();
 
-			loginUser = userService.getUserByToken(token);
+			User loginUser = userService.getUserByToken(token);
 
             if (loginUser != null)
 				bl = true;
@@ -45,17 +43,16 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 				Cookie[] cookie = req.getCookies();
 				if (cookie != null) {
 					for (Cookie c : cookie) {
-		                if (c.getName().equals("token")) {
+						if (c.getName().equals("token")) {
 							token = c.getValue();
 							break;
 						}
 					}
 				}
-		        if ( token == null || token.equals("") ) {
+				if ( token == null || token.equals("") ) {
 					bl = false;
-		        }
-			    else {
-				    loginUser = userService.getUserByToken(token);
+				} else {
+					loginUser = userService.getUserByToken(token);
 //				    System.out.println(user);
 				}
 
@@ -63,12 +60,14 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 					bl = true;
 				}
 
-				if (bl) {
-					session.setAttribute("user", loginUser);
-				}
-				else resp.sendRedirect("/login");
-
 			}
+			if (bl) {
+				loginUser.setPassword("");
+				session.setAttribute("user", null);
+				System.out.println(session.getAttribute("user"));
+				session.setAttribute("user", loginUser);
+				System.out.println(session.getAttribute("user"));
+			} else resp.sendRedirect("/login");
 
         } catch (Exception e) {
             e.printStackTrace();

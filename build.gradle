@@ -33,6 +33,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/commons-codec/commons-codec
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+	implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0-M2'
+
 	// https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter
 	implementation group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: '2.1.0'
 	// https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-jasper

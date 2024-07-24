@@ -35,11 +35,18 @@
     <update id="updateUserById">
         update user
             <set>
+                <if test="user.username != null">
+                    username = #{user.username},
+                </if>
                 <if test="user.password != null">
                     password = #{user.password},
                 </if>
-                birthday = #{user.birthday},
-                avatar = #{user.avatar},
+                <if test="user.birthday != null">
+                    birthday = #{user.birthday},
+                </if>
+                <if test="user.avatar != null">
+                    avatar = #{user.avatar},
+                </if>
                 <if test="user.token != null">
                     token = #{user.token},
                 </if>

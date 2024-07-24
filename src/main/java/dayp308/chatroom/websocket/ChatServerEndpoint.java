@@ -19,20 +19,17 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @ServerEndpoint(value = "/server/{serverId}/{Token}")
 public class ChatServerEndpoint implements ApplicationContextAware {
-    private int userId;
-    private int serverId;
-
     private static ApplicationContext appContext;
 
     private UserService userService;
@@ -42,7 +39,7 @@ public class ChatServerEndpoint implements ApplicationContextAware {
 
     private ObjectMapper objectMapper;
 
-    static Set<Session> connections = Collections.synchronizedSet(new HashSet<>());
+    private static ConcurrentHashMap<Session, Integer> connections = new ConcurrentHashMap<>();
 
     private static class ServerCloseReason {
         protected static class Codes {
@@ -61,12 +58,14 @@ public class ChatServerEndpoint implements ApplicationContextAware {
 
         User user = userService.getUserByToken(param);
         if (user != null) {
-            userId = user.getUserId();
-            serverId = Integer.parseInt(param1);
+            int userId = user.getUserId();
+            int serverId = Integer.parseInt(param1);
             Identity identity = chatServerService.getUserIdentityOfServer(serverId, userId);
 
-            if ( identity != null)
-                connections.add(session);
+            if ( identity.getIndex() >= 0 ) {
+                connections.put(session, serverId);
+                System.out.println("user " + userId + " connected to server " + serverId);
+            }
             else session.close(ServerCloseReason.NOT_ALLOWED);
 
         } else session.close(ServerCloseReason.UNAUTHORIZED);
@@ -76,13 +75,13 @@ public class ChatServerEndpoint implements ApplicationContextAware {
         this.objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
         );
-        System.out.println("user " + userId + " connected to server " + serverId);
     }
 
-    private void broadcast(String str) {
-        for (Session client : connections) {
-            send(str, client);
-        }
+    private void broadcast(int serverId, String str) {
+        connections.forEach( (session, sid) -> {
+            if (sid == serverId)
+                send(str, session);
+        } );
     }
 
     private void send(String str, Session client) {
@@ -94,7 +93,7 @@ public class ChatServerEndpoint implements ApplicationContextAware {
     }
 
     @OnMessage
-    public void onMessage(String s, boolean b) throws JsonProcessingException {
+    public void onMessage(Session session, String s, @PathParam("Token") String token, @PathParam("serverId") int serverId) throws JsonProcessingException {
         System.out.println(s);
         HashMap<String, String> json = objectMapper.readValue(s, new TypeReference<>() {
         });
@@ -106,7 +105,7 @@ public class ChatServerEndpoint implements ApplicationContextAware {
 
         Message msg = new Message(
                     json.get("text"),
-                    this.userId,
+                    userService.getUserByToken(token).getUserId(),
                     channel,
                     "",
                     Timestamp.from(Instant.now()),
@@ -117,18 +116,18 @@ public class ChatServerEndpoint implements ApplicationContextAware {
 //        String msgStr = String.format("{\"type\":\"chat\",\"text\":\"%s\",\"user\":\"%s\",\"date\":\"%s\" }", s, this.userId, new Date().getTime());
         String msgStr = objectMapper.writeValueAsString(msg);
         System.out.println(msgStr);
-        broadcast(msgStr);
+        broadcast(serverId, msgStr);
     }
 
     @OnError
-    public void onError(Session session, Throwable cause) throws IOException {
+    public void onError(Session session, @PathParam("serverId") int serverId, Throwable cause) throws IOException {
         System.out.println(cause.getMessage());
         connections.remove(session);
         session.close();
     }
 
     @OnClose
-    public void onClose(Session session, CloseReason reason) throws IOException {
+    public void onClose(Session session, @PathParam("serverId") int serverId, CloseReason reason) throws IOException {
         System.out.println("connection closed, reason:" + reason.getReasonPhrase());
         connections.remove(session);
         session.close();

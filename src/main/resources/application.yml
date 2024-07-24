@@ -18,6 +18,7 @@ spring:
         - classpath:/static/
         - classpath:/public/
         - file:${dayp308.chatroom.fileStorePath}
+        - file:${dayp308.chatroom.resourcePath}
 
 mybatis:
   type-aliases-package: 'dayp308.chatroom.bean'

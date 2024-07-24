@@ -1,7 +1,6 @@
 package dayp308.chatroom.service;
 
 import dayp308.chatroom.bean.*;
-import org.apache.catalina.Server;
 import org.apache.commons.io.FilenameUtils;
 
 import dayp308.chatroom.mapper.ChatServerMapper;
@@ -32,7 +31,10 @@ public class FileService {
 	private final ServerFileMapper serverFileMapper;
 
 	@Value("${dayp308.chatroom.fileStorePath}")
-	private String path;
+	private String filePath;
+
+	@Value("${dayp308.chatroom.resourcePath}")
+	private String resourcePath;
 
 	@Autowired
 	public FileService(ChatServerMapper chatServerMapper, MessageMapper messageMapper, ServerFileMapper serverFileMapper) {
@@ -42,40 +44,58 @@ public class FileService {
 		this.dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
 	}
 //	FIXME: 设置异常回退机制
-public String uploadFile(MultipartFile file, int userId, int serverId) throws FileUploadException{
-	if (file.isEmpty())
-		throw new FileUploadException("empty file is not allowed.");
-	String fileName = file.getOriginalFilename();
-	String baseName = FilenameUtils.getBaseName(fileName);
-	String extension = FilenameUtils.getExtension(fileName);
-	String md5 = FileUtil.getMD5(file);
-	Date uploadDate = new Date();
-	String storeName = this.dateFormat.format(uploadDate) + "_" + md5;
-	ServerFile savedFile = new ServerFile(baseName, storeName, md5, userId, extension, uploadDate, serverId);
-	try {
-		InputStream stream = file.getInputStream();
-		File fileDir = new File(path + File.separator + serverId + File.separator);
-		if (!fileDir.exists())
-			fileDir.mkdirs();
-		this.serverFileMapper.addFile(savedFile);
-		Files.copy(stream, Paths.get(path, serverId + "", storeName + "." + extension), StandardCopyOption.REPLACE_EXISTING);
-		return storeName + "." + extension;
-	} catch (Exception e) {
-		e.printStackTrace();
-		if (savedFile.getFileId() != null)
-			this.serverFileMapper.deleteFile(savedFile.getFileId());
-		throw new FileUploadException(e.getMessage(), e);
+	public String uploadFile(MultipartFile file, int userId, int serverId) throws FileUploadException {
+		if (file.isEmpty())
+			throw new FileUploadException("empty file is not allowed.");
+		String fileName = file.getOriginalFilename();
+		String baseName = FilenameUtils.getBaseName(fileName);
+		String extension = FilenameUtils.getExtension(fileName);
+		String md5 = FileUtil.getMD5(file);
+		Date uploadDate = new Date();
+		String storeName = this.dateFormat.format(uploadDate) + "_" + md5;
+		ServerFile savedFile = new ServerFile(baseName, storeName, md5, userId, extension, uploadDate, serverId);
+		try {
+			InputStream stream = file.getInputStream();
+			File fileDir = new File(filePath + File.separator + serverId + File.separator);
+			if (!fileDir.exists())
+				fileDir.mkdirs();
+			this.serverFileMapper.addFile(savedFile);
+			Files.copy(stream, Paths.get(filePath, serverId + "", storeName + "." + extension), StandardCopyOption.REPLACE_EXISTING);
+			return storeName + "." + extension;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (savedFile.getFileId() != null)
+				this.serverFileMapper.deleteFile(savedFile.getFileId());
+			throw new FileUploadException(e.getMessage(), e);
+		}
 	}
-}
 
+	public String uploadImage(MultipartFile imageFile) throws FileUploadException {
+		if (imageFile.isEmpty())
+			throw new FileUploadException("empty file is not allowed.");
+		String fileName = imageFile.getOriginalFilename();
+		String extension = FilenameUtils.getExtension(fileName);
+		String storeName = FileUtil.getMD5(imageFile) + "." + extension;
+		try {
+			InputStream stream = imageFile.getInputStream();
+			File fileDir = new File(resourcePath + File.separator + "images" );
+			if (!fileDir.exists())
+				fileDir.mkdirs();
+			Files.copy(stream, Paths.get(resourcePath, "images", storeName), StandardCopyOption.REPLACE_EXISTING);
+			return "/images/" + storeName;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FileUploadException(e.getMessage(), e);
+		}
+	}
 	public File getFile(ServerFile serverFile) {
-		return new File(path + File.separator + serverFile.getServerId()+"", serverFile.getStoreName() + "." + serverFile.getExtension());
+		return new File(filePath + File.separator + serverFile.getServerId()+"", serverFile.getStoreName() + "." + serverFile.getExtension());
 	}
 
 	public void deleteFile(int fileId) throws IOException {
 		ServerFile file = getFileById(fileId);
 		this.serverFileMapper.deleteFile(fileId);
-		Files.deleteIfExists(Paths.get(path, file.getServerId()+"", file.getStoreName()+"."+file.getExtension()));
+		Files.deleteIfExists(Paths.get(filePath, file.getServerId()+"", file.getStoreName()+"."+file.getExtension()));
 	}
 
 	public List<ServerFile> getFilesInServer(int serverId) {
