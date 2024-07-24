@@ -19,7 +19,7 @@
 	    <%
 	        request.setCharacterEncoding("utf-8");
 	        response.setCharacterEncoding("utf-8");
-	        Object attrUser = session.getAttribute("user");
+	  Object attrUser = session.getAttribute("user");
 	        User user = null;
 	        if (attrUser instanceof User) {
 	            user = (User) attrUser;
@@ -33,6 +33,7 @@
 			const token = "<%=user.getToken()%>"
 			const channelList = <%=request.getAttribute("channelList")%>
 			const server = <%=request.getAttribute("serverId")%>;
+			const memberMap = <%=request.getAttribute("memberMap")%>
 		</script>
 	</head>
 	<body>
@@ -48,7 +49,7 @@
 <%--		<script src="<c:url value="/static/js/chat-main.js"/>" type="module"></script>--%>
 		<script type="module">
 			import axios from 'axios';
-			import { createApp } from 'vue';
+			import { createApp, computed } from 'vue';
 			import MainComponent from 'main-component'
 
 			const main = MainComponent;
@@ -58,10 +59,20 @@
 					this.channels.set(e.id, e.name);
 					this.cachedInputs.set(e.id, "")
 				})
+				memberMap.forEach(e => {
+					this.members.set(e.userId, {
+						"username": e.username,
+						"avatar": e.avatar,
+						"identity": e.identity,
+						"nickname": e.nickname
+					})
+				})
 				this.activeChannel = channelList[0].id;
 				this.cachedInput = [this.cachedInputs.values()];
+				console.log("channels:")
 				console.log(this.channels);
-				console.log(this.cachedInput);
+				console.log("members:")
+				console.log(this.members)
 				console.log("app successfully created");
 			}
 			main.mounted = function() {

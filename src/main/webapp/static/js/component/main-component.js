@@ -1,21 +1,28 @@
 import MessageWindow from "./message-window.js";
+import { computed } from 'vue'
 
 export default {
     components: {
         MessageWindow
     },
     data() {
-    return {
-        username: username,
-        avatar: avatar,
-        activeChannel: null,
-        channels: new Map(),
-        cachedInputs: new Map(),
-        cachedInput: "",
-        url: null,
-        ws: null
-    }
-},
+		return {
+			username: username,
+			avatar: avatar,
+			activeChannel: null,
+			channels: new Map(),
+			cachedInputs: new Map(),
+			members: new Map(),
+			cachedInput: "",
+			url: null,
+			ws: null
+		}
+	},
+	provide() {
+		return {
+			members: computed( () => this.members )
+		}
+	},
     computed: {
         userAvatarStyle() {
             return {

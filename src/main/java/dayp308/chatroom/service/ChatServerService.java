@@ -90,4 +90,9 @@ public class ChatServerService implements IChatServerService{
         PageHelper.clearPage();
         return pageInfo;
     }
+	@Override
+	public List<ServerMember> getAllMembersInServer(int serverId) {
+		List<ServerMember> list = chatServerMapper.getAllUsersInServer(serverId);
+		return list;
+	}
 }

@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.List;
 
 import java.io.IOException;
 
@@ -23,10 +26,12 @@ import java.io.IOException;
 public class ChatServerController {
     private final UserService userService;
     private final ChatServerService chatServerService;
+	private ObjectMapper objectMapper;
 
     @Autowired
     public ChatServerController(UserService userService, ChatServerService chatServerService) {
         this.userService = userService;
+		this.objectMapper = new ObjectMapper();
         this.chatServerService = chatServerService;
     }
 
@@ -63,28 +68,30 @@ public class ChatServerController {
         resp.sendRedirect("/list_users?serverId=" + serverId);
     }
 
-    @PostMapping(value = "/get_username", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/get_member", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String getUname(@RequestParam("userId") Integer userId, @RequestParam("serverId") Integer serverId) {
+    public String getMember(@RequestParam("userId") Integer userId, @RequestParam("serverId") Integer serverId) throws JsonProcessingException {
 		ServerMember memberMap = chatServerService.getServerMemberById(serverId, userId);
         if ( memberMap != null )
-            return "{\"userId\":" + memberMap.getUser().getUserId() +
-		    	",\"nickname\":\"" + ( memberMap.getNickname() == null || memberMap.getNickname().isBlank() ? memberMap.getUser().getUsername() : memberMap.getNickname() ) +
-			    "\",\"avatar\":\"" + memberMap.getUser().getAvatar() +
-			    "\",\"identity\":\"" + memberMap.getIdentity().getName() + "\"}";
+			return objectMapper.writeValueAsString(memberMap);
         else {
             User user = userService.getUserById(userId);
-            if ( user != null)
-                return "{\"userId\":" + user.getUserId() +
-                        ",\"nickname\":\"" + user.getUsername() +
-                        "\",\"avatar\":\"" + user.getAvatar() +
-                        "\",\"identity\":\"" + Identity.NON_MEMBER.getName() + "\"}";
-            else return "{\"userId\":" + 0 +
-                    ",\"nickname\":\"" + "ghost" +
-                    "\",\"avatar\":" + "null" +
-                    ",\"identity\":\"" + Identity.NON_MEMBER.getName() + "\"}";
-        }
+            if ( user != null) {
+				memberMap = ServerMember.nonMember(user);
+			}
+            else {
+				memberMap = ServerMember.nonMember(User.ghost());
+			}
+		}
+		return objectMapper.writeValueAsString(memberMap);
     }
+
+	@PostMapping(value = "/get_member_map", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public String getMemberMap(@RequestParam("serverId") int serverId) throws JsonProcessingException {
+		List<ServerMember> memberMapList = chatServerService.getAllMembersInServer(serverId);
+		return objectMapper.writeValueAsString(memberMapList);
+	}
 
     @RequestMapping(value = "/list_users")
     public String toList(@RequestParam(name = "page", defaultValue = "1") @Nullable Integer page,

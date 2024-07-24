@@ -20,4 +20,5 @@ public interface IChatServerService {
     public void updateUserIdentity(int id, int user_id, Identity identity, String nickname);
     public PageInfo<ServerMember> getPagedUsers(Integer page, Integer serverId);
     public PageInfo<ServerMember> searchUserByText(Integer page, String text, Integer serverId);
+	public List<ServerMember> getAllMembersInServer(int serverId);
 }

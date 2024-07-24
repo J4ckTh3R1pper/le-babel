@@ -1,8 +1,10 @@
 package dayp308.chatroom.bean;
 
-import org.springframework.stereotype.Component;
+import dayp308.chatroom.configuration.IdentitySerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 // @Component
+@JsonSerialize(using = IdentitySerializer.class)
 public enum Identity {
 	NON_MEMBER("non_member", -1),
 	MEMBER("member", 0),

@@ -1,14 +1,23 @@
 package dayp308.chatroom.bean;
 
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import java.io.Serializable;
 @Component
 public class ServerMember implements Serializable {
+	@JsonUnwrapped
     private User user;
     private Identity identity;
     private String nickname;
 
+		
+	public static ServerMember nonMember(User user) {
+		ServerMember member = new ServerMember();
+		member.user = user;
+		member.identity = Identity.NON_MEMBER;
+		return member;
+	}
     public ServerMember() {
     }
 
@@ -43,10 +52,12 @@ public class ServerMember implements Serializable {
 
     @Override
     public String toString() {
-        return "ServerMember{" +
-                "user=" + user.getUserId() +
-                ", identity=" + identity +
-                ", nickname='" + nickname + '\'' +
-                '}';
+        return "{" +
+                "\"userId\":" + user.getUserId() +
+                ", \"username\":\"" + user.getUsername() +
+                "\", \"avatar\":\"" + user.getAvatar() +
+                "\", \"identity\":\"" + identity.getName() +
+                "\", \"nickname\":\"" + nickname + "\"" +
+                "}";
     }
 }

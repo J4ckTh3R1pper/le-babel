@@ -1,8 +1,10 @@
 import axios from 'axios'
 import Message from './message.js'
+
 export default {
 	expose: ['showUsrText', 'channelId'],
 	props: ['channelId', 'channelName'],
+	inject: ['members'],
 	components: {
 		Message
 	},
@@ -21,39 +23,40 @@ export default {
 		}
 	},
 	methods: {
-		showUsrText(message) {
-			axios.post("/get_username", {
+		async showUsrText(message) {
+			let member;
+			function setMember(e) { member = e; }
+			if (!this.members.has(message.owner)) {
+				let response = await axios.post("/get_member", {
 					userId: message.owner,
 					serverId: this.serverId
-				}, {
-					headers: {
+				}, { headers: {
 						'Content-Type': 'multipart/form-data'
 					}
-				}
-			).then( (resp) => {
-				console.log(resp.data);
-				let avatar = resp.data.avatar ? resp.data.avatar : ( "/static/img/default_avatar.png" )
-				let date = this.dateFmt.format(message.date)
-				this.messages.push({
-					"ind": message.ind,
-					"type": message.type,
-					"owner": resp.data.userId,
-					"avatar": avatar,
-					"date": date,
-					"identity": resp.data.identity,
-					"nickname": resp.data.nickname,
-					"msgText": message.text
 				})
-			}).catch( (error) => {
-				console.log(error);
+				member = response.data
+			}
+			else setMember(this.members.get(message.owner))
+			let date = this.dateFmt.format(message.date)
+			let avatar = member.avatar ? member.avatar : ( "/static/img/default_avatar.png" )
+			this.messages.push({
+				"ind": message.ind,
+				"type": message.type,
+				"owner": message.owner,
+				"avatar": avatar,
+				"date": date,
+				"identity": member.identity,
+				"nickname": member.nickname ? member.nickname : member.username,
+				"msgText": message.text
 			})
 		},
 		//TODO: 根据ind而不是timestamp来检索历史消息
 		//TODO: 缓存最后消息的ind用于刷新后检索历史消息
-        getHistory() {
+        async getHistory() {
+			let history = [];
             console.log(this.timestamp);
 			console.log(this.historyIndex);
-            axios.post("/get_last_messages",
+            let response = await axios.post("/get_last_messages",
                 {   channelId: this.channelId,
 					timestamp: !this.historyIndex ? this.timestamp : null,
 					index: this.historyIndex
@@ -62,18 +65,26 @@ export default {
 						'Content-Type': 'multipart/form-data'
 					}
 				}
-            ).then(resp => {
-                // console.log(data);
-                // console.log("current timestamp is: " + this.timestamp);
-                resp.data.forEach( msg => this.showUsrText(msg) );
+            )
+			history = response.data;
+			// history.forEach(e => this.showUsrText(e));
+			let iter = history.entries();
+			let result = iter.next();
+			try {
+				while (!result.done) {
+					console.log(result.value[1])
+					await this.showUsrText(result.value[1]);
+					result = iter.next();
+				}
+			} catch (e) { console.log("error: " + e); }
+			finally {
+				if (result.done) 
+					this.historyIndex = history.at(-1).ind;
+				else 
+					this.historyIndex = result.value[1].ind;
+				console.log("historyIndex changed to: " + this.historyIndex);
 
-                if (resp.data.at(-1)) {
-                    this.historyIndex = resp.data.at(-1).ind;
-                    console.log("historyIndex changed to: " + this.historyIndex);
-                }
-            }).catch(error => {
-                console.log("error data: " + error);
-            })
+			}
         },
 		goTop() {
 			this.$refs['msgWindow'].scrollTop = 0;
@@ -86,7 +97,7 @@ export default {
 	},
 	template: `
 		<div class="header">{{channelName}}</div>
-		<div class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up"></i></div>
+		<div class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up">获取历史记录</i></div>
 		<ul class="messages" ref="msgWindow">
 			<Message
 				v-for="msg in sortedMessages"

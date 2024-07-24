@@ -1,11 +1,13 @@
 package dayp308.chatroom.bean;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Component
 public class User implements Serializable {
     private Integer userId;
@@ -16,6 +18,13 @@ public class User implements Serializable {
     private String password;
     private String avatar;
     private String token;
+
+	public static User ghost() {
+		User ghostUser = new User();
+		ghostUser.userId = 0;
+		ghostUser.username = "ghost";
+		return ghostUser;
+	}
 
     public Integer getUserId() {
         return userId;

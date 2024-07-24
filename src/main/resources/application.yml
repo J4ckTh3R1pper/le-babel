@@ -7,6 +7,17 @@ spring:
     view:
       prefix: '/WEB-INF/jsp/'
       suffix: '.jsp'
+  servlet:
+    multipart:
+      max-file-size: 128MB
+  web:
+    resources:
+      static-locations:
+        - classpath:/META-INF/resources/
+        - classpath:/resources/
+        - classpath:/static/
+        - classpath:/public/
+        - file:${dayp308.chatroom.fileStorePath}
 
 mybatis:
   type-aliases-package: 'dayp308.chatroom.bean'
