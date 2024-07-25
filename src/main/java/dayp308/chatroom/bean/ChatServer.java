@@ -3,8 +3,10 @@ package dayp308.chatroom.bean;
 import java.util.HashMap;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.stereotype.Component;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Component
 public class ChatServer {
     private int id;
@@ -12,18 +14,18 @@ public class ChatServer {
     private String avatar;
     private String description;
     private String banner;
-	
-	private HashMap<Integer, Identity> memberMap;
+
+    private List<ServerMember> memberList;
 	private List<Channel> channelList;
 
-	public HashMap<Integer, Identity> getMemberMap() {
-		return this.memberMap;
-	}
+    public List<ServerMember> getMemberList() {
+        return memberList;
+    }
 
-	public void setMemberMap(HashMap<Integer, Identity> memberMap) {
-		this.memberMap = memberMap;
-	}
-	
+    public void setMemberList(List<ServerMember> memberList) {
+        this.memberList = memberList;
+    }
+
 	public List<Channel> getChannelList() {
 		return this.channelList;
 	}

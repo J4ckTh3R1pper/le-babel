@@ -7,8 +7,13 @@ export default {
     },
     data() {
 		return {
-			username: username,
-			avatar: avatar,
+            serverInfo: {
+            },
+            isMounted: false,
+            inputHeight: "42px",
+            permission: 0,
+			username: "",
+			avatar: "",
 			activeChannel: null,
 			channels: new Map(),
 			cachedInputs: new Map(),
@@ -20,13 +25,20 @@ export default {
 	},
 	provide() {
 		return {
-			members: computed( () => this.members )
+            serverId: computed( () => this.serverInfo['id'] ),
+			members: computed( () => this.members ),
+            permission: computed( () => this.permission )
 		}
 	},
     computed: {
         userAvatarStyle() {
             return {
                 "background-image": "url(\"" + this.avatar + "\")"
+            }
+        },
+        inputBoxStyle() {
+            return {
+                "height" : this.inputHeight
             }
         }
     },
@@ -54,6 +66,9 @@ export default {
                 window.location = "/login"
             }
         },
+        updateInputHeight() {
+            this.inputHeight = this.$refs['inputBar'].scrollHeight + "px";
+        },
         setActive(id) {
             this.activeChannel = id;
         },
@@ -64,7 +79,7 @@ export default {
                 text: text,
                 file:"",
                 channel: this.activeChannel,
-                server: server
+                server: server['id']
             });
             if (text !== "") {
                 // console.log(text);
@@ -74,13 +89,20 @@ export default {
             }
             else alert("文本不能为空！");
         },
+        goToUrl(url) {
+            window.location.href = url
+        }
     },
     template: `
 		<div class="sidebar">
             <!--TODO: 获取服务器名-->
-			<div class="header">这是服务器名字</div>
+			<div class="header" @click="goToUrl('/manage_server?serverId=' + serverInfo.id )">
+			    <img v-if="serverInfo.avatar" :src="serverInfo.avatar" class="avatar">
+			    {{serverInfo.name}}
+			</div>
             <!--TODO: 获取频道列表-->
 			<div class="channel-list">
+			<img v-if="serverInfo.banner" :src="serverInfo.banner">
 				<div v-for="[key, value] in channels"
 				     :class="'channel ' + (key == this.activeChannel ? 'active' : '')"
 				     :key="key"
@@ -90,7 +112,7 @@ export default {
 				</div>
 			</div>
 			<div class="user-console">
-				<div class="user-card">
+				<div class="user-card" @click="goToUrl('/edit_user')">
 					<div class="avatar" :style="userAvatarStyle"></div>
 					<div class="user-name">
 						<div class="nickname" v-text="username"></div>
@@ -101,6 +123,7 @@ export default {
 			</div>
 		</div>
 		<div class="chat-area">
+		    <div class="header">{{channels.get(activeChannel)}}</div>
 		    <div v-for="[key, value] in channels" v-show="activeChannel == key" class="msg-component">
 	    	        <MessageWindow
 	    	            ref="msgWindows"
@@ -110,8 +133,7 @@ export default {
 	    		    </MessageWindow>
 		    </div>
 		    <div class="footer">
-			    <div class="input-bar">
-			    <!--TODO:为输入框占位符匹配频道名-->
+			    <div class="input-bar" :style="inputBoxStyle">
 				    <textarea
 				        @keyup.enter.prevent="submitText"
 				        ref="inputBar"
@@ -119,6 +141,8 @@ export default {
 				        id="input-text" 
 				        v-model="cachedInput"
 				        :placeholder="'给 #' + channels.get(activeChannel) + ' 发消息'"
+				        :style="inputBoxStyle"
+				        @change="updateInputHeight"
 				    >
 				    </textarea>
 			    </div>

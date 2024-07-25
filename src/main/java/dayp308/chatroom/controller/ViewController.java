@@ -1,6 +1,7 @@
 package dayp308.chatroom.controller;
 
 import dayp308.chatroom.bean.Channel;
+import dayp308.chatroom.bean.ChatServer;
 import dayp308.chatroom.bean.ServerFile;
 import dayp308.chatroom.bean.User;
 import dayp308.chatroom.service.ChannelService;
@@ -43,14 +44,13 @@ public class ViewController {
     public String chatView(@RequestParam("serverId") String serverId , ModelMap modelMap, HttpServletRequest request) throws JsonProcessingException {
         int sid = Integer.parseInt(serverId);
         User user = (User) (request.getSession().getAttribute("user"));
-        if ( chatServerService.getUserIdentityOfServer(sid, user.getUserId()).getIndex() < 0  ) {
-            return "index";
-        }
+        int identity = chatServerService.getUserIdentityOfServer(sid, user.getUserId()).getIndex();
+        if ( identity < 0  ) return "index";
 
-        List<Channel> channelList = channelService.getChannelList(sid);
-        modelMap.addAttribute("channelList", channelList);
+        ChatServer server = chatServerService.getServerById(sid, true);
+        modelMap.addAttribute("permission", identity);
+        modelMap.addAttribute("serverInfo", objectMapper.writeValueAsString(server));
         modelMap.addAttribute("serverId", sid);
-		modelMap.addAttribute("memberMap", objectMapper.writeValueAsString(chatServerService.getAllMembersInServer(sid)));
         return "chat";
     }
 
@@ -61,7 +61,7 @@ public class ViewController {
         if (chatServerService.getUserIdentityOfServer(sid, user.getUserId()).getIndex() < 0)
             return "index";
         List<ServerFile> serverFiles = fileService.getFilesInServer(sid);
-        modelMap.addAttribute("fileList", objectMapper.writeValueAsString(serverFiles));
+        modelMap.addAttribute("filePage", objectMapper.writeValueAsString(serverFiles));
         modelMap.addAttribute("serverId", sid);
         return "uploadtest";
     }

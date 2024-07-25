@@ -9,6 +9,6 @@ import java.io.IOException;
 public class IdentitySerializer extends JsonSerializer<Identity> {
 	@Override
 	public void serialize(Identity value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-		gen.writeString(value.getName());
+		gen.writeString(value.getIndex() + "");
 	}
 }

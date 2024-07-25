@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.Date;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Component
 public class User implements Serializable {
     private Integer userId;

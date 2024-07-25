@@ -36,7 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/webapp/static/.sass-cache/
-/src/main/webapp/static/css/chat.css
-/src/main/webapp/static/css/chat.css.map
-/src/main/webapp/static/css/login.css
-/src/main/webapp/static/css/login.css.map
+/src/main/webapp/static/css/*.css

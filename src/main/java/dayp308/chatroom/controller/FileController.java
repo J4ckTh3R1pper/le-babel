@@ -1,5 +1,6 @@
 package dayp308.chatroom.controller;
 
+import com.github.pagehelper.PageInfo;
 import dayp308.chatroom.bean.Identity;
 import dayp308.chatroom.bean.ServerFile;
 import dayp308.chatroom.bean.ServerMember;
@@ -31,12 +32,14 @@ public class FileController {
 	private final UserService userService;
 	private final ChatServerService chatServerService;
 	private final FileService fileService;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
 	public FileController(UserService userService, ChatServerService chatServerService, FileService fileService) {
 		this.userService = userService;
 		this.chatServerService = chatServerService;
 		this.fileService = fileService;
+		this.objectMapper = new ObjectMapper();
 	}
 
 	@PostMapping(value = "/upload_file", produces = "application/json;charset=UTF-8")
@@ -56,6 +59,18 @@ public class FileController {
 			str = "{code: 500, message: \"" + e.getMessage() + "\"}";
 		}
 		return str;
+	}
+
+	@GetMapping(value = "/list_files", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public String getFileList(@RequestParam("serverId") int serverId, @Nullable @RequestParam("page") Integer page, @Nullable @RequestParam("keyword") String keyword) throws JsonProcessingException {
+		PageInfo<ServerFile> pageInfo;
+		if (keyword == null || keyword.isEmpty())
+			pageInfo = this.fileService.getPagedFiles(serverId);
+		else pageInfo = this.fileService.getPagedFilesByKeyword(serverId, keyword);
+		if (page != null)
+			pageInfo.setPageNum(page);
+		return this.objectMapper.writeValueAsString(pageInfo);
 	}
 
 	@GetMapping("/download")

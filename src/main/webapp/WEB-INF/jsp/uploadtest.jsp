@@ -37,82 +37,32 @@
     </style>
   </head>
   <body>
-    <div id="app">
-        <input type="file" ref="input">
-        <button @click="upload">上传</button>
-        <table id="list-files">
-            <tr>
-                <th>文件名</th>
-                <th>上传日期</th>
-                <th>上传者ID</th>
-                <th>操作</th>
-            </tr>
-            <template v-for="file in files" :key="file.fileId">
-                <tr>
-                    <td>{{file.fileName}}</td>
-                    <td>{{file.uploadDate}}</td>
-                    <td>{{file.userId}}</td>
-                    <td>
-                        <button @click="download(file.fileId)">下载</button>
-                    </td>
-                </tr>
-            </template>
-        </table>
-    </div>
+    <div id="app"></div>
     <script type="importmap">
 	  {  "imports": {
 		   "vue": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/vue.esm-browser.js",
 		   "axios": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/axios.esm.min.js",
-		   "main-component": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/component/main-component.js"
+		   "file-manager": "${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}/static/js/component/file-manager.js"
 	     }
 	  }
 	</script>
     <script type="module">
         import {createApp} from "vue"
         import axios from "axios"
+        import fileManager from "file-manager";
         const serverId = <%=request.getAttribute("serverId")%>
-        const fileList = eval(<%=request.getAttribute("fileList")%>);
-        const mainComponent = {
-            data() {
-                return {
-                    serverId: serverId,
-                    files: fileList
+        const main = fileManager;
+        main.created = function () {
+            this.serverId = serverId;
+            axios.get("/list_files", {
+                params: {
+                    serverId: this.serverId,
                 }
-            },
-            mounted() {
-              console.log(this.files);
-            },
-            methods: {
-                download(fileId) {
-                    window.open("/download?fileId=" + fileId);
-                },
-                async upload() {
-                    if (!this.$refs['input'].files)
-                        return;
-                    const data = new FormData();
-                    data.append("file", this.$refs['input'].files[0]);
-                    data.append("serverId", this.serverId);
-                    let resp;
-                    try {
-                        resp = await axios.post("/upload_file", data, {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data'
-                                },
-                                transformRequest: [function (data, headers) {
-                                    console.log(headers)
-                                    return data;
-                                }]
-                        })
-                    } catch (e) {
-                        console.log(e);
-                    }
-                    finally {
-                        console.log(resp);
-                    }
-                }
-            }
+            }).then(resp => {
+                this.filePage = resp.data;
+            })
         }
-        const app = createApp(mainComponent);
+        const app = createApp(main);
         app.mount("#app")
     </script>
   </body>

@@ -27,6 +27,7 @@ import java.util.List;
 class ChatSpringbootApplicationTests {
 
     private final ChatServerService chatServerService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final MessageService messageService;
 
     private final UserService userService;
@@ -36,6 +37,10 @@ class ChatSpringbootApplicationTests {
         this.chatServerService = chatServerService;
         this.messageService = messageService;
         this.userService = userService;
+    }
+    @Test
+    void testChatServer() throws JsonProcessingException {
+        System.out.println(this.objectMapper.writeValueAsString(this.chatServerService.getServerById(1, true)));
     }
     @Test
     void addServer() {

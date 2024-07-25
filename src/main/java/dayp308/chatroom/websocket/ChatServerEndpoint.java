@@ -93,11 +93,16 @@ public class ChatServerEndpoint implements ApplicationContextAware {
     }
 
     @OnMessage
-    public void onMessage(Session session, String s, @PathParam("Token") String token, @PathParam("serverId") int serverId) throws JsonProcessingException {
+    public void onMessage(Session session, String s, @PathParam("Token") String token, @PathParam("serverId") int serverId) throws IOException {
         System.out.println(s);
         HashMap<String, String> json = objectMapper.readValue(s, new TypeReference<>() {
         });
         System.out.println(json);
+        if ( this.chatServerService.getUserIdentityOfServer(serverId,
+                this.userService.getUserByToken(token).getUserId()).getIndex() < 0 ) {
+            connections.remove(session);
+            session.close(ServerCloseReason.UNAUTHORIZED);
+        }
         int channel = Integer.parseInt(json.get("channel"));
         Channel ch = channelService.findChannelInServer(channel, serverId);
         if ( ch == null )

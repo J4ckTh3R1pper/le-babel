@@ -42,6 +42,7 @@ public class UserController {
     @ResponseBody
     public String addUser(@RequestBody User newUser) {
         if (userService.addUser(newUser)) {
+            chatServerService.addUser(1, newUser.getUserId());
             return "login";
         }
         else return "reg_failed";
@@ -87,18 +88,43 @@ public class UserController {
             user = new User();
             user.setAvatar(url);
             update = this.userService.updateUserById(userId, user);
-            return "{status:\"success\", update:" + update + "}";
+            return "{\"updates\":" + update + "}";
         } catch (Exception e) {
-            return "{error: \"" + e.getMessage() +"\"";
+            return "{\"error\":\"" + e.getMessage() +"\"";
         }
     }
-    @PostMapping(value = "/edit_user/update_user")
+    @PostMapping(value = "/edit_user/update_user", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String updateUser(@RequestBody User user, HttpServletRequest req) {
-        System.out.println(user);
-        if (Objects.equals(((User) (req.getSession().getAttribute("user"))).getUserId(), user.getUserId()))
-            return "{status:\"success\", update:"+ userService.updateUserById(user.getUserId(), user) + "}";
-        else return "{status:\"operation not allowed\"}";
+    public String updateUser(
+            @RequestParam("userId") Integer userId,
+            @Nullable @RequestParam("oldPwd") String oldPwd,
+            @Nullable @RequestParam("password") String newPwd,
+            @Nullable @RequestParam("username") String username,
+            @Nullable @RequestParam("avatar") String avatar,
+            @Nullable @DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("birthday") Date birthday,
+            HttpServletRequest req,
+            HttpServletResponse resp) {
+        User user = new User();
+        if (Objects.equals(((User) (req.getSession().getAttribute("user"))).getUserId(), userId)) {
+            if ( username != null && !username.isBlank() )
+                user.setUsername(username);
+            if ( birthday != null )
+                user.setBirthday(birthday);
+            if ( avatar != null && !avatar.isBlank() )
+                user.setAvatar(avatar);
+            if ( newPwd != null && !newPwd.isBlank() ) {
+                if ( !userService.getUserById(userId).getPassword().equals(oldPwd) ) {
+                    resp.setStatus(401);
+                    return "{\"code\":401}";
+                }
+                user.setPassword(newPwd);
+            }
+            return "{code:\"200\", update:"+ userService.updateUserById(userId, user) + "}";
+        }
+        else {
+            resp.setStatus(403);
+            return "{\"code\":403}";
+        }
     }
 
 }

@@ -63,10 +63,8 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 			}
 			if (bl) {
 				loginUser.setPassword("");
-				session.setAttribute("user", null);
-				System.out.println(session.getAttribute("user"));
 				session.setAttribute("user", loginUser);
-				System.out.println(session.getAttribute("user"));
+//				System.out.println(session.getAttribute("user"));
 			} else resp.sendRedirect("/login");
 
         } catch (Exception e) {

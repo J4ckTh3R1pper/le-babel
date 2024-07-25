@@ -12,9 +12,9 @@ import java.util.List;
 public interface IChatServerService {
 
     public List<ChatServer> getServerByName(String keyword);
-    public ChatServer getServerById(int id);
+    public ChatServer getServerById(int id, boolean isFull);
     public void createServer(ChatServer server, int owner);
-    public void updateServerById(ChatServer server, int id);
+    public int updateServerById(ChatServer server, int id);
     public boolean addUser(int id, int user_id);
     public boolean removeUser(int id, int user_id);
     public void updateUserIdentity(int id, int user_id, Identity identity, String nickname);

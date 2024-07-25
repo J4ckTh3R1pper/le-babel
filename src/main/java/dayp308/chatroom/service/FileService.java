@@ -1,5 +1,7 @@
 package dayp308.chatroom.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import dayp308.chatroom.bean.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -20,6 +22,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +54,7 @@ public class FileService {
 		String baseName = FilenameUtils.getBaseName(fileName);
 		String extension = FilenameUtils.getExtension(fileName);
 		String md5 = FileUtil.getMD5(file);
-		Date uploadDate = new Date();
+		Date uploadDate = Date.from(Instant.now());
 		String storeName = this.dateFormat.format(uploadDate) + "_" + md5;
 		ServerFile savedFile = new ServerFile(baseName, storeName, md5, userId, extension, uploadDate, serverId);
 		try {
@@ -102,6 +105,21 @@ public class FileService {
 		return this.serverFileMapper.getAllFilesInServer(serverId);
 	}
 
+	public PageInfo<ServerFile> getPagedFiles(int serverId) {
+		PageHelper.startPage(1, 8);
+		List<ServerFile> fileList = getFilesInServer(serverId);
+		PageInfo<ServerFile> pageInfo = new PageInfo<>(fileList);
+		PageHelper.clearPage();
+		return pageInfo;
+	}
+
+	public PageInfo<ServerFile> getPagedFilesByKeyword(int serverId, String keyword) {
+		PageHelper.startPage(1, 8);
+		List<ServerFile> fileList = this.serverFileMapper.searchFileInServer(serverId, keyword);
+		PageInfo<ServerFile> pageInfo = new PageInfo<>(fileList);
+		PageHelper.clearPage();
+		return pageInfo;
+	}
 	public ServerFile getFileById(int fileId) {
 		return this.serverFileMapper.getFileById(fileId);
 	}

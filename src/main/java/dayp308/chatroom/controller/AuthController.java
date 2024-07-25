@@ -42,7 +42,7 @@ public class AuthController {
                     cookie.setMaxAge(24 * 60 * 60 * 7);
                     resp.addCookie(cookie);
                 }
-                resp.sendRedirect("/chat");
+                resp.sendRedirect("/chat?serverId=1");
             }
             else resp.sendRedirect("/login");
         } catch (Exception e) {

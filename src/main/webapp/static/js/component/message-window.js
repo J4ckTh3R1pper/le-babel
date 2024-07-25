@@ -4,7 +4,7 @@ import Message from './message.js'
 export default {
 	expose: ['showUsrText', 'channelId'],
 	props: ['channelId', 'channelName'],
-	inject: ['members'],
+	inject: ['members', 'serverId'],
 	components: {
 		Message
 	},
@@ -49,7 +49,6 @@ export default {
 				"msgText": message.text
 			})
 		},
-		//TODO: 根据ind而不是timestamp来检索历史消息
 		//TODO: 缓存最后消息的ind用于刷新后检索历史消息
         async getHistory() {
 			let history = [];
@@ -95,9 +94,8 @@ export default {
 
 	},
 	template: `
-		<div class="header">{{channelName}}</div>
-		<div class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up">获取历史记录</i></div>
 		<ul class="messages" ref="msgWindow">
+			<li class="get-history" @click="getHistory" ><i class="fa-solid fa-arrow-up">获取历史记录</i></li>
 			<Message
 				v-for="[key, value] in sortedMessages"
 				:key="key"

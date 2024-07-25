@@ -31,9 +31,7 @@
 			const userId = "<%=user.getUserId()%>" * 1;
 			const avatar = "<%=user.getAvatar()%>" ? "<%=user.getAvatar()%>" : ( self.location.host + "/static/img/default_avatar.png" );
 			const token = "<%=user.getToken()%>"
-			const channelList = <%=request.getAttribute("channelList")%>
-			const server = <%=request.getAttribute("serverId")%>;
-			const memberMap = <%=request.getAttribute("memberMap")%>
+			const server = <%=request.getAttribute("serverInfo")%>;
 		</script>
 	</head>
 	<body>
@@ -54,12 +52,12 @@
 
 			const main = MainComponent;
 			main.created = function () {
-				this.url = "ws://" + self.location.host + "/server/" + server + "/" + token;
-				channelList.forEach(e => {
-					this.channels.set(e.id, e.name);
-					this.cachedInputs.set(e.id, "")
+				this.url = "ws://" + self.location.host + "/server/" + server['id'] + "/" + token;
+				server['channelList'].forEach(e => {
+					this.channels.set(e['channelId'], e['channelName']);
+					this.cachedInputs.set(e['channelId'], "")
 				})
-				memberMap.forEach(e => {
+				server['memberList'].forEach(e => {
 					this.members.set(e.userId, {
 						"username": e.username,
 						"avatar": e.avatar,
@@ -67,7 +65,17 @@
 						"nickname": e.nickname
 					})
 				})
-				this.activeChannel = channelList[0].id;
+				this.serverInfo = {
+					id: server['id'],
+					name: server['name'],
+					avatar: server['avatar'],
+					description: server['description'],
+					banner: server['banner']
+				}
+				this.username = username;
+				this.avatar = avatar;
+				this.permission = <%=request.getAttribute("permission")%>
+				this.activeChannel = server.channelList[0].channelId;
 				this.cachedInput = [this.cachedInputs.values()];
 				console.log("channels:")
 				console.log(this.channels);
@@ -85,13 +93,13 @@
 							e.showUsrText(dataObj);
 					})
 				}
+				this.isMounted = true;
 				console.log("app successfully mounted");
 			}
 
 			const app = createApp(main)
 			app.config.globalProperties = {
 				dateFmt : new Intl.DateTimeFormat('zh-CN', {dateStyle: "short", timeStyle: "medium"}),
-				serverId: server,
 				userId: userId,
 			}
 

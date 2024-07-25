@@ -26,8 +26,11 @@ public class ChatServerService implements IChatServerService{
     }
 
     @Override
-    public ChatServer getServerById(int id) {
-        return this.chatServerMapper.getServerById(id);
+    public ChatServer getServerById(int id, boolean isFull) {
+        if ( isFull )
+            return this.chatServerMapper.getFullServerById(id);
+        else
+            return this.chatServerMapper.getServerById(id);
     }
 
     @Override
@@ -38,8 +41,8 @@ public class ChatServerService implements IChatServerService{
     }
 
     @Override
-    public void updateServerById(ChatServer server, int id) {
-        this.chatServerMapper.updateServerById(server, id);
+    public int updateServerById(ChatServer server, int id) {
+        return this.chatServerMapper.updateServerById(server, id);
     }
 
     @Override
