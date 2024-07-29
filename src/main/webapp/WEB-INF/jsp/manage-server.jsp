@@ -77,6 +77,7 @@
     serverInfoComponent.created = function() {
         this.serverInfo = serverInfo;
         this.token = token;
+        this.permission= permission;
         // this.updateInfo();
     }
 
@@ -93,12 +94,14 @@
 
     fileComponent.created = function () {
         this.serverId = serverInfo.id;
+        this.permission = permission;
         axios.get("/list_files", {
             params: {
                 serverId: this.serverId,
             }
         }).then(resp => {
             this.filePage = resp.data;
+            this.userId = userId;
             this.toPage = resp.data['pageNum'];
         })
     }

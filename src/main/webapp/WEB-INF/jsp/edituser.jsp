@@ -111,6 +111,7 @@
                             axios.get("get_user?userId=" + this.userData.userId)
                                 .then(e => {
                                     this.userData = e.data;
+                                    alert("个人信息更新成功！")
                                 })
                         }).catch( e => {
                             if (e.response) {

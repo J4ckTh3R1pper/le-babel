@@ -87,7 +87,7 @@ public class ChatServerController {
 
     @PostMapping(value = "/edit_server/update_banner")
     @ResponseBody
-    public String updateBanner(@RequestPart("image") MultipartFile imageFile, @RequestPart("serverId") int serverId, @RequestPart("token") String token, HttpServletResponse resp) {
+    public String updateBanner(@RequestParam("image") MultipartFile imageFile, @RequestParam("serverId") int serverId, @RequestParam("token") String token, HttpServletResponse resp) {
         Integer userId = userService.getUserByToken(token).getUserId();
         if ( userId == null )
             return "{message: \"invalid credential\"}";
@@ -135,7 +135,7 @@ public class ChatServerController {
         Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
         if ( selfIdentity.getIndex() < targetIdentity.getIndex() )
             return "{message: \"you are not allowed to perform this operation\"}";
-        else if ( selfIdentity == Identity.OWNER )
+        else if ( targetIdentity == Identity.OWNER )
             return "{message: \"you are not allowed to perform this operation\"}";
         else chatServerService.removeUser(serverId, userId);
             return "{message: \"operation successful\"}";
@@ -230,7 +230,7 @@ public class ChatServerController {
         User user = (User) req.getSession().getAttribute("user");
         Identity selfIdentity = chatServerService.getUserIdentityOfServer(serverId, user.getUserId());
         Identity targetIdentity = chatServerService.getUserIdentityOfServer(serverId, userId);
-        if ( selfIdentity.getIndex() > 0 && user.getUserId().equals(userId) || selfIdentity.getIndex() > targetIdentity.getIndex() ) {
+        if ( selfIdentity.getIndex() >= 0 && user.getUserId().equals(userId) || selfIdentity.getIndex() > targetIdentity.getIndex() ) {
             this.chatServerService.updateUserIdentity(serverId, userId, null, nickname);
             return "{message: \"operation successful\"}";
         }

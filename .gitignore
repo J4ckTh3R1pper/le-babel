@@ -36,4 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/webapp/static/.sass-cache/
-/src/main/webapp/static/css/*.css
+/src/main/webapp/static/css/

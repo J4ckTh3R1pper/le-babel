@@ -105,16 +105,16 @@ public class FileService {
 		return this.serverFileMapper.getAllFilesInServer(serverId);
 	}
 
-	public PageInfo<ServerFile> getPagedFiles(int serverId) {
-		PageHelper.startPage(1, 8);
+	public PageInfo<ServerFile> getPagedFiles(Integer page, int serverId) {
+		PageHelper.startPage(page, 8);
 		List<ServerFile> fileList = getFilesInServer(serverId);
 		PageInfo<ServerFile> pageInfo = new PageInfo<>(fileList);
 		PageHelper.clearPage();
 		return pageInfo;
 	}
 
-	public PageInfo<ServerFile> getPagedFilesByKeyword(int serverId, String keyword) {
-		PageHelper.startPage(1, 8);
+	public PageInfo<ServerFile> getPagedFilesByKeyword(Integer page, int serverId, String keyword) {
+		PageHelper.startPage(page, 8);
 		List<ServerFile> fileList = this.serverFileMapper.searchFileInServer(serverId, keyword);
 		PageInfo<ServerFile> pageInfo = new PageInfo<>(fileList);
 		PageHelper.clearPage();

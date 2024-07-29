@@ -63,14 +63,19 @@ public class FileController {
 
 	@GetMapping(value = "/list_files", produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public String getFileList(@RequestParam("serverId") int serverId, @Nullable @RequestParam("page") Integer page, @Nullable @RequestParam("keyword") String keyword) throws JsonProcessingException {
+	public String getFileList(@RequestParam("serverId") int serverId, @Nullable @RequestParam(value = "page", defaultValue = "1") Integer page, @Nullable @RequestParam("keyword") String keyword) throws JsonProcessingException {
 		PageInfo<ServerFile> pageInfo;
+		if (page == null)
+			page = 1;
 		if (keyword == null || keyword.isEmpty())
-			pageInfo = this.fileService.getPagedFiles(serverId);
-		else pageInfo = this.fileService.getPagedFilesByKeyword(serverId, keyword);
-		if (page != null)
-			pageInfo.setPageNum(page);
+			pageInfo = this.fileService.getPagedFiles(page, serverId);
+		else pageInfo = this.fileService.getPagedFilesByKeyword(page, serverId, keyword);
 		return this.objectMapper.writeValueAsString(pageInfo);
+	}
+
+	@GetMapping("delete_file")
+	public void deleteFile(@RequestParam("fileId") int fileId) throws IOException {
+		this.fileService.deleteFile(fileId);
 	}
 
 	@GetMapping("/download")
@@ -81,7 +86,7 @@ public class FileController {
 		response.setContentType("application/octet-stream");
 		response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
-				.filename(file.getName(), StandardCharsets.UTF_8)
+				.filename(serverFile.getFileName() + "." + serverFile.getExtension(), StandardCharsets.UTF_8)
 				.build().toString()
 		);
 		byte[] buffer = new byte[1024];

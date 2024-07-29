@@ -20,9 +20,9 @@ export default {
                     <td>{{user.identity == 2 ? "群主" : user.identity == 1 ? "管理员" : "普通用户"}}</td>
                     <td>{{user.nickname ? user.nickname : "无"}}</td>
                     <td>
-                        <button v-if="0 < permission < 2" @click="banishUser(user.userId)">踢出</button>
-                        <button v-if="permission > 1 && user.identity == 0 " @click="setAdmin(user.userId)">设为管理员</button>
-                        <button v-if="permission > 1 && user.identity == 1" @click="unSetAdmin(user.userId)">取消管理员</button>
+                        <button v-if="0 < permission && ( permission < 2 || userId != user.userId )" @click="banishUser(user.userId, user.username)">踢出</button>
+                        <button v-if="permission > 1 && user.identity == 0 " @click="setAdmin(user.userId, user.username)">设为管理员</button>
+                        <button v-if="permission > 1 && user.identity == 1" @click="unSetAdmin(user.userId, user.username)">取消管理员</button>
                         <button v-if="permission > 0 || user.userId == userId"
                                 @click="setupDialog(user.userId, user.username)"
                         >
@@ -76,15 +76,16 @@ export default {
                 this.loadUserList();
             })
         },
-        banishUser(userId) {
-            axios.get("/banish_user", {
-                params: {
-                    serverId: this.serverInfo['id'],
-                    userId: userId
-                }
-            }).then(resp => {
-                console.log(resp.data.message);
-                this.loadUserList();
+        banishUser(userId, username) {
+            if (confirm("确定要踢出用户" + username +"吗？"))
+                 axios.get("/banish_user", {
+					params: {
+						serverId: this.serverInfo['id'],
+						userId: userId
+					}
+                 }).then(resp => {
+                 console.log(resp.data);
+                 this.loadUserList();
             })
         },
         setNickname() {
@@ -100,26 +101,28 @@ export default {
             })
             this.closeDialog();
         },
-        setAdmin(userId) {
-            axios.get("/set_admin", {
-                params: {
-                    serverId: this.serverInfo['id'],
-                    userId: userId,
-                }
-            }).then(resp => {
-                console.log(resp.data.message);
-                this.loadUserList();
+        setAdmin(userId, username) {
+            if (confirm("确定要设置" + username + "为管理员吗？" ))
+				axios.get("/set_admin", {
+					params: {
+						serverId: this.serverInfo['id'],
+						userId: userId,
+					}
+				}).then(resp => {
+					console.log(resp.data.message);
+					this.loadUserList();
             })
         },
-        unSetAdmin(userId) {
-            axios.get("/unset_admin", {
-                params: {
-                    serverId: this.serverInfo['id'],
-                    userId: userId,
-                }
-            }).then(resp => {
-                console.log(resp.data.message);
-                this.loadUserList();
+        unSetAdmin(userId, username) {
+            if (confirm("确定要移除" + username + "的管理员权限吗？" ))
+				axios.get("/unset_admin", {
+					params: {
+						serverId: this.serverInfo['id'],
+						userId: userId,
+					}
+				}).then(resp => {
+					console.log(resp.data.message);
+					this.loadUserList();
             })
         },
         search() {

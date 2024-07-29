@@ -23,7 +23,7 @@ export default {
                     <td>{{file.userId}}</td>
                     <td>
                         <button @click="download(file.fileId)">下载</button>
-                        <button v-if="true">删除</button>
+                        <button v-if="permission > 0 || file.userId == userId" @click="deleteFile(file.fileId, file.fileName)">删除</button>
                     </td>
                 </tr>
             </template>
@@ -39,9 +39,11 @@ export default {
     `,
     data() {
         return {
+            userId: 0,
             serverId: 0,
             filePage: {list:[]},
             toPage: 1,
+            permission: -1,
             searchText: ""
         }
     },
@@ -78,8 +80,19 @@ export default {
                     keyword: this.searchText
                 }
             }).then(resp => {
+                console.log(resp)
                 this.filePage = resp.data;
                 this.toPage = resp.data['pageNum'];
+            })
+        },
+        deleteFile(id, fileName) {
+			if (confirm("确定要删除文件" + fileName +"吗？"))
+				axios.get("/delete_file", {
+					params: {
+						fileId: id
+					}
+				}).then(resp => {
+					this.loadFileList();
             })
         }
     }

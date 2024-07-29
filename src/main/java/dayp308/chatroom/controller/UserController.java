@@ -39,8 +39,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/add_user")
-    @ResponseBody
-    public String addUser(@RequestBody User newUser) {
+    public String addUser(User newUser) {
         if (userService.addUser(newUser)) {
             chatServerService.addUser(1, newUser.getUserId());
             return "login";

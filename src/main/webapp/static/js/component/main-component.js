@@ -33,7 +33,7 @@ export default {
     computed: {
         userAvatarStyle() {
             return {
-                "background-image": "url(\"" + this.avatar + "\")"
+                "background-image": "url(\"" + (this.avatar ? this.avatar : "/static/img/default_avatar.png") + "\")"
             }
         },
         inputBoxStyle() {
