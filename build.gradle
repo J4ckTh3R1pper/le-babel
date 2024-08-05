@@ -63,6 +63,8 @@ tasks.named('test') {
 
 ext {
     staticDir = './src/main/webapp/static'
+    nodeJsDir = './src/main/node_js'
+    nodeJsOutDir = './src/main/resources/static/dist'
 }
 
 tasks.register('compileScss') {
@@ -76,6 +78,14 @@ tasks.register('compileScss') {
                 workingDir(staticDir)
                 commandLine 'sass', "scss/${scssFile.name}", "css/${scssFile.name.replaceFirst(~/\.[^.]+$/, '.css')}"
             }
+    }
+}
+
+tasks.register('compileJs') {
+    inputs.dir nodeJsDir
+    exec {
+        workingDir(nodeJsDir)
+        commandLine 'yarn', 'build'
     }
 }
 

@@ -16,6 +16,7 @@ spring:
         - classpath:/META-INF/resources/
         - classpath:/resources/
         - classpath:/static/
+        - classpath:/dist/
         - classpath:/public/
         - file:${dayp308.chatroom.fileStorePath}
         - file:${dayp308.chatroom.resourcePath}
