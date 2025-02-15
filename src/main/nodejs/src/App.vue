@@ -2,7 +2,7 @@
 import HelloWorld from './components/HelloWorld.vue'
 import Markdown from "./components/Markdown.vue";
 import {ref, computed} from 'vue'
-const code = ref(`\`\`\`java
+const code = ref(`# 123\n\`\`\`java
 package dayp308.chatroom.filter;
 
 import dayp308.chatroom.bean.User;
@@ -101,8 +101,8 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Vite + Vue" />
-  <Markdown :text="code"></Markdown>
+<!--  <HelloWorld msg="Vite + Vue" />-->
+  <Markdown :md-text="code"></Markdown>
 </template>
 
 <style scoped>

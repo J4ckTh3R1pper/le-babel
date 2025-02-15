@@ -1,6 +1,5 @@
 package dayp308.chatroom.websocket;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -26,10 +25,11 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
-@ServerEndpoint(value = "/server/{serverId}/{Token}")
-public class ChatServerEndpoint implements ApplicationContextAware {
+@ServerEndpoint(value = "/public_chat/{serverId}/{Token}")
+public class ChatEndpoint implements ApplicationContextAware {
     private static ApplicationContext appContext;
 
     private UserService userService;
@@ -39,7 +39,8 @@ public class ChatServerEndpoint implements ApplicationContextAware {
 
     private ObjectMapper objectMapper;
 
-    private static ConcurrentHashMap<Session, Integer> connections = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Session, Integer> sessions = new ConcurrentHashMap<>();
+    private static Set<ChatEndpoint> connections = new CopyOnWriteArraySet<>();
 
     private static class ServerCloseReason {
         protected static class Codes {
@@ -48,6 +49,10 @@ public class ChatServerEndpoint implements ApplicationContextAware {
         }
         protected static final CloseReason UNAUTHORIZED = new CloseReason(Codes.UNAUTHORIZED, "Unauthorized");
         protected static final CloseReason NOT_ALLOWED = new CloseReason(Codes.NOT_ALLOWED, "Not allowed");
+
+    }
+
+    ChatEndpoint() {
 
     }
 
@@ -63,7 +68,7 @@ public class ChatServerEndpoint implements ApplicationContextAware {
             Identity identity = chatServerService.getUserIdentityOfServer(serverId, userId);
 
             if ( identity.getIndex() >= 0 ) {
-                connections.put(session, serverId);
+                sessions.put(session, serverId);
                 System.out.println("user " + userId + " connected to server " + serverId);
             }
             else session.close(ServerCloseReason.NOT_ALLOWED);
@@ -78,7 +83,7 @@ public class ChatServerEndpoint implements ApplicationContextAware {
     }
 
     private void broadcast(int serverId, String str) {
-        connections.forEach( (session, sid) -> {
+        sessions.forEach( (session, sid) -> {
             if (sid == serverId)
                 send(str, session);
         } );
@@ -100,7 +105,7 @@ public class ChatServerEndpoint implements ApplicationContextAware {
         System.out.println(json);
         if ( this.chatServerService.getUserIdentityOfServer(serverId,
                 this.userService.getUserByToken(token).getUserId()).getIndex() < 0 ) {
-            connections.remove(session);
+            sessions.remove(session);
             session.close(ServerCloseReason.UNAUTHORIZED);
         }
         int channel = Integer.parseInt(json.get("channel"));
@@ -127,20 +132,20 @@ public class ChatServerEndpoint implements ApplicationContextAware {
     @OnError
     public void onError(Session session, @PathParam("serverId") int serverId, Throwable cause) throws IOException {
         System.out.println(cause.getMessage());
-        connections.remove(session);
+        sessions.remove(session);
         session.close();
     }
 
     @OnClose
-    public void onClose(Session session, @PathParam("serverId") int serverId, CloseReason reason) throws IOException {
-        System.out.println("connection closed, reason:" + reason.getReasonPhrase());
-        connections.remove(session);
+    public void onClose(Session session, @PathParam("serverId") int serverId) throws IOException {
+        System.out.println("connection closed, reason:");
+        sessions.remove(session);
         session.close();
 
     }
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
-        ChatServerEndpoint.appContext = applicationContext;
+        ChatEndpoint.appContext = applicationContext;
     }
 }

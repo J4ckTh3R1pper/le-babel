@@ -49,9 +49,7 @@ public class AuthHandlerInterceptor implements HandlerInterceptor {
 						}
 					}
 				}
-				if ( token == null || token.equals("") ) {
-					bl = false;
-				} else {
+				if ( token != null && !token.isEmpty()) {
 					loginUser = userService.getUserByToken(token);
 //				    System.out.println(user);
 				}
