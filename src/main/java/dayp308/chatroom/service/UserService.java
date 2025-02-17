@@ -1,87 +1,53 @@
 package dayp308.chatroom.service;
-import dayp308.chatroom.bean.User;
-import dayp308.chatroom.mapper.UserMapper;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import org.apache.commons.codec.digest.DigestUtils;
+
+import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.dto.UserDTO;
+import dayp308.chatroom.repository.UserRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class UserService implements IUserService {
-    private final UserMapper userMapper;
+public class UserService {
 
+    private final UserRepository userRepository;
+    private final ConversionService conversionService;
 
     @Autowired
-    public UserService(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
-    @Override
-    public boolean addUser(User user) {
-        if ( userMapper.getUserByUsername(user.getUsername()) == null )
-        {
-            String token = DigestUtils.sha256Hex(user.getUsername() +  user.getPassword());
-            user.setToken(DigestUtils.sha256Hex(token + (Math.random() * 10000) ));
-            userMapper.addUser(user);
-            return true;
-        }
-        return false;
-    }
-    @Override
-    public User getUserLogin(String username, String password)
-    {
-        return userMapper.getUserLogin(username, password);
+    public UserService(UserRepository userRepository, ConversionService conversionService) {
+        this.userRepository = userRepository;
+        this.conversionService = conversionService;
     }
 
-	@Override
-	public User getUserByToken(String token) {
-		return userMapper.getUserByToken(token);
-	}
-
-    @Override
-    public PageInfo<User> searchUserByText(Integer page, String text) {
-        PageHelper.startPage(page, 5);
-        List<User> users = userMapper.searchUserByText(text);
-        PageInfo<User> pageInfo = new PageInfo<>(users);
-        PageHelper.clearPage();
-        return pageInfo;
+    /***
+     *
+     * @param loginName 用户输入的邮箱
+     * @param passwordMd5 用户输入的加密密码
+     * @return 用户或密码错误时返回false
+     */
+    public boolean checkLogin(String loginName, String passwordMd5) {
+        return (userRepository.findByLoginNameAndPasswordMd5(loginName, passwordMd5) != null);
     }
 
-    @Override
-    public void delUserById(Integer id) {
-        if (userMapper.getUserById(id) != null)
-            userMapper.delUserById(id);
+    /***
+     *
+     * @param loginName 要搜索用户的邮箱
+     * @return 搜索到用户的UserDTO类
+     */
+    public UserDTO findByLoginName(String loginName) {
+        UserDTO dto = new UserDTO();
+        BeanUtils.copyProperties(userRepository.findByLoginName(loginName), dto);
+        return dto;
     }
 
-    @Override
-    public Integer updateUserById(Integer id, User newUser) {
-        if ( userMapper.getUserById(id) == null )
-            return 3;
-        if (userMapper.updateUserById(id, newUser))
-            return 100;
-        return 101;
-    }
+    public List<UserDTO> findByNickName(String nickName) {
+        List<User> DOList = userRepository.findByNickName(nickName);
 
-    @Override
-    public User getUserById(Integer id) {
-        return userMapper.getUserById(id);
+        return DOList.stream().map(u -> conversionService.convert(u, UserDTO.class)).toList();
     }
-
-    @Override
-    public List<User> getAllUsers() {
-        return userMapper.getAllUsers();
-    }
-
-    @Override
-    public PageInfo<User> getPagedUsers(Integer page) {
-        PageHelper.startPage(page, 5);
-        List<User> list = userMapper.getAllUsers();
-        PageInfo<User> pageInfo = new PageInfo<>(list);
-        PageHelper.clearPage();
-        return pageInfo;
-    }
-
 
 }

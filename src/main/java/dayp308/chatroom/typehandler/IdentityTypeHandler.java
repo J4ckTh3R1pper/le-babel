@@ -1,6 +1,6 @@
 package dayp308.chatroom.typehandler;
 
-import dayp308.chatroom.bean.Identity;
+import dayp308.chatroom.model.Identity;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;

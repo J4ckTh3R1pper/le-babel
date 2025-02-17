@@ -1,16 +1,13 @@
 package dayp308.chatroom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dayp308.chatroom.bean.*;
-import dayp308.chatroom.exception.FileUploadException;
-import dayp308.chatroom.service.*;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import dayp308.chatroom.deprecated.ChatServerService;
+import dayp308.chatroom.deprecated.FileService;
+import dayp308.chatroom.deprecated.UserService;
+import dayp308.chatroom.model.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +18,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-@Controller
 public class UserController {
     private final UserService userService;
     private final ChatServerService chatServerService;
     private final FileService fileService;
     private final ObjectMapper objectMapper;
 
-    @Autowired
     public UserController(UserService service,
                           ChatServerService chatServerService,
                           FileService fileService) {

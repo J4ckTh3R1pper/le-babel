@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="dayp308.chatroom.mapper.MessageMapper">
+<mapper namespace="dayp308.chatroom.deprecated.mapper.MessageMapper">
     <insert id="insertMessage" useGeneratedKeys="true" keyProperty="ind" keyColumn="ind">
         INSERT INTO history (text, file, owner, date, in_channel, type)
                      VALUES (#{msg.text}, #{msg.file}, #{msg.owner}, #{msg.date}, #{msg.inChannel}, #{msg.type})

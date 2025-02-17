@@ -1,15 +1,12 @@
 package dayp308.chatroom.controller;
 
-import dayp308.chatroom.bean.Channel;
-import dayp308.chatroom.bean.ChatServer;
-import dayp308.chatroom.bean.ServerFile;
-import dayp308.chatroom.bean.User;
-import dayp308.chatroom.service.ChannelService;
-import dayp308.chatroom.service.ChatServerService;
-import dayp308.chatroom.service.FileService;
+import dayp308.chatroom.model.ChatServer;
+import dayp308.chatroom.model.ServerFile;
+import dayp308.chatroom.model.User;
+import dayp308.chatroom.deprecated.ChannelService;
+import dayp308.chatroom.deprecated.ChatServerService;
+import dayp308.chatroom.deprecated.FileService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,14 +17,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 
 
-@Controller
 public class ViewController {
     private final ChannelService channelService;
     private final ChatServerService chatServerService;
     private final FileService fileService;
 
 	private ObjectMapper objectMapper;
-    @Autowired
     public ViewController(ChatServerService chatServerService, ChannelService channelService, FileService fileService) {
         this.channelService = channelService;
 		this.objectMapper = new ObjectMapper();

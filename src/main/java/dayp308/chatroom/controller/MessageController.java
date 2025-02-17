@@ -3,23 +3,19 @@ package dayp308.chatroom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import dayp308.chatroom.bean.Message;
-import dayp308.chatroom.service.MessageService;
-import org.springframework.beans.factory.annotation.Autowired;
+import dayp308.chatroom.model.Message;
+import dayp308.chatroom.deprecated.MessageService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
 
-@RestController
 public class MessageController {
 
     private final MessageService messageService;
 	private ObjectMapper objectMapper;
-    @Autowired
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
 		this.objectMapper = new ObjectMapper();

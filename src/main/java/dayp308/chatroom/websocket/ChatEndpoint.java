@@ -3,22 +3,20 @@ package dayp308.chatroom.websocket;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import dayp308.chatroom.bean.Channel;
-import dayp308.chatroom.bean.Identity;
-import dayp308.chatroom.bean.Message;
-import dayp308.chatroom.bean.User;
-import dayp308.chatroom.service.ChannelService;
-import dayp308.chatroom.service.ChatServerService;
-import dayp308.chatroom.service.MessageService;
-import dayp308.chatroom.service.UserService;
+import dayp308.chatroom.model.Channel;
+import dayp308.chatroom.model.Identity;
+import dayp308.chatroom.model.Message;
+import dayp308.chatroom.model.User;
+import dayp308.chatroom.deprecated.ChannelService;
+import dayp308.chatroom.deprecated.ChatServerService;
+import dayp308.chatroom.deprecated.MessageService;
+import dayp308.chatroom.deprecated.UserService;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
-import jakarta.websocket.server.ServerEndpoint;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -27,8 +25,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@Component
-@ServerEndpoint(value = "/public_chat/{serverId}/{Token}")
+// @Component
+// @ServerEndpoint(value = "/public_chat/{serverId}/{Token}")
 public class ChatEndpoint implements ApplicationContextAware {
     private static ApplicationContext appContext;
 

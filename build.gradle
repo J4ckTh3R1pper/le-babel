@@ -3,11 +3,15 @@ plugins {
     id 'war'
     id 'org.springframework.boot' version '3.2.6'
     id 'io.spring.dependency-management' version '1.1.5'
+
 }
 
 group = 'dayp308'
 version = '0.0.1-SNAPSHOT'
 def hibernateVersion = '6.6.7.Final'
+def lombokVersion = '1.18.36'
+def mapstructVersion = '1.6.3'
+def mapstructSpringExtensionsVersion = '1.1.2'
 
 java {
     toolchain {
@@ -29,7 +33,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
+    // https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '3.2.6'
 	// https://mvnrepository.com/artifact/commons-codec/commons-codec
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.0'
@@ -51,13 +58,40 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.2.6'
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: hibernateVersion
+// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-hikaricp
+    implementation group: 'org.hibernate.orm', name: 'hibernate-hikaricp', version: hibernateVersion
+    // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-jpamodelgen
+    compileOnly group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
+    annotationProcessor group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
+    testCompileOnly group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
+    testAnnotationProcessor group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.2.6'
+// https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
+
+    annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: mapstructVersion
+
+    implementation "org.mapstruct.extensions.spring:mapstruct-spring-annotations:${mapstructSpringExtensionsVersion}"
+    annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
+
+    testAnnotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
+    testImplementation "org.mapstruct.extensions.spring:mapstruct-spring-test-extensions:${mapstructSpringExtensionsVersion}"
 
 
 
+}
+sourceSets {
+}
 
-
-
-
+compileJava {
+    options.generatedSourceOutputDirectory = file('src/generated')
 }
 
 tasks.named('test') {

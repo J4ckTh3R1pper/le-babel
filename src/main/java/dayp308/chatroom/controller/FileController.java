@@ -1,22 +1,17 @@
 package dayp308.chatroom.controller;
 
 import com.github.pagehelper.PageInfo;
-import dayp308.chatroom.bean.Identity;
-import dayp308.chatroom.bean.ServerFile;
-import dayp308.chatroom.bean.ServerMember;
-import dayp308.chatroom.bean.User;
-import dayp308.chatroom.service.ChatServerService;
-import dayp308.chatroom.service.UserService;
-import dayp308.chatroom.service.FileService;
+import dayp308.chatroom.model.ServerFile;
+import dayp308.chatroom.model.User;
+import dayp308.chatroom.deprecated.ChatServerService;
+import dayp308.chatroom.deprecated.UserService;
+import dayp308.chatroom.deprecated.FileService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
@@ -24,17 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 
-@RestController
 public class FileController {
 	private final UserService userService;
 	private final ChatServerService chatServerService;
 	private final FileService fileService;
 	private final ObjectMapper objectMapper;
 
-	@Autowired
 	public FileController(UserService userService, ChatServerService chatServerService, FileService fileService) {
 		this.userService = userService;
 		this.chatServerService = chatServerService;

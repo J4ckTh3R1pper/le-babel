@@ -1,4 +1,4 @@
-<%@ page import="dayp308.chatroom.bean.User" %>
+<%@ page import="dayp308.chatroom.model.User" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%--

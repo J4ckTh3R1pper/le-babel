@@ -2,7 +2,9 @@ spring:
   application:
     name: 'chat_springboot'
   datasource:
-    url: 'jdbc:mariadb://localhost:3306/chatroom?user=root&password=123456&&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false'
+    url: 'jdbc:mariadb://localhost:3306/lebabel?user=lebabel&password=123456&&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false'
+    hikari:
+      driver-class-name: 'org.mariadb.jdbc.Driver'
   mvc:
     view:
       prefix: '/WEB-INF/jsp/'
@@ -20,11 +22,17 @@ spring:
         - classpath:/public/
         - file:${dayp308.chatroom.fileStorePath}
         - file:${dayp308.chatroom.resourcePath}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          fetch_size: 1048576
 
-mybatis:
-  type-aliases-package: 'dayp308.chatroom.bean'
-  mapper-locations: 'classpath*:dayp308/chatroom/mapper/*.xml'
-  configuration:
-    map-underscore-to-camel-case: true
-    lazy-loading-enabled: true
-  type-handlers-package: 'dayp308.chatroom.typehandler'
+#mybatis:
+#  type-aliases-package: 'dayp308.chatroom.bean'
+#  mapper-locations: 'classpath*:dayp308/chatroom/mapper/*.xml'
+#  configuration:
+#    map-underscore-to-camel-case: true
+#    lazy-loading-enabled: true
+#  type-handlers-package: 'dayp308.chatroom.typehandler'

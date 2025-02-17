@@ -1,18 +1,16 @@
 package dayp308.chatroom.controller;
 
 import com.github.pagehelper.PageInfo;
-import dayp308.chatroom.bean.ChatServer;
-import dayp308.chatroom.bean.Identity;
-import dayp308.chatroom.bean.ServerMember;
-import dayp308.chatroom.bean.User;
-import dayp308.chatroom.service.ChatServerService;
-import dayp308.chatroom.service.FileService;
-import dayp308.chatroom.service.UserService;
+import dayp308.chatroom.model.ChatServer;
+import dayp308.chatroom.model.Identity;
+import dayp308.chatroom.model.ServerMember;
+import dayp308.chatroom.model.User;
+import dayp308.chatroom.deprecated.ChatServerService;
+import dayp308.chatroom.deprecated.FileService;
+import dayp308.chatroom.deprecated.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,7 +22,6 @@ import java.util.List;
 
 import java.io.IOException;
 
-@Controller
 public class ChatServerController {
     private final UserService userService;
     private final ChatServerService chatServerService;
@@ -32,7 +29,6 @@ public class ChatServerController {
     private ObjectMapper objectMapper;
     private FileService fileService;
 
-    @Autowired
     public ChatServerController(UserService userService, ChatServerService chatServerService, FileService fileService) {
         this.userService = userService;
         this.objectMapper = new ObjectMapper();

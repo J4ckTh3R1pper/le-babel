@@ -1,25 +1,21 @@
 package dayp308.chatroom.controller;
 
-import dayp308.chatroom.bean.User;
-import dayp308.chatroom.service.UserService;
+import dayp308.chatroom.model.User;
+import dayp308.chatroom.deprecated.UserService;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
-@Controller
 public class AuthController {
     private final UserService userService;
 
-    @Autowired
     public AuthController(UserService userService) {
         this.userService = userService;
     }
