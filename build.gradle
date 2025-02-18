@@ -83,6 +83,10 @@ dependencies {
 
     testAnnotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
     testImplementation "org.mapstruct.extensions.spring:mapstruct-spring-test-extensions:${mapstructSpringExtensionsVersion}"
+// https://mvnrepository.com/artifact/commons-validator/commons-validator
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
+// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
 
 
 
@@ -92,6 +96,7 @@ sourceSets {
 
 compileJava {
     options.generatedSourceOutputDirectory = file('src/generated')
+
 }
 
 tasks.named('test') {
@@ -100,7 +105,7 @@ tasks.named('test') {
 
 ext {
     staticDir = './src/main/webapp/static'
-    nodeJsDir = './src/main/nodejs'
+    viteDir = './vite'
     nodeJsOutDir = './src/main/resources/static/dist'
 }
 

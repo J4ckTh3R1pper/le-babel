@@ -42,7 +42,7 @@ public class User {
     private String location;
 
     @ColumnDefault("''")
-    @Column(name = "introduce", nullable = false, length = 32)
+    @Column(name = "introduce", nullable = false, length = 32, insertable = false)
     private String introduce;
 
     @ColumnDefault("0")
@@ -50,17 +50,17 @@ public class User {
     private Boolean userStatus = false;
 
     @ColumnDefault("current_timestamp()")
-    @Column(name = "last_login_time", nullable = false)
+    @Column(name = "last_login_time", nullable = false, insertable = false)
     private Instant lastLoginTime;
 
     @ColumnDefault("current_timestamp()")
-    @Column(name = "create_time", nullable = false)
+    @Column(name = "create_time", nullable = false, insertable = false)
     private Instant createTime;
 
-    @ColumnDefault("'unknown'")
+    @ColumnDefault("'UNKNOWN'")
     @Lob
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender", nullable = false, insertable = false)
     private Genders gender;
 
     @OneToMany(mappedBy = "user")

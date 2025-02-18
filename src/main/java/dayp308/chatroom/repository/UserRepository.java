@@ -1,8 +1,6 @@
 package dayp308.chatroom.repository;
 
 import dayp308.chatroom.entity.User;
-import dayp308.chatroom.exception.UserExistedException;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -11,6 +9,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 import dayp308.chatroom.entity.User_;
@@ -86,19 +85,16 @@ public class UserRepository implements Repository<User, Long> {
      *
      * @param user 要创建用户的类
      * @return 用户创建成功后的主键
-     * @throws EntityExistsException 注册邮箱已存在时抛出异常
+     * @throws ConstraintViolationException 注册邮箱或用户名已存在时抛出异常
      */
     @Transactional
-    public long addUser(User user) throws EntityExistsException {
-        if ( this.findByLoginName(user.getLoginName()) != null ) {
-            throw new EntityExistsException();
-        }
+    public long addUser(User user) throws ConstraintViolationException {
         em.persist(user);
         return user.getId();
     }
 
     @Transactional
-    public User updateUser(User user) {
+    public User updateUser(User user) throws ConstraintViolationException {
         em.merge(user);
         return user;
     }

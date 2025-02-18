@@ -15,6 +15,6 @@ export default defineConfig({
   },
   plugins: [vue(), vueJsxPlugin()],
   build: {
-    outDir: "../resources/dist"
+    outDir: "dist"
   }
 })
