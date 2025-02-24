@@ -1,9 +1,8 @@
 package dayp308.chatroom.deprecated.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
+import dayp308.chatroom.deprecated.model.Channel;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
-import dayp308.chatroom.model.*;
+
 import java.util.List;
 
 public interface ChannelMapper {

@@ -2,14 +2,14 @@ package dayp308.chatroom.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import java.util.Objects;
 
-@Setter
-@Getter
+@Data
 @Embeddable
 public class UserBookmarkCommentId implements java.io.Serializable {
     private static final long serialVersionUID = 4585486529617563221L;

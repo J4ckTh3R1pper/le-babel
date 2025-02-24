@@ -1,18 +1,23 @@
 package dayp308.chatroom.controller;
 
-import dayp308.chatroom.model.User;
-import dayp308.chatroom.deprecated.UserService;
+import dayp308.chatroom.service.UserService;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
+import java.util.Arrays;
 
+@Controller
 public class AuthController {
     private final UserService userService;
 
@@ -21,28 +26,33 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/check_login", method = RequestMethod.POST)
-    public void login(@RequestParam("username") String username,
-                      @RequestParam("password") String password,
-                      @Nullable @RequestParam("remember") String remember,
-                      HttpServletRequest req,
-                      HttpServletResponse resp) throws IOException {
+    @ResponseBody
+    public ResponseEntity<String> login(@RequestParam("username") String username,
+                                @RequestParam("password") String password,
+                                @Nullable @RequestParam("remember") String remember,
+                                HttpServletRequest req,
+                                HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession();
         System.out.println("remember: " + remember);
         try {
-            User user = userService.getUserLogin(username, password);
-            if (user != null) {
-                session.setAttribute("user", user);
-                if (remember != null) {
-                    Cookie cookie = new Cookie("token", user.getToken());
-                    cookie.setPath("/");
-                    cookie.setMaxAge(24 * 60 * 60 * 7);
-                    resp.addCookie(cookie);
-                }
-                resp.sendRedirect("/chat?serverId=1");
+            String token = userService.login(username, password);
+            session.setAttribute("user", token);
+            if (remember != null) {
+                Arrays.stream(req.getCookies())
+                        .filter(cookie -> cookie.getName().contains("token"))
+                        .forEach(c -> {
+                    c.setMaxAge(0);
+                    resp.addCookie(c);
+                });
+                Cookie cookie = new Cookie("token", token);
+                cookie.setPath("/");
+                cookie.setMaxAge(604800); // cookie保存7天时间
+                resp.addCookie(cookie);
             }
-            else resp.sendRedirect("/login");
+            return ResponseEntity.ok("successfully logged in");
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 

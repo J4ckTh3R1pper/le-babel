@@ -26,5 +26,6 @@ public interface UserMapper extends Converter<User, UserDTO> {
     @Mapping(target = "bookmarkedPosts", ignore = true)
     @Mapping(target = "bookmarkedComments", ignore = true)
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "token", ignore = true)
     User inverseConvert(UserDTO source);
 }

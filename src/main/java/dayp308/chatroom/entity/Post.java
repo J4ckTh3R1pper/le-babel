@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Generated;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -21,9 +22,8 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "publish_user_id", nullable = false)
-    private dayp308.chatroom.entity.User publishUser;
+    private User publishUser;
 
-    @ColumnDefault("''")
     @Column(name = "post_title", nullable = false, length = 64)
     private String postTitle;
 
@@ -36,22 +36,27 @@ public class Post {
     private PostCategory postCategory;
 
     @ColumnDefault("1")
+    @Generated
     @Column(name = "post_status", nullable = false)
     private Byte postStatus;
 
     @ColumnDefault("0")
+    @Generated
     @Column(name = "post_views", nullable = false)
     private Long postViews;
 
     @ColumnDefault("current_timestamp()")
+    @Generated
     @Column(name = "last_update_time", nullable = false)
     private Instant lastUpdateTime;
 
     @ColumnDefault("current_timestamp()")
+    @Generated
     @Column(name = "create_time", nullable = false)
     private Instant createTime;
 
     @ColumnDefault("'[]'")
+    @Generated
     @Lob
     @Column(name = "post_tags", nullable = false)
     private String postTags;
@@ -59,7 +64,7 @@ public class Post {
     @ManyToMany(mappedBy = "bookmarkedPosts")
     private Set<User> bookmarkedUsers = new LinkedHashSet<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "post")
     private Set<PostComment> postComments = new LinkedHashSet<>();
 
 }

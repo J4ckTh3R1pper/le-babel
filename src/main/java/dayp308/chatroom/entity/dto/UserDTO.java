@@ -1,8 +1,11 @@
 package dayp308.chatroom.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import dayp308.chatroom.entity.*;
 import dayp308.chatroom.entity.enums.Genders;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -13,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Component
 public class UserDTO {
     private Long id;
 
@@ -28,8 +32,12 @@ public class UserDTO {
 
     private Boolean userStatus = false;
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Instant lastLoginTime = Instant.now();
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Instant createTime = Instant.now();
 
     private Genders gender = Genders.UNKNOWN;

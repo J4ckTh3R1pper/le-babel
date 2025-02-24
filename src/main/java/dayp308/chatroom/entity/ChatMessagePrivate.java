@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -33,7 +34,6 @@ public class ChatMessagePrivate {
     @JoinColumn(name = "target_id", nullable = false)
     private dayp308.chatroom.entity.User target;
 
-    @OneToMany(mappedBy = "replyTo")
-    private Set<ChatMessagePrivate> tbChatMessagePrivates = new LinkedHashSet<>();
-
+    @Column(name = "create_time", nullable = false)
+    private Instant createTime = Instant.now();
 }

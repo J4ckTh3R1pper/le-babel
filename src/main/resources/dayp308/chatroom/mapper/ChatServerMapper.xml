@@ -24,7 +24,7 @@
 
 	<resultMap id="serverMemberMap" type="ServerMember">
 		<id column="user_id"/>
-		<result property="identity" column="user_identity" javaType="Identity" typeHandler="dayp308.chatroom.typehandler.IdentityTypeHandler"/>
+		<result property="identity" column="user_identity" javaType="Identity" typeHandler="dayp308.chatroom.deprecated.typehandler.IdentityTypeHandler"/>
 		<result property="nickname" column="nickname" javaType="String"/>
 		<association property="user" javaType="User" autoMapping="true">
 			<id property="userId" column="user_id"/>

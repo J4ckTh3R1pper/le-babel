@@ -2,11 +2,11 @@ package dayp308.chatroom.deprecated.mapper;
 
 import java.util.List;
 
-import dayp308.chatroom.model.*;
-import org.apache.ibatis.annotations.Mapper;
+import dayp308.chatroom.deprecated.model.Channel;
+import dayp308.chatroom.deprecated.model.ChatServer;
+import dayp308.chatroom.deprecated.model.Identity;
+import dayp308.chatroom.deprecated.model.ServerMember;
 import org.apache.ibatis.annotations.Param;
-
-import org.springframework.stereotype.Repository;
 
 public interface ChatServerMapper {
 	public List<ChatServer> getServerByName(@Param("keyword") String keyword);

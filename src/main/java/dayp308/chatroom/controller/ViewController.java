@@ -1,11 +1,11 @@
 package dayp308.chatroom.controller;
 
-import dayp308.chatroom.model.ChatServer;
-import dayp308.chatroom.model.ServerFile;
-import dayp308.chatroom.model.User;
-import dayp308.chatroom.deprecated.ChannelService;
-import dayp308.chatroom.deprecated.ChatServerService;
-import dayp308.chatroom.deprecated.FileService;
+import dayp308.chatroom.deprecated.model.ChatServer;
+import dayp308.chatroom.deprecated.model.ServerFile;
+import dayp308.chatroom.deprecated.model.User;
+import dayp308.chatroom.deprecated.service.ChannelService;
+import dayp308.chatroom.deprecated.service.ChatServerService;
+import dayp308.chatroom.deprecated.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;

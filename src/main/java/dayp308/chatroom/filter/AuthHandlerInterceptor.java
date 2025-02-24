@@ -1,7 +1,7 @@
 package dayp308.chatroom.filter;
 
-import dayp308.chatroom.model.User;
-import dayp308.chatroom.deprecated.UserService;
+import dayp308.chatroom.deprecated.model.User;
+import dayp308.chatroom.deprecated.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

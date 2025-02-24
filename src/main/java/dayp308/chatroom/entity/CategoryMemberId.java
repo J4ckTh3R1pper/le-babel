@@ -2,8 +2,7 @@ package dayp308.chatroom.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import java.util.Objects;
@@ -11,6 +10,8 @@ import java.util.Objects;
 @Setter
 @Getter
 @Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
 public class CategoryMemberId implements java.io.Serializable {
     private static final long serialVersionUID = 3033184338078385519L;
     @Column(name = "category_id", nullable = false)

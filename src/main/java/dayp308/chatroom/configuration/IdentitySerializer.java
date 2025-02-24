@@ -1,6 +1,6 @@
 package dayp308.chatroom.configuration;
 import com.fasterxml.jackson.databind.JsonSerializer;
-import dayp308.chatroom.model.Identity;
+import dayp308.chatroom.deprecated.model.Identity;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
 

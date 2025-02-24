@@ -1,11 +1,11 @@
 package dayp308.chatroom.controller;
 
 import com.github.pagehelper.PageInfo;
-import dayp308.chatroom.model.ServerFile;
-import dayp308.chatroom.model.User;
-import dayp308.chatroom.deprecated.ChatServerService;
-import dayp308.chatroom.deprecated.UserService;
-import dayp308.chatroom.deprecated.FileService;
+import dayp308.chatroom.deprecated.model.ServerFile;
+import dayp308.chatroom.deprecated.model.User;
+import dayp308.chatroom.deprecated.service.ChatServerService;
+import dayp308.chatroom.deprecated.service.UserService;
+import dayp308.chatroom.deprecated.service.FileService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

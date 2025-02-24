@@ -1,19 +1,19 @@
 package dayp308.chatroom.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 
-@Setter
-@Getter
+@Data
 @Entity
 @Table(name = "tb_user_bookmark_post")
 public class UserBookmarkPost {
     @EmbeddedId
-    private UserBookmarkPostId id;
+    private UserBookmarkPostId id = new UserBookmarkPostId();
 
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.EAGER, optional = false)

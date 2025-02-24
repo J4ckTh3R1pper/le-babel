@@ -2,19 +2,24 @@ package dayp308.chatroom.entity;
 
 import dayp308.chatroom.entity.enums.Genders;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Setter
-@Getter
 @Entity
+@Data
 @Table(name = "tb_user")
+@DynamicInsert
+@DynamicUpdate
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,16 +38,19 @@ public class User {
     @Column(name = "nick_name", nullable = false, length = 8, unique = true)
     private String nickName;
 
-    @ColumnDefault("''")
-    @Column(name = "head_img_url", nullable = false, length = 256)
+    @ColumnDefault("'/images/avatar/default.jpg'")
+    @Generated
+    @Column(name = "head_img_url", length = 256, nullable = false)
     private String headImgUrl;
 
     @ColumnDefault("''")
+    @Generated
     @Column(name = "location", nullable = false, length = 4)
     private String location;
 
     @ColumnDefault("''")
-    @Column(name = "introduce", nullable = false, length = 32, insertable = false)
+    @Generated
+    @Column(name = "introduce", nullable = false, length = 32)
     private String introduce;
 
     @ColumnDefault("0")
@@ -50,17 +58,25 @@ public class User {
     private Boolean userStatus = false;
 
     @ColumnDefault("current_timestamp()")
-    @Column(name = "last_login_time", nullable = false, insertable = false)
+    @Generated
+    @Column(name = "last_login_time", nullable = false)
     private Instant lastLoginTime;
 
     @ColumnDefault("current_timestamp()")
-    @Column(name = "create_time", nullable = false, insertable = false)
+    @Generated
+    @Column(name = "create_time", nullable = false)
     private Instant createTime;
+
+    @ColumnDefault("( sha2(concat(`password_md5`, unix_timestamp(), `nick_name`), 256) )")
+    @Generated
+    @Column(name = "token", unique = true, length = 256)
+    private String token;
 
     @ColumnDefault("'UNKNOWN'")
     @Lob
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = false, insertable = false)
+    @Generated
+    @Column(name = "gender", nullable = false)
     private Genders gender;
 
     @OneToMany(mappedBy = "user")
@@ -96,29 +112,4 @@ public class User {
 
     @OneToMany(mappedBy = "commentUser")
     private Set<PostComment> comments = new LinkedHashSet<>();
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", loginName='" + loginName + '\'' +
-                ", passwordMd5='" + passwordMd5 + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", headImgUrl='" + headImgUrl + '\'' +
-                ", location='" + location + '\'' +
-                ", introduce='" + introduce + '\'' +
-                ", userStatus=" + userStatus +
-                ", lastLoginTime=" + lastLoginTime +
-                ", createTime=" + createTime +
-                ", gender=" + gender +
-                ", categoriesMember=" + categoriesMember +
-                ", chatMessagesPrivate=" + chatMessagesPrivate +
-                ", receivedChatMessagesPrivate=" + receivedChatMessagesPrivate +
-                ", chatMessagesPublic=" + chatMessagesPublic +
-                ", posts=" + posts +
-                ", bookmarkedPosts=" + bookmarkedPosts +
-                ", bookmarkedComments=" + bookmarkedComments +
-                ", comments=" + comments +
-                '}';
-    }
 }
