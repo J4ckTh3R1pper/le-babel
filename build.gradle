@@ -1,8 +1,8 @@
 plugins {
     id 'java'
     id 'war'
-    id 'org.springframework.boot' version '3.2.6'
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
 
 }
 
@@ -32,11 +32,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.4.3'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '3.2.6'
 	// https://mvnrepository.com/artifact/commons-codec/commons-codec
 	implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
@@ -51,8 +54,6 @@ dependencies {
     compileOnly group: 'jakarta.servlet.jsp', name: 'jakarta.servlet.jsp-api', version: '3.1.1'
     // https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl
     implementation group: 'org.glassfish.web', name: 'jakarta.servlet.jsp.jstl', version: '3.0.1'
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-gradle-plugin
-    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.2.6'
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: hibernateVersion
 // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-hikaricp
@@ -63,8 +64,6 @@ dependencies {
     testCompileOnly group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
     testAnnotationProcessor group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
 
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.2.6'
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
@@ -72,8 +71,8 @@ dependencies {
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
-    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
 
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: mapstructVersion
 
     implementation "org.mapstruct.extensions.spring:mapstruct-spring-annotations:${mapstructSpringExtensionsVersion}"
@@ -81,12 +80,11 @@ dependencies {
 
     testAnnotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
     testImplementation "org.mapstruct.extensions.spring:mapstruct-spring-test-extensions:${mapstructSpringExtensionsVersion}"
+
     // https://mvnrepository.com/artifact/commons-validator/commons-validator
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '3.2.6'
 
 
 
