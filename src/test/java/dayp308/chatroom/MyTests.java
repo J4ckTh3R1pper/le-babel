@@ -22,8 +22,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.BodyInserters;
 
 @SpringBootTest
 
@@ -75,7 +73,6 @@ class MyTests {
         PostDTO post = null;
         CategoryMemberDTO member = null;
         CommentDTO comment = null;
-        String token = null;
 
         UserRegistrationForm form = new UserRegistrationForm();
         form.setLoginName(RandomString.make(8) + "@example.com");
@@ -83,7 +80,6 @@ class MyTests {
         form.setPassword(RandomString.make(8));
         try {
             user = userService.register(form);
-            token = null;
             category = categoryService.createCategory(
                     new CategoryDTO(RandomString.make(8))
             );
