@@ -2,7 +2,9 @@ spring:
   application:
     name: 'chat_springboot'
   datasource:
-    url: 'jdbc:mariadb://localhost:3306/lebabel?user=lebabel&password=123456&&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false'
+    url: 'jdbc:mariadb://localhost:3306/lebabel?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false'
+    username: 'lebabel'
+    password: '123456'
     hikari:
       driver-class-name: 'org.mariadb.jdbc.Driver'
   mvc:
@@ -11,7 +13,7 @@ spring:
       suffix: '.jsp'
   servlet:
     multipart:
-      max-file-size: 128MB
+      max-file-size: 64MB
   web:
     resources:
       static-locations:

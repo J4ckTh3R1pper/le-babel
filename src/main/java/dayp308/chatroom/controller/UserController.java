@@ -1,7 +1,6 @@
 package dayp308.chatroom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dayp308.chatroom.annotation.UserTokenExists;
 import dayp308.chatroom.entity.business.UserEditForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.dto.UserDTO;
@@ -14,7 +13,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -45,17 +43,17 @@ public class UserController {
     @PostMapping(value = "/api/user/update_avatar")
     public ResponseEntity<String> updateAvatar(
             @RequestPart("image") MultipartFile imageFile,
-            @RequestPart("token") @UserTokenExists String token
+            @RequestPart("token") String token
     ) throws FileUploadException {
 
-        UserDTO user = userService.findByToken(token);
+        UserDTO user = null;
         user.setHeadImgUrl(fileService.uploadImage(imageFile));
         return new ResponseEntity<>(userService.updateUser(user).getHeadImgUrl(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/api/user/update", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> updateUser(@Valid UserEditForm form) {
-        UserDTO user = userService.findByToken(form.getToken());
+        UserDTO user = null;
         BeanUtils.copyProperties(form, user);
         userService.updateUser(user);
         return new ResponseEntity<>("success", HttpStatus.OK);

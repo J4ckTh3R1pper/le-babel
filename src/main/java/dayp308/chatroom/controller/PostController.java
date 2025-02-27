@@ -24,13 +24,13 @@ public class PostController {
 
     @PostMapping("/api/post/create")
     public ResponseEntity<String> createPost(@Valid PostForm postForm) throws EntityNotFoundException {
-        long id = postService.addPost(postForm).getId();
+        long id = postService.addPost(postForm, null).getId();
         return new ResponseEntity<>("thread: " + id, HttpStatus.CREATED);
     }
 
     @PostMapping("/api/comment/create")
     public ResponseEntity<String> createComment(@Valid CommentCreationForm commentCreationForm) throws EntityNotFoundException {
-        long id = postService.addComment(commentCreationForm).getId();
+        long id = postService.addComment(commentCreationForm, null).getId();
         return new ResponseEntity<>("comment: " + id, HttpStatus.CREATED);
     }
 }

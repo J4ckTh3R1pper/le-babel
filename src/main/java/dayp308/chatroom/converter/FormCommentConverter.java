@@ -30,12 +30,11 @@ public class FormCommentConverter implements Converter<CommentCreationForm, Post
     @Override
     public PostComment convert(CommentCreationForm source) {
         Post post = postRepository.findById(source.getPostId()).orElseThrow();
-        User user = userRepository.findByToken(source.getToken()).orElseThrow();
         PostComment target = new PostComment();
         target.setPost(post);
-        target.setCommentUser(user);
         target.setCommentBody(source.getCommentBody());
-        target.setParentComment(commentRepository.findById(source.getParentCommentId()).orElse(null));
+        if ( source.getParentCommentId() != null )
+            target.setParentComment(commentRepository.findById(source.getParentCommentId()).orElse(null));
         return target;
     }
 }

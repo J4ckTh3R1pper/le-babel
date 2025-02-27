@@ -44,8 +44,9 @@ public class PostService {
         this.categoryRepository = categoryRepository;
     }
 
-    public PostDTO addPost(PostForm form) {
+    public PostDTO addPost(PostForm form, User user) {
         Post post = conversionService.convert(form, Post.class);
+        post.setPublishUser(user);
         postRepository.saveAndFlush(post);
         return conversionService.convert(post, PostDTO.class);
     }
@@ -56,8 +57,9 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public CommentDTO addComment(@NotNull CommentCreationForm form) {
+    public CommentDTO addComment(@NotNull CommentCreationForm form, User user) {
         PostComment comment = conversionService.convert(form, PostComment.class);
+        comment.setCommentUser(user);
         return conversionService.convert(commentRepository.saveAndFlush(comment), CommentDTO.class);
     }
 }

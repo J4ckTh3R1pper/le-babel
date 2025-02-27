@@ -27,12 +27,10 @@ public class FormPostConverter implements Converter<PostForm, Post> {
     @Override
     public Post convert(PostForm source) {
         PostCategory category = categoryRepository.findById(source.getCategoryId()).orElseThrow();
-        User user = userRepository.findByToken(source.getToken()).orElseThrow();
         Post target = new Post();
         target.setPostCategory(category);
         target.setPostTitle(source.getTitle());
         target.setPostContent(source.getContent());
-        target.setPublishUser(user);
         return target;
     }
 }

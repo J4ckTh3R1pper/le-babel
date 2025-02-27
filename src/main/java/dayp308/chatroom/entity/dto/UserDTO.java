@@ -30,7 +30,7 @@ public class UserDTO {
 
     private String introduce = "";
 
-    private Boolean userStatus = false;
+    private Boolean userLocked = false;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

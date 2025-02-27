@@ -3,65 +3,67 @@ package dayp308.chatroom.service;
 import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.dto.UserDTO;
-import dayp308.chatroom.exception.InvalidFormException;
 import dayp308.chatroom.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final ConversionService conversionService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, ConversionService conversionService) {
+    public UserService(UserRepository userRepository, ConversionService conversionService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.conversionService = conversionService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /***
      *
      * @param loginName 用户输入的邮箱
-     * @param passwordMd5 用户输入的加密密码
+     * @param password 用户输入的加密密码
      * @return 用户或密码错误时返回false
      */
-    public boolean checkLogin(String loginName, String passwordMd5) {
-        return userRepository.existsByLoginNameAndPasswordMd5(loginName, passwordMd5);
+    public boolean checkLogin(String loginName, String password) {
+        return userRepository.existsByLoginNameAndPassword(loginName, password);
     }
 
-    public String login(String loginName, String plainPassword) throws Exception {
+    public UserDTO login(String loginName, String plainPassword) throws Exception {
         String passwordMd5 = DigestUtils.md5Hex(plainPassword);
-        if (!userRepository.existsByLoginNameAndPasswordMd5(loginName, DigestUtils.md5Hex(passwordMd5))) {
+        if (!userRepository.existsByLoginNameAndPassword(loginName, DigestUtils.md5Hex(passwordMd5))) {
             throw new Exception("email or password incorrect");
         }
-        User user = userRepository.findByLoginNameAndPasswordMd5(loginName, passwordMd5);
-        return user.getToken();
+        User user = userRepository.findByLoginNameAndPassword(loginName, passwordMd5);
+        return conversionService.convert(user, UserDTO.class);
     }
 
     public UserDTO findById(Long id) {
         return conversionService.convert(userRepository.findById(id), UserDTO.class);
     }
 
-    public UserDTO findByToken(String token) {
-        return conversionService.convert(userRepository.findByToken(token), UserDTO.class);
-    }
 
     /***
      *
      * @param loginName 要搜索用户的邮箱
      * @return 搜索到用户的UserDTO类
      */
-    public UserDTO findByLoginName(String loginName) {
-        UserDTO dto = new UserDTO();
-        BeanUtils.copyProperties(userRepository.findByLoginName(loginName), dto);
-        return dto;
+    public Optional<User> findByLoginName(String loginName) {
+        return userRepository.findByLoginName(loginName);
     }
 
     /***
@@ -85,7 +87,7 @@ public class UserService {
         User user = new User();
         user.setLoginName(form.getLoginName());
         user.setNickName(form.getNickName());
-        user.setPasswordMd5(DigestUtils.md5Hex(form.getPassword()));
+        user.setPassword(passwordEncoder.encode(form.getPassword()));
         userRepository.saveAndFlush(user);
         return conversionService.convert(user, UserDTO.class);
     }
@@ -95,4 +97,5 @@ public class UserService {
         userRepository.saveAndFlush(user);
         return conversionService.convert(user, UserDTO.class);
     }
+
 }

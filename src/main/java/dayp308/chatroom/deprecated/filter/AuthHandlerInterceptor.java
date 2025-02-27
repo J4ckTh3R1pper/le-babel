@@ -1,4 +1,4 @@
-package dayp308.chatroom.filter;
+package dayp308.chatroom.deprecated.filter;
 
 import dayp308.chatroom.deprecated.model.User;
 import dayp308.chatroom.deprecated.service.UserService;

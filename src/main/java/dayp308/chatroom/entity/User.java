@@ -3,16 +3,18 @@ package dayp308.chatroom.entity;
 import dayp308.chatroom.entity.enums.Genders;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Generated;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,7 +22,7 @@ import java.util.Set;
 @Table(name = "tb_user")
 @DynamicInsert
 @DynamicUpdate
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -31,8 +33,8 @@ public class User {
     private String loginName;
 
     @ColumnDefault("''")
-    @Column(name = "password_md5", nullable = false, length = 32)
-    private String passwordMd5;
+    @Column(name = "password", nullable = false, length = 32)
+    private String password;
 
     @ColumnDefault("''")
     @Column(name = "nick_name", nullable = false, length = 8, unique = true)
@@ -54,8 +56,8 @@ public class User {
     private String introduce;
 
     @ColumnDefault("0")
-    @Column(name = "user_status", nullable = false)
-    private Boolean userStatus = false;
+    @Column(name = "user_locked", nullable = false)
+    private Boolean userLocked = false;
 
     @ColumnDefault("current_timestamp()")
     @Generated
@@ -66,11 +68,6 @@ public class User {
     @Generated
     @Column(name = "create_time", nullable = false)
     private Instant createTime;
-
-    @ColumnDefault("( sha2(concat(`password_md5`, unix_timestamp(), `nick_name`), 256) )")
-    @Generated
-    @Column(name = "token", unique = true, length = 256)
-    private String token;
 
     @ColumnDefault("'UNKNOWN'")
     @Lob
@@ -112,4 +109,34 @@ public class User {
 
     @OneToMany(mappedBy = "commentUser")
     private Set<PostComment> comments = new LinkedHashSet<>();
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !this.userLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new GrantedAuthority[]{new SimpleGrantedAuthority("ROLE_USER")});
+    }
+
+    @Override
+    public String getUsername() {
+        return this.loginName;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

@@ -1,8 +1,11 @@
 package dayp308.chatroom;
 
+import dayp308.chatroom.controller.AuthController;
 import dayp308.chatroom.entity.CategoryMemberId;
 import dayp308.chatroom.entity.PostComment;
+import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
+import dayp308.chatroom.entity.business.LoginForm;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.dto.*;
@@ -19,6 +22,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 
 @SpringBootTest
 
@@ -39,6 +44,8 @@ class MyTests {
     private CategoryRepository categoryRepository;
     @Autowired
     private CategoryMemberRepository categoryMemberRepository;
+    @Autowired
+    private AuthController authController;
 
     @ParameterizedTest
     @CsvSource({"qq", ".com"})
@@ -50,12 +57,6 @@ class MyTests {
     @CsvSource({"coder", "s"})
     public void searchUserByNickName(String nickName) {
         System.out.println(userService.searchByNickName(nickName));
-    }
-
-    @ParameterizedTest
-    @CsvSource({"spidey5852@foxmail.com, e10adc3949ba59abbe56e057f20f883e", "123456@example.com, password"})
-    public void testLogin(String loginName, String password) {
-        System.out.println(userService.checkLogin(loginName, password));
     }
 
     @Test
@@ -82,7 +83,7 @@ class MyTests {
         form.setPassword(RandomString.make(8));
         try {
             user = userService.register(form);
-            token = userRepository.getReferenceById(user.getId()).getToken();
+            token = null;
             category = categoryService.createCategory(
                     new CategoryDTO(RandomString.make(8))
             );
@@ -91,20 +92,18 @@ class MyTests {
 
             post = postService.addPost(
                     new PostForm(
-                            token,
                             category.getId(),
                             RandomString.make(16),
                             RandomString.make(512)
-                    )
+                    ), conversionService.convert(user, User.class)
             );
 
             comment = postService.addComment(
                     new CommentCreationForm(
                             RandomString.make(512),
                             post.getId(),
-                            null,
-                            token
-                    )
+                            null
+                    ), conversionService.convert(user, User.class)
             );
         } catch (Exception e) {
             throw new RuntimeException(e);

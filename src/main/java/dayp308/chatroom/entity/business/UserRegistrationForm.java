@@ -18,6 +18,6 @@ public class UserRegistrationForm {
     @NotBlank
     private String nickName;
 
-    @Size(min = 8, max = 64)
+    @Size(min = 8, max = 72)
     private String password;
 }

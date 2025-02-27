@@ -9,11 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
-    Optional<User> findByToken(String token);
-    User findByLoginName(String loginName);
-    User findByLoginNameAndPasswordMd5(String loginName, String passwordMd5);
-    boolean existsByLoginNameAndPasswordMd5(String loginName, String passwordMd5);
+    Optional<User> findByLoginName(String loginName);
+    User findByLoginNameAndPassword(String loginName, String password);
+    boolean existsByLoginNameAndPassword(String loginName, String password);
     List<User> findByNickNameContainingIgnoreCase(String nickName);
 
-    boolean existsByToken(String token);
 }
