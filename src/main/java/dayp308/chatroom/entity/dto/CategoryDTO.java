@@ -23,6 +23,10 @@ public class CategoryDTO {
 
     private Boolean isDeleted = false;
 
+    private Boolean isMuted = false;
+
+    private Boolean isPending = true;
+
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Instant createTime = Instant.now();
@@ -30,6 +34,8 @@ public class CategoryDTO {
     private String categoryAvatar = "";
 
     private String categoryInfo = "";
+
+    private String categoryRule = "";
 
     public CategoryDTO(String categoryName) {
         this.categoryName = categoryName;

@@ -5,6 +5,7 @@ import dayp308.chatroom.entity.view.ErrorResponseBody;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,14 +18,21 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public String invalidRegistrationForm(final InvalidFormException e) {
-        return new ErrorResponseBody(e.getErrorCode(), e.getMessage()).toString();
+        return new ErrorResponseBody(e.getErrCode(), e.getMessage()).toString();
     }
 
-    @ExceptionHandler(EntityExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
-    public String userExists(final EntityExistsException e) {
-        return new ErrorResponseBody(100, e.getMessage()).toString();
+    public String userExists(final UserExistsException e) {
+        return new ErrorResponseBody(e.getErrCode(), e.getMessage()).toString();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public String entityExists(final EntityExistsException e) {
+        return new ErrorResponseBody(409, e.getMessage()).toString();
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -46,5 +54,12 @@ public class ControllerExceptionHandler {
     @ResponseBody
     public String fileUploadException(final FileUploadException e) {
         return new ErrorResponseBody(500, e.getMessage()).toString();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public String accessDeniedException(final AccessDeniedException e) {
+        return new ErrorResponseBody(403, e.getMessage()).toString();
     }
 }

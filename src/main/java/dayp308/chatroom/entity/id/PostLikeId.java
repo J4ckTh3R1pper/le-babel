@@ -1,24 +1,24 @@
-package dayp308.chatroom.entity;
+package dayp308.chatroom.entity.id;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Objects;
 
-@Setter
 @Getter
+@Setter
 @Embeddable
-public class UserBookmarkPostId implements java.io.Serializable {
-    private static final long serialVersionUID = -9180015529837495002L;
-    @ColumnDefault("0")
+public class PostLikeId implements java.io.Serializable {
+    private static final long serialVersionUID = -7534116644126160665L;
+    @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @ColumnDefault("0")
+    @NotNull
     @Column(name = "post_id", nullable = false)
     private Long postId;
 
@@ -26,7 +26,7 @@ public class UserBookmarkPostId implements java.io.Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        UserBookmarkPostId entity = (UserBookmarkPostId) o;
+        PostLikeId entity = (PostLikeId) o;
         return Objects.equals(this.postId, entity.postId) &&
                 Objects.equals(this.userId, entity.userId);
     }

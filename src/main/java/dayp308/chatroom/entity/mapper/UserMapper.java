@@ -18,14 +18,14 @@ public interface UserMapper extends Converter<User, UserDTO> {
     @InheritInverseConfiguration
     @DelegatingConverter
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "categoriesMember", ignore = true)
-    @Mapping(target = "chatMessagesPrivate", ignore = true)
-    @Mapping(target = "receivedChatMessagesPrivate", ignore = true)
-    @Mapping(target = "chatMessagesPublic", ignore = true)
-    @Mapping(target = "posts", ignore = true)
+//    @Mapping(target = "categoriesMember", ignore = true)
+//    @Mapping(target = "chatMessagesPrivate", ignore = true)
+//    @Mapping(target = "receivedChatMessagesPrivate", ignore = true)
+//    @Mapping(target = "chatMessagesPublic", ignore = true)
+//    @Mapping(target = "posts", ignore = true)
     @Mapping(target = "bookmarkedPosts", ignore = true)
     @Mapping(target = "bookmarkedComments", ignore = true)
-    @Mapping(target = "comments", ignore = true)
+//    @Mapping(target = "comments", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     User inverseConvert(UserDTO source);
 }

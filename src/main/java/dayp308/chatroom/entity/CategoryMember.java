@@ -1,6 +1,7 @@
 package dayp308.chatroom.entity;
 
-import dayp308.chatroom.entity.enums.Roles;
+import dayp308.chatroom.entity.enums.Role;
+import dayp308.chatroom.entity.id.CategoryMemberId;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -9,14 +10,15 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Generated;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_category_member")
 @DynamicInsert
 @DynamicUpdate
+@Table(name = "tb_category_member")
 public class CategoryMember {
     @EmbeddedId
     private CategoryMemberId id = new CategoryMemberId(); // 不初始化id会造成NPE
@@ -33,12 +35,10 @@ public class CategoryMember {
 
     @Lob
     @Enumerated(EnumType.STRING)
-    @Generated
     @Column(name = "role", nullable = false)
-    private Roles role = Roles.SUBSCRIBER;
+    private Role role = Role.GUEST;
 
     @ColumnDefault("0")
-    @Generated
     @Column(name = "experience", nullable = false)
     private Integer experience = 0;
 
@@ -47,7 +47,16 @@ public class CategoryMember {
 
     @ColumnDefault("from_unixtime(0)")
     @Column(name = "mute_expiration_date")
-    @Generated
     private Instant muteExpirationDate = Instant.EPOCH;
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CategoryMember that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

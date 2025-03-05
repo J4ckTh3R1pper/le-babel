@@ -36,35 +36,30 @@ public class Post {
     private PostCategory postCategory;
 
     @ColumnDefault("1")
-    @Generated
     @Column(name = "post_status", nullable = false)
-    private Byte postStatus;
+    private Byte postStatus = 1;
 
     @ColumnDefault("0")
-    @Generated
     @Column(name = "post_views", nullable = false)
-    private Long postViews;
+    private Long postViews = 0L;
 
     @ColumnDefault("current_timestamp()")
-    @Generated
     @Column(name = "last_update_time", nullable = false)
-    private Instant lastUpdateTime;
+    private Instant lastUpdateTime = Instant.now();
 
     @ColumnDefault("current_timestamp()")
-    @Generated
     @Column(name = "create_time", nullable = false)
-    private Instant createTime;
+    private Instant createTime = Instant.now();
 
     @ColumnDefault("'[]'")
-    @Generated
     @Lob
     @Column(name = "post_tags", nullable = false)
-    private String postTags;
+    private String postTags = "[]";
 
     @ManyToMany(mappedBy = "bookmarkedPosts")
     private Set<User> bookmarkedUsers = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "post")
-    private Set<PostComment> postComments = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "post")
+//    private Set<PostComment> postComments = new LinkedHashSet<>();
 
 }

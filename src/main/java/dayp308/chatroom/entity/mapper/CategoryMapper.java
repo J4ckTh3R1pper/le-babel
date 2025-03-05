@@ -15,9 +15,9 @@ public interface CategoryMapper extends Converter<PostCategory, CategoryDTO> {
 
     @InheritInverseConfiguration
     @DelegatingConverter
-    @Mapping(target = "posts", ignore = true)
-    @Mapping(target = "categoryMembers", ignore = true)
-    @Mapping(target = "chatChannels", ignore = true)
+//    @Mapping(target = "posts", ignore = true)
+//    @Mapping(target = "categoryMembers", ignore = true)
+//    @Mapping(target = "chatChannels", ignore = true)
     PostCategory inverseConvert(CategoryDTO source);
 
 }

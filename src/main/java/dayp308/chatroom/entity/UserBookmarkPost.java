@@ -1,9 +1,8 @@
 package dayp308.chatroom.entity;
 
+import dayp308.chatroom.entity.id.UserBookmarkPostId;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;

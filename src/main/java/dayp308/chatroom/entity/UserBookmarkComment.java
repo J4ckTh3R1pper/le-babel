@@ -1,9 +1,8 @@
 package dayp308.chatroom.entity;
 
+import dayp308.chatroom.entity.id.UserBookmarkCommentId;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 

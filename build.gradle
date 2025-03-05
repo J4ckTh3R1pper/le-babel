@@ -56,7 +56,7 @@ dependencies {
     implementation group: 'org.glassfish.web', name: 'jakarta.servlet.jsp.jstl', version: '3.0.1'
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: hibernateVersion
-// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-hikaricp
+    // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-hikaricp
     implementation group: 'org.hibernate.orm', name: 'hibernate-hikaricp', version: hibernateVersion
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-jpamodelgen
     compileOnly group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
@@ -64,6 +64,10 @@ dependencies {
     testCompileOnly group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
     testAnnotationProcessor group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
 
+    // https://mvnrepository.com/artifact/org.mybatis/mybatis
+    implementation 'org.mybatis:mybatis:3.5.19'
+    // https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper
+    implementation 'com.github.pagehelper:pagehelper:6.1.0'
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
@@ -86,7 +90,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
 
-
+    implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
+    // https://mvnrepository.com/artifact/net.coobird/thumbnailator
+    implementation 'net.coobird:thumbnailator:0.4.20'
 
 }
 sourceSets {

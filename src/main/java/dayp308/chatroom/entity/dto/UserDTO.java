@@ -1,15 +1,12 @@
 package dayp308.chatroom.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import dayp308.chatroom.entity.*;
-import dayp308.chatroom.entity.enums.Genders;
+import dayp308.chatroom.entity.enums.Gender;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -40,6 +37,6 @@ public class UserDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Instant createTime = Instant.now();
 
-    private Genders gender = Genders.UNKNOWN;
+    private Gender gender = Gender.UNKNOWN;
 
 }

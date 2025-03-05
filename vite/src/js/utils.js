@@ -12,5 +12,6 @@ export const axios =  ax.create({
     headers: {
         'content-type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-    }
+    },
+    withCredentials: true
 });

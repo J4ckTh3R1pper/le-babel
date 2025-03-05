@@ -3,13 +3,13 @@ package dayp308.chatroom.exception;
 import lombok.Getter;
 
 @Getter
-public class InvalidFormException extends Exception {
+public class InvalidFormException extends AbstractCodedException {
 
-    private final int errorCode;
+    private final int errCode;
 
     public InvalidFormException(String message, ErrorCode errorCode) {
         super(message);
-        this.errorCode = errorCode.code;
+        this.errCode = errorCode.code;
     }
 
     public enum ErrorCode {

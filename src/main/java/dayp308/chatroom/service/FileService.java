@@ -2,6 +2,9 @@ package dayp308.chatroom.service;
 
 import dayp308.chatroom.exception.FileUploadException;
 import dayp308.chatroom.util.FileUtil;
+import net.coobird.thumbnailator.Thumbnailator;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.name.Rename;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,14 +41,21 @@ public class FileService {
             throw new FileUploadException("empty file is not allowed.");
         String fileName = imageFile.getOriginalFilename();
         String extension = FilenameUtils.getExtension(fileName);
-        String storeName = FileUtil.getMD5(imageFile) + File.separator + extension;
+        String storeName = FileUtil.getMD5(imageFile) + "." + extension;
         try {
             InputStream stream = imageFile.getInputStream();
-            File fileDir = new File(assetsPath + File.separator + imgPath + File.separator + "avatar");
+            File fileDir = new File(imgPath);
             if (!fileDir.exists())
                 fileDir.mkdirs();
-            Files.copy(stream, Path.of(fileDir.getPath(), storeName), StandardCopyOption.REPLACE_EXISTING);
-            return "/images/" + "avatar/" + storeName;
+            Path path = Path.of(fileDir.getPath(), storeName);
+            Path thumbnailPath = Path.of(fileDir.getPath(), "thumbnails");
+            Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
+            Thumbnails.of(path.toFile())
+                    .outputFormat("webp")
+                    .size(1280, 720)
+                    .allowOverwrite(true)
+                    .toFiles(thumbnailPath.toFile(), Rename.SUFFIX_HYPHEN_THUMBNAIL);
+            return "/images/" + storeName;
         } catch (Exception e) {
             e.printStackTrace();
             throw new FileUploadException(e.getMessage(), e);

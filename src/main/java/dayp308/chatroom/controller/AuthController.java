@@ -28,7 +28,7 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/login", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> login(@RequestBody LoginForm form,
                       HttpServletRequest req,

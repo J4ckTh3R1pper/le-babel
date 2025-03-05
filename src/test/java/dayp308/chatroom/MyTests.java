@@ -1,20 +1,24 @@
 package dayp308.chatroom;
 
-import dayp308.chatroom.controller.AuthController;
-import dayp308.chatroom.entity.CategoryMemberId;
-import dayp308.chatroom.entity.PostComment;
+import dayp308.chatroom.converter.PostToBriefView;
+import dayp308.chatroom.entity.business.CategoryCreationForm;
+import dayp308.chatroom.entity.enums.Role;
+import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
-import dayp308.chatroom.entity.business.LoginForm;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.dto.*;
-import dayp308.chatroom.exception.InvalidFormException;
+import dayp308.chatroom.entity.view.PagedResponse;
+import dayp308.chatroom.entity.view.comment.CommentBriefView;
+import dayp308.chatroom.entity.view.comment.CommentDetailResponse;
+import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.repository.*;
+import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.UserService;
-import jakarta.persistence.EntityExistsException;
+import dayp308.chatroom.util.PageUtil;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,7 +47,7 @@ class MyTests {
     @Autowired
     private CategoryMemberRepository categoryMemberRepository;
     @Autowired
-    private AuthController authController;
+    private CategoryMemberService categoryMemberService;
 
     @ParameterizedTest
     @CsvSource({"qq", ".com"})
@@ -81,10 +85,10 @@ class MyTests {
         try {
             user = userService.register(form);
             category = categoryService.createCategory(
-                    new CategoryDTO(RandomString.make(8))
+                    new CategoryCreationForm(RandomString.make(8), RandomString.make(8), RandomString.make(8))
             );
 
-            member = categoryService.addUserToCategory(category, user);
+            member = categoryMemberService.addMember(category, user, Role.SUBSCRIBER);
 
             post = postService.addPost(
                     new PostForm(
@@ -112,5 +116,43 @@ class MyTests {
             if (user != null) userRepository.deleteById(user.getId());
             if (category != null) categoryRepository.deleteById(category.getId());
         }
+    }
+    @Test
+    void testCropMarkdown() {
+        String md = """
+                # h1 Heading 8-)
+                ## h2 Heading
+                ### h3 Heading
+                #### h4 Heading
+                ##### h5 Heading
+                ###### h6 Heading
+                
+                
+                ## Horizontal Rules
+                
+                ___
+                
+                ---
+                
+                ***
+                """;
+        System.out.println(PostToBriefView.cropContent(md));
+    }
+
+    @Test
+    void testCommentTree() {
+        CommentDetailResponse view = postService.getCommentDetailedView(32, null);
+        System.out.println(view.toString());
+    }
+    @Test
+    void testCommentTreeCropped() {
+        CommentBriefView view = postService.getCommentBriefView(32);
+        System.out.println(view.toString());
+    }
+
+    @Test
+    void testPageComment() {
+        PagedResponse<CommentBriefView> resp = postService.getBriefCommentSliceByPost(17, 0, 25, null);
+        System.out.println(resp.getContent());
     }
 }

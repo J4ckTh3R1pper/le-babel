@@ -1,7 +1,7 @@
 package dayp308.chatroom.converter;
 
 import dayp308.chatroom.entity.CategoryMember;
-import dayp308.chatroom.entity.CategoryMemberId;
+import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.dto.CategoryMemberDTO;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
@@ -24,10 +24,11 @@ public class CategoryMemberConverter implements Converter<CategoryMemberDTO, Cat
 
     @Override
     public CategoryMember convert(CategoryMemberDTO source) {
-        CategoryMember categoryMember = new CategoryMember();
-        categoryMember.setCategory(categoryRepository.getReferenceById(source.getCategoryId()));
-        categoryMember.setUser(userRepository.getReferenceById(source.getUserId()));
-        BeanUtils.copyProperties(source, categoryMember);
-        return categoryMember;
+        CategoryMember target = new CategoryMember();
+        target.setCategory(categoryRepository.getReferenceById(source.getCategoryId()));
+        target.setUser(userRepository.getReferenceById(source.getUserId()));
+        target.setId(new CategoryMemberId(source.getCategoryId(), source.getUserId()));
+        BeanUtils.copyProperties(source, target);
+        return target;
     }
 }

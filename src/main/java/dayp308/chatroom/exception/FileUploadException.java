@@ -1,12 +1,17 @@
 package dayp308.chatroom.exception;
 
 
-public class FileUploadException extends Exception {
-	public FileUploadException(String msg) {
-		super(msg);
+public class FileUploadException extends AbstractCodedException {
+	public FileUploadException(String message) {
+		super(message);
 	}
 
-	public FileUploadException(String msg, Throwable cause) {
-		super(msg, cause);
+	public FileUploadException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	@Override
+	int getErrCode() {
+		return 1201;
 	}
 }

@@ -36,12 +36,10 @@ public class PostComment {
     private String commentBody;
 
     @ColumnDefault("current_timestamp()")
-    @Generated
     @Column(name = "comment_create_time", nullable = false)
     private Instant commentCreateTime = Instant.now();
 
     @ColumnDefault("0")
-    @Generated
     @Column(name = "is_deleted", length = 1)
     private boolean isDeleted = false;
 
@@ -52,8 +50,8 @@ public class PostComment {
     @JoinColumn(name = "parent_comment_id")
     private PostComment parentComment;
 
-    @OneToMany(mappedBy = "parentComment")
-    private List<PostComment> subComments;
+//    @OneToMany(mappedBy = "parentComment")
+//    private List<PostComment> subComments;
 
 
 }

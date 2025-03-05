@@ -1,6 +1,6 @@
 package dayp308.chatroom.entity.dto;
 
-import dayp308.chatroom.entity.enums.Roles;
+import dayp308.chatroom.entity.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +13,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @Component
 public class CategoryMemberDTO {
-    private Long userId;
-    private Integer categoryId;
-    private Roles role = Roles.SUBSCRIBER;
+    private long userId;
+    private int categoryId;
+    private Role role = Role.SUBSCRIBER;
     private String title;
-    private Integer experience = 0;
+    private int experience = 0;
     private Instant muteExpirationDate = Instant.EPOCH;
 
     public CategoryMemberDTO(Long userId, Integer categoryId) {

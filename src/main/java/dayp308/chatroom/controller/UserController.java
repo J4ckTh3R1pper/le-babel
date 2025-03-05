@@ -6,6 +6,7 @@ import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.dto.UserDTO;
 import dayp308.chatroom.exception.FileUploadException;
 import dayp308.chatroom.exception.InvalidFormException;
+import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.FileService;
 import dayp308.chatroom.service.UserService;
 import jakarta.persistence.EntityExistsException;
@@ -22,11 +23,13 @@ public class UserController {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final FileService fileService;
+    private final UserRepository userRepository;
 
-    public UserController(UserService service, FileService fileService) {
+    public UserController(UserService service, FileService fileService, UserRepository userRepository) {
         this.userService = service;
         this.objectMapper = new ObjectMapper();
         this.fileService = fileService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping(value = "/api/user/register")
@@ -59,4 +62,9 @@ public class UserController {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
+    @GetMapping("/api/no_auth/user/get_overall_exp")
+    public ResponseEntity<String> getOverallExp(@RequestParam("userId") long userId) {
+        int exp = userService.getOverallExp(userRepository.getReferenceById(userId));
+        return new ResponseEntity<>(exp + "", HttpStatus.OK);
+    }
 }
