@@ -1,13 +1,9 @@
 package dayp308.chatroom.service;
 
-import dayp308.chatroom.entity.CategoryMember;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
-import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.PostCategory;
 import dayp308.chatroom.entity.User;
-import dayp308.chatroom.entity.dto.CategoryDTO;
-import dayp308.chatroom.entity.dto.CategoryMemberDTO;
-import dayp308.chatroom.entity.dto.UserDTO;
+import dayp308.chatroom.entity.CategoryDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.exception.CategoryDeletedException;
 import dayp308.chatroom.exception.CategoryPendingException;
@@ -15,12 +11,9 @@ import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.repository.UserRepository;
-import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class CategoryService {
@@ -41,27 +34,23 @@ public class CategoryService {
         this.categoryMemberService = categoryMemberService;
     }
 
-    public CategoryDTO createCategory(CategoryCreationForm form) {
+    public PostCategory createCategory(CategoryCreationForm form) {
         PostCategory category = conversionService.convert(form, PostCategory.class);
-        category.setIsPending(false);
-        categoryRepository.saveAndFlush(category);
-        return conversionService.convert(category, CategoryDTO.class);
+        return categoryRepository.saveAndFlush(category);
     }
 
-    public CategoryDTO createCategory(CategoryCreationForm form, User user) {
+    public int createCategory(CategoryCreationForm form, User user) {
         PostCategory category = conversionService.convert(form, PostCategory.class);
-        category.setIsPending(false);
         categoryRepository.saveAndFlush(category);
-        CategoryDTO categoryDTO = conversionService.convert(category, CategoryDTO.class);
-        categoryMemberService.addMember(categoryDTO, conversionService.convert(user, UserDTO.class), Role.ADMIN);
-        return categoryDTO;
+        categoryMemberService.addMember(category, user, Role.ADMIN);
+        return category.getId();
     }
 
 
 
 
     private void checkAvailability(CategoryDTO dto) {
-        if (dto.getIsDeleted()) throw new CategoryDeletedException("category has been deleted");
-        if (dto.getIsPending()) throw new CategoryPendingException("category is currently pending");
+        if (dto.isDeleted()) throw new CategoryDeletedException("category has been deleted");
+        if (dto.isPending()) throw new CategoryPendingException("category is currently pending");
     }
 }

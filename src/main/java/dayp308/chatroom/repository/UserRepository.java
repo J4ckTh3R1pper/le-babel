@@ -1,6 +1,7 @@
 package dayp308.chatroom.repository;
 
 import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.UserDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,9 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
-    Optional<User> findByLoginName(String loginName);
+    <T> Optional<T> findByLoginName(String loginName, Class<T> type);
     User findByLoginNameAndPassword(String loginName, String password);
     boolean existsByLoginNameAndPassword(String loginName, String password);
-    List<User> findByNickNameContainingIgnoreCase(String nickName);
+    <T> List<T> findByNickNameContainingIgnoreCase(String nickName, Class<T> clazz);
 
+    <T> T findById(Long id, Class<T> clazz);
 }

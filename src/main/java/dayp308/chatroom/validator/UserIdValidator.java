@@ -1,6 +1,6 @@
 package dayp308.chatroom.validator;
 
-import dayp308.chatroom.annotation.UserIdExists;
+import dayp308.chatroom.validator.annotation.UserIdExists;
 import dayp308.chatroom.repository.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

@@ -8,18 +8,17 @@ import java.util.List;
 
 @Data
 @Component
-public class PostUserView {
+public class PostDetailedView {
     private Long id;
     private UserBriefView userBriefView;
-    private String postTitle;
-    private String postContent;
-    private Integer postCategoryId;
+    private String title;
+    private String content;
+    private Integer categoryId;
     private Instant createTime;
     private Instant lastUpdateTime;
     private List<String> tags;
-    private Long postViews;
+    private Long views;
     private Long likes;
     private Long comments;
-    private Boolean liked;
 
 }

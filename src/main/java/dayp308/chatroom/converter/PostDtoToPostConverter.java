@@ -3,7 +3,7 @@ package dayp308.chatroom.converter;
 import dayp308.chatroom.entity.Post;
 import dayp308.chatroom.entity.PostCategory;
 import dayp308.chatroom.entity.User;
-import dayp308.chatroom.entity.dto.PostDTO;
+import dayp308.chatroom.entity.PostDTO;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
@@ -25,12 +25,12 @@ public class PostDtoToPostConverter implements Converter<PostDTO, Post> {
 
     @Override
     public Post convert(PostDTO source) {
-        User user = userRepository.findById(source.getPublishUserId()).orElseThrow();
-        PostCategory postCategory = categoryRepository.findById(source.getPostCategoryId()).orElseThrow();
+        User user = userRepository.findById(source.getPublishUser().getId()).orElseThrow();
+        PostCategory postCategory = categoryRepository.findById(source.getCategory().getId()).orElseThrow();
         Post target = new Post();
         BeanUtils.copyProperties(source, target);
         target.setPublishUser(user);
-        target.setPostCategory(postCategory);
+        target.setCategory(postCategory);
         return target;
     }
 }

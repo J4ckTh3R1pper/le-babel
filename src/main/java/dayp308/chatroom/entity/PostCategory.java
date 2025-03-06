@@ -7,12 +7,9 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Generated;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -44,23 +41,23 @@ public class PostCategory {
 
     @ColumnDefault("''")
     @Column(name = "category_avatar")
-    private String categoryAvatar = "";
+    private String avatar = "";
 
     @ColumnDefault("''")
     @Column(name = "category_info")
-    private String categoryInfo = "";
+    private String info = "";
 
-    @ColumnDefault("''")
+    @ColumnDefault("'0'")
     @Column(name = "is_muted")
     private Boolean isMuted = false;
 
-    @ColumnDefault("''")
+    @ColumnDefault("0")
     @Column(name = "is_pending")
-    private Boolean isPending = true;
+    private Boolean isPending = false;
 
     @ColumnDefault("''")
     @Column(name = "category_rule")
-    private String categoryRule = "";
+    private String rule = "";
 //    @OneToMany(mappedBy = "category")
 //    private Set<CategoryMember> categoryMembers = new LinkedHashSet<>();
 

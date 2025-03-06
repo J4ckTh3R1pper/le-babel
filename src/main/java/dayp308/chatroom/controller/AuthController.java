@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Arrays;
 
-@RestController
+//@RestController
 public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;

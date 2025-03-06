@@ -2,28 +2,20 @@ package dayp308.chatroom.service;
 
 import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
-import dayp308.chatroom.entity.dto.UserDTO;
+import dayp308.chatroom.entity.UserDTO;
 import dayp308.chatroom.exception.UserExistsException;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.UserRepository;
-import dayp308.chatroom.repository.specification.CustomSpecifications;
-import jakarta.persistence.EntityExistsException;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static dayp308.chatroom.repository.specification.CustomSpecifications.userMemberships;
 
@@ -89,8 +81,8 @@ public class UserService {
      * @return 搜索到用户的UserDTO类
      */
     @Transactional(readOnly = true)
-    public Optional<User> findByLoginName(String loginName) {
-        return userRepository.findByLoginName(loginName);
+    public Optional<UserDTO> findByLoginName(String loginName) {
+        return userRepository.findByLoginName(loginName, UserDTO.class);
     }
 
     /***
@@ -100,9 +92,8 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public List<UserDTO> searchByNickName(String nickName) {
-        List<User> DOList = userRepository.findByNickNameContainingIgnoreCase(nickName);
-
-        return DOList.stream().map(u -> conversionService.convert(u, UserDTO.class)).toList();
+        List<UserDTO> DOList = userRepository.findByNickNameContainingIgnoreCase(nickName, UserDTO.class);
+        return DOList;
     }
 
     /*** 注册用户
@@ -111,7 +102,7 @@ public class UserService {
      * @return 注册完成的用户DTO对象
      * @throws UserExistsException 邮箱或用户名重复时抛出
      */
-    public UserDTO register(UserRegistrationForm form) {
+    public long register(UserRegistrationForm form) {
         User user = new User();
         user.setLoginName(form.getLoginName());
         user.setNickName(form.getNickName());
@@ -121,13 +112,12 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new UserExistsException("User e-mail already exists");
         }
-        return conversionService.convert(user, UserDTO.class);
+        return user.getId();
     }
 
-    public UserDTO updateUser(UserDTO dto) {
-        User user = conversionService.convert(dto, User.class);
+    public UserDTO updateUser(User user) {
         userRepository.saveAndFlush(user);
-        return conversionService.convert(user, UserDTO.class);
+        return userRepository.findById(user.getId(), UserDTO.class);
     }
 
 }

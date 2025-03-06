@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Generated;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -20,28 +19,28 @@ public class Post {
     @Column(name = "post_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "publish_user_id", nullable = false)
     private User publishUser;
 
     @Column(name = "post_title", nullable = false, length = 64)
-    private String postTitle;
+    private String title;
 
     @Lob
     @Column(name = "post_content", nullable = false)
-    private String postContent;
+    private String content;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_category_id", nullable = false)
-    private PostCategory postCategory;
+    private PostCategory category;
 
-    @ColumnDefault("1")
+    @ColumnDefault("0")
     @Column(name = "post_status", nullable = false)
-    private Byte postStatus = 1;
+    private Byte status = 1;
 
     @ColumnDefault("0")
     @Column(name = "post_views", nullable = false)
-    private Long postViews = 0L;
+    private Long views = 0L;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "last_update_time", nullable = false)
@@ -54,12 +53,12 @@ public class Post {
     @ColumnDefault("'[]'")
     @Lob
     @Column(name = "post_tags", nullable = false)
-    private String postTags = "[]";
+    private String tags = "[]";
 
     @ManyToMany(mappedBy = "bookmarkedPosts")
     private Set<User> bookmarkedUsers = new LinkedHashSet<>();
 
-//    @OneToMany(mappedBy = "post")
-//    private Set<PostComment> postComments = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "post")
+    private Set<PostComment> postComments = new LinkedHashSet<>();
 
 }

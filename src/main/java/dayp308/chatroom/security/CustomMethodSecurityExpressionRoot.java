@@ -1,9 +1,8 @@
 package dayp308.chatroom.security;
 
-import dayp308.chatroom.entity.PostCategory;
-import dayp308.chatroom.entity.PostComment;
+import dayp308.chatroom.entity.Post;
 import dayp308.chatroom.entity.User;
-import dayp308.chatroom.entity.dto.CommentDTO;
+import dayp308.chatroom.entity.CommentDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.PostService;
@@ -39,24 +38,24 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot {
     }
 
     public boolean hasAuthorityPostGe(long postId, String role) {
-        int categoryId = postService.getPostById(postId).getPostCategoryId();
+        int categoryId = postService.getPostById(postId).getCategory().getId();
         return this.categoryMemberService.hasAuthorityGreaterOrEquals(
                 categoryId, ((User) this.getPrincipal()).getId(), Role.valueOf(role));
     }
 
     public boolean isOwnerOfPost(long postId) {
         long authenticatedUserId = ( (User) this.getPrincipal() ).getId();
-        return postService.getPostById(postId).getPublishUserId() == authenticatedUserId;
+        return postService.getPostById(postId).getPublishUser().getId() == authenticatedUserId;
     }
 
     public boolean isOwnerOfComment(long commentId) {
         long authenticatedUserId = ( (User) this.getPrincipal() ).getId();
-        return postService.getCommentById(commentId).getUserId() == authenticatedUserId;
+        return postService.getCommentById(commentId).getUser().getId() == authenticatedUserId;
     }
 
     public boolean hasAuthorityCommentGe(long commentId, String role) {
         CommentDTO comment = postService.getCommentById(commentId);
-        return hasAuthorityPostGe(comment.getPostId(), role);
+        return hasAuthorityPostGe(comment.getPost().getId(), role);
     }
 
     public boolean hasMembershipEquals(int categoryId, String role) {

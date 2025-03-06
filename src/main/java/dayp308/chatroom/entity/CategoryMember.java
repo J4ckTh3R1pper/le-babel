@@ -24,12 +24,12 @@ public class CategoryMember {
     private CategoryMemberId id = new CategoryMemberId(); // 不初始化id会造成NPE
 
     @MapsId("categoryId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private PostCategory category;
 
     @MapsId("userId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

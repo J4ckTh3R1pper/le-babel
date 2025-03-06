@@ -10,7 +10,7 @@ public class MessageService implements IMessageService{
 
     private final MessageMapper messageMapper;
 
-    @Autowired
+//    @Autowired
     public MessageService(MessageMapper messageMapper) {
         this.messageMapper = messageMapper;
     }

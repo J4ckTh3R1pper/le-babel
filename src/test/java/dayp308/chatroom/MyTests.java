@@ -1,24 +1,21 @@
 package dayp308.chatroom;
 
 import dayp308.chatroom.converter.PostToBriefView;
+import dayp308.chatroom.entity.*;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
-import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
-import dayp308.chatroom.entity.dto.*;
 import dayp308.chatroom.entity.view.PagedResponse;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
 import dayp308.chatroom.entity.view.comment.CommentDetailResponse;
-import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.repository.*;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.UserService;
-import dayp308.chatroom.util.PageUtil;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,10 +46,19 @@ class MyTests {
     @Autowired
     private CategoryMemberService categoryMemberService;
 
+    UserDTO randomUser( String password ) {
+        UserRegistrationForm form = new UserRegistrationForm();
+        form.setLoginName(RandomString.make(8) + "@example.com");
+        form.setNickName(RandomString.make(8));
+        form.setPassword(password);
+        long id = userService.register(form);
+        return userRepository.findById(id, UserDTO.class);
+    }
+
     @ParameterizedTest
     @CsvSource({"qq", ".com"})
     public void searchUserByLoginName(String loginName) {
-        System.out.println(userRepository.findByLoginName(loginName));
+        System.out.println(userRepository.findByLoginName(loginName, UserDTO.class));
     }
 
     @ParameterizedTest
@@ -63,39 +69,34 @@ class MyTests {
 
     @Test
     public void testRegister() {
-        UserRegistrationForm form = new UserRegistrationForm();
-        form.setLoginName(RandomString.make(8) + "@example.com");
-        form.setNickName(RandomString.make(8));
-        form.setPassword(RandomString.make(8));
-        System.out.println(userService.register(form));
+        String password = RandomString.make(8);
+        System.out.println(randomUser(password));
     }
 
     @Test
     public void fullTest() {
-        UserDTO user = null;
-        CategoryDTO category = null;
+        PostCategory category = null;
         PostDTO post = null;
-        CategoryMemberDTO member = null;
+        CategoryMemberId member = null;
         CommentDTO comment = null;
 
-        UserRegistrationForm form = new UserRegistrationForm();
-        form.setLoginName(RandomString.make(8) + "@example.com");
-        form.setNickName(RandomString.make(8));
-        form.setPassword(RandomString.make(8));
+        String password = RandomString.make(8);
+        UserDTO user = randomUser(password);
+
         try {
-            user = userService.register(form);
+            User user1 = userRepository.findById(user.id(), User.class);
             category = categoryService.createCategory(
                     new CategoryCreationForm(RandomString.make(8), RandomString.make(8), RandomString.make(8))
             );
 
-            member = categoryMemberService.addMember(category, user, Role.SUBSCRIBER);
+            member = categoryMemberService.addMember(category, user1, Role.SUBSCRIBER);
 
             post = postService.addPost(
                     new PostForm(
                             category.getId(),
                             RandomString.make(16),
                             RandomString.make(512)
-                    ), conversionService.convert(user, User.class)
+                    ), user1
             );
 
             comment = postService.addComment(
@@ -103,17 +104,15 @@ class MyTests {
                             RandomString.make(512),
                             post.getId(),
                             null
-                    ), conversionService.convert(user, User.class)
+                    ), user1
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             if (comment != null) commentRepository.deleteById(comment.getId());
             if (post != null) postRepository.deleteById(post.getId());
-            if (member != null) categoryMemberRepository.deleteById(new CategoryMemberId(
-                    member.getCategoryId(), member.getUserId()
-            ));
-            if (user != null) userRepository.deleteById(user.getId());
+            if (member != null) categoryMemberRepository.deleteById(member);
+            if (user != null) userRepository.deleteById(user.id());
             if (category != null) categoryRepository.deleteById(category.getId());
         }
     }

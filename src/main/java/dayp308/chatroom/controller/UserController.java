@@ -1,9 +1,10 @@
 package dayp308.chatroom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.UserEditForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
-import dayp308.chatroom.entity.dto.UserDTO;
+import dayp308.chatroom.entity.UserDTO;
 import dayp308.chatroom.exception.FileUploadException;
 import dayp308.chatroom.exception.InvalidFormException;
 import dayp308.chatroom.repository.UserRepository;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -46,18 +48,21 @@ public class UserController {
     @PostMapping(value = "/api/user/update_avatar")
     public ResponseEntity<String> updateAvatar(
             @RequestPart("image") MultipartFile imageFile,
-            @RequestPart("token") String token
+            @RequestPart("token") String token,
+            Authentication auth
     ) throws FileUploadException {
 
-        UserDTO user = null;
+        User user = ((User) auth.getPrincipal());
         user.setHeadImgUrl(fileService.uploadImage(imageFile));
-        return new ResponseEntity<>(userService.updateUser(user).getHeadImgUrl(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.updateUser(user).headImgUrl(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/api/user/update", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<String> updateUser(@Valid UserEditForm form) {
-        UserDTO user = null;
-        BeanUtils.copyProperties(form, user);
+    public ResponseEntity<String> updateUser(@Valid UserEditForm form, Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        user.setNickName(form.getNickName());
+        user.setIntroduce(form.getIntroduce());
+        user.setGender(form.getGender());
         userService.updateUser(user);
         return new ResponseEntity<>("success", HttpStatus.OK);
     }

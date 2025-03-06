@@ -14,4 +14,7 @@ public interface CommentRepository extends JpaRepository<PostComment, Long> {
     Slice<PostComment> findAll(Specification<PostComment> specification, Pageable pageable);
     Set<PostComment> findAll(Specification<PostComment> specification);
     long countByPostId(Long postId);
+
+    <T> T findById(Long id, Class<T> type);
+
 }

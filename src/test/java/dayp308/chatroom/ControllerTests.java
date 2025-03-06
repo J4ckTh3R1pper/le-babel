@@ -1,13 +1,14 @@
 package dayp308.chatroom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dayp308.chatroom.entity.CategoryMember;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
-import dayp308.chatroom.entity.dto.CategoryDTO;
-import dayp308.chatroom.entity.dto.CategoryMemberDTO;
-import dayp308.chatroom.entity.dto.UserDTO;
+import dayp308.chatroom.entity.CategoryMemberDTO;
+import dayp308.chatroom.entity.UserDTO;
 import dayp308.chatroom.repository.CategoryMemberRepository;
+import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.UserService;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -41,17 +41,20 @@ public class ControllerTests {
     private CategoryMemberService categoryMemberService;
     @Autowired
     private CategoryMemberRepository categoryMemberRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     UserDTO randomUser( String password ) {
         UserRegistrationForm form = new UserRegistrationForm();
         form.setLoginName(RandomString.make(8) + "@example.com");
         form.setNickName(RandomString.make(8));
         form.setPassword(password);
-        return userService.register(form);
+        long id = userService.register(form);
+        return userRepository.findById(id, UserDTO.class);
     }
 
     @Test
-    public void testUnlogin() {
+    public void testUnLogin() {
         try {
             mockMvc.perform(
                     MockMvcRequestBuilders.post("/api/test_moderator")
@@ -64,36 +67,6 @@ public class ControllerTests {
 
     @Test
     public void testExp() {
-        CategoryDTO cDto = new CategoryDTO();
-        cDto.setId(6);
-        String password = RandomString.make(72);
-        UserDTO uDto = randomUser(password);
-
-        String password2 = RandomString.make(72);
-        UserDTO uDto2 = randomUser(password2);
-
-        CategoryMemberDTO memberDTO = categoryMemberService.addMember(cDto, uDto, Role.SUBSCRIBER);
-        memberDTO.setExperience(5000);
-        CategoryMemberDTO memberDTO2 = categoryMemberService.addMember(cDto, uDto2, Role.SUBSCRIBER);
-        memberDTO2.setExperience(4000);
-
-        categoryMemberService.updateMember(memberDTO);
-        categoryMemberService.updateMember(memberDTO2);
-
-        try {
-            mockMvc.perform(
-                    MockMvcRequestBuilders.get("/api/no_auth/user/get_overall_exp")
-                            .param("userId", uDto.getId().toString())
-            ).andDo(print());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            categoryMemberRepository.deleteById(new CategoryMemberId(cDto.getId(), uDto.getId()));
-            userRepository.deleteById(uDto.getId());
-
-            categoryMemberRepository.deleteById(new CategoryMemberId(cDto.getId(), uDto2.getId()));
-            userRepository.deleteById(uDto2.getId());
-        }
     }
 
     @Test
@@ -101,14 +74,16 @@ public class ControllerTests {
         String password = RandomString.make(72);
         UserDTO uDto = randomUser(password);
 
-        CategoryDTO cDto = new CategoryDTO();
-        cDto.setId(6);
-        CategoryMemberDTO mDto = null;
+        CategoryMemberId mDto = categoryMemberService.addMember(
+                categoryRepository.getReferenceById(6),
+                userRepository.getReferenceById(uDto.id()),
+                null
+        );
         final Cookie[][] cookies = new Cookie[1][1];
         try {
             mockMvc.perform(
                     MockMvcRequestBuilders.post("/login")
-                            .formField("loginName", uDto.getLoginName())
+                            .formField("loginName", uDto.loginName())
                             .formField("password", password)
                             .formField("remember-me", "true")
                             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -125,11 +100,9 @@ public class ControllerTests {
                     .andDo(result -> cookies[0] = result.getResponse().getCookies())
                     .andDo(print());
 
-            mDto = categoryMemberService.addMember(cDto, uDto, Role.SUBSCRIBER);
-
             mockMvc.perform(
                     MockMvcRequestBuilders.post("/api/test_moderator")
-                            .param("categoryId", cDto.getId().toString())
+                            .param("categoryId", mDto.getCategoryId().toString())
                             .cookie(cookies[0])
             ).andExpect(status().is2xxSuccessful())
                     .andDo(result -> cookies[0] = result.getResponse().getCookies())
@@ -144,15 +117,17 @@ public class ControllerTests {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if ( mDto != null ) categoryMemberRepository.deleteById(new CategoryMemberId(6, uDto.getId()));
-            userRepository.deleteById(uDto.getId());
+            if ( mDto != null ) categoryMemberRepository.deleteById(mDto);
+            userRepository.deleteById(uDto.id());
         }
     }
 
     @Test
-    public void testMembership() {
-        String password = RandomString.make(72);
-        UserDTO uDTO = randomUser(password);
-
+    public void testPostList() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/no_auth/post/get_posts")
+                        .param("categoryId", "1")
+                        .param("pageNum", "0")
+        ).andExpect(status().is2xxSuccessful()).andDo(print());
     }
 }

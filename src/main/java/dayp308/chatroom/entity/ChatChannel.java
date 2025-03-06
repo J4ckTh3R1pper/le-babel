@@ -17,7 +17,7 @@ public class ChatChannel {
     @Column(name = "channel_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private PostCategory category;
 

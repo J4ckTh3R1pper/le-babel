@@ -1,4 +1,4 @@
-package dayp308.chatroom.annotation;
+package dayp308.chatroom.validator.annotation;
 
 import dayp308.chatroom.validator.PostIdValidator;
 import jakarta.validation.Constraint;

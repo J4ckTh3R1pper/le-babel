@@ -6,13 +6,13 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FormCategoryConverter implements Converter<CategoryCreationForm, PostCategory> {
+public class FormToPostCategory implements Converter<CategoryCreationForm, PostCategory> {
     @Override
     public PostCategory convert(CategoryCreationForm source) {
         PostCategory target = new PostCategory();
         target.setCategoryName(source.getCategoryName());
-        target.setCategoryInfo(source.getCategoryInfo());
-        target.setCategoryAvatar(source.getAvatar());
+        target.setInfo(source.getCategoryInfo());
+        target.setAvatar(source.getAvatar());
         return target;
     }
 }

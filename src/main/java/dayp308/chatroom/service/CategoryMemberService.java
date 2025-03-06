@@ -4,9 +4,7 @@ import dayp308.chatroom.entity.CategoryMember;
 import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.PostCategory;
-import dayp308.chatroom.entity.dto.CategoryDTO;
-import dayp308.chatroom.entity.dto.CategoryMemberDTO;
-import dayp308.chatroom.entity.dto.UserDTO;
+import dayp308.chatroom.entity.CategoryMemberDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.view.UserBriefView;
 import dayp308.chatroom.exception.CategoryDeletedException;
@@ -15,11 +13,10 @@ import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class CategoryMemberService {
@@ -47,42 +44,22 @@ public class CategoryMemberService {
         return conversionService.convert(member, UserBriefView.class);
     }
 
-    public CategoryMemberDTO updateMember(CategoryMemberDTO dto) {
-        PostCategory category = categoryRepository.getReferenceById(dto.getCategoryId());
+    public CategoryMemberId addMember(PostCategory category, User user, @Nullable Role role) {
         checkAvailability(category);
-        CategoryMember membership = conversionService.convert(dto, CategoryMember.class);
-        categoryMemberRepository.saveAndFlush(membership);
-        return conversionService.convert(membership, CategoryMemberDTO.class);
-    }
+        if (categoryMemberRepository.findByUser(user).isPresent()) throw new EntityExistsException();
 
-    public CategoryMemberDTO addMember(CategoryDTO categoryDto, UserDTO userDto, @Nullable Role role) {
-        PostCategory category = categoryRepository.getReferenceById(categoryDto.getId());
-        checkAvailability(category);
-        CategoryMemberId memberId = new CategoryMemberId(categoryDto.getId(), userDto.getId());
-        if ( categoryMemberRepository.existsById(memberId)
-                && role != null
-                && categoryMemberRepository.getReferenceById(memberId).getRole().ordinal() <= role.ordinal() ) {
-            return setUserRole(categoryDto, userDto, role);
-        }
-
-        User user = userRepository.getReferenceById(userDto.getId());
         CategoryMember member = new CategoryMember();
         member.setCategory(category);
         member.setUser(user);
         if (role != null) member.setRole(role);
 
-        categoryMemberRepository.saveAndFlush(member);
-        return conversionService.convert(
-                member,
-                CategoryMemberDTO.class
-        );
+        return categoryMemberRepository.saveAndFlush(member).getId();
     }
 
-    public CategoryMemberDTO setUserRole(CategoryDTO categoryDto, UserDTO userDto, Role role) {
-        checkAvailability(categoryRepository.getReferenceById(categoryDto.getId()));
-        CategoryMember member = categoryMemberRepository.getReferenceById(new CategoryMemberId(categoryDto.getId(), userDto.getId()));
+    public void setUserRole(PostCategory category, User user, Role role) {
+        checkAvailability(category);
+        CategoryMember member = categoryMemberRepository.getReferenceById(new CategoryMemberId(category.getId(), user.getId()));
         member.setRole(role);
-        return conversionService.convert( categoryMemberRepository.saveAndFlush(member), CategoryMemberDTO.class );
     }
 
     public boolean hasMembership(int categoryId, long userId) {

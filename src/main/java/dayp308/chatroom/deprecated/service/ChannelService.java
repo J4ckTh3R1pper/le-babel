@@ -9,7 +9,7 @@ import java.util.List;
 public class ChannelService implements IChannelService{
 
     private final ChannelMapper channelMapper;
-    @Autowired
+//    @Autowired
     public ChannelService(ChannelMapper channelMapper) {
         this.channelMapper = channelMapper;
     }

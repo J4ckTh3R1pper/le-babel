@@ -2,12 +2,9 @@ package dayp308.chatroom.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Generated;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,13 +20,13 @@ public class PostComment {
     @Column(name = "comment_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "comment_user_id", nullable = false)
-    private User commentUser;
+    private User user;
 
     @ColumnDefault("''")
     @Column(name = "comment_body", nullable = false, length = 512)
@@ -37,11 +34,11 @@ public class PostComment {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "comment_create_time", nullable = false)
-    private Instant commentCreateTime = Instant.now();
+    private Instant createTime = Instant.now();
 
     @ColumnDefault("0")
     @Column(name = "is_deleted", length = 1)
-    private boolean isDeleted = false;
+    private Boolean isDeleted = false;
 
     @ManyToMany(mappedBy = "bookmarkedComments")
     private List<User> bookmarkedUsers;

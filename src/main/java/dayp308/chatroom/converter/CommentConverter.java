@@ -1,8 +1,7 @@
 package dayp308.chatroom.converter;
 
 import dayp308.chatroom.entity.PostComment;
-import dayp308.chatroom.entity.dto.CommentDTO;
-import dayp308.chatroom.repository.CategoryRepository;
+import dayp308.chatroom.entity.CommentDTO;
 import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
@@ -25,8 +24,8 @@ public class CommentConverter implements Converter<CommentDTO, PostComment> {
     @Override
     public PostComment convert(CommentDTO source) {
         PostComment target = new PostComment();
-        target.setCommentUser(userRepository.getReferenceById(source.getUserId()));
-        target.setPost(postRepository.getReferenceById(source.getPostId()));
+        target.setUser(userRepository.getReferenceById(source.getUser().getId()));
+        target.setPost(postRepository.getReferenceById(source.getPost().getId()));
         BeanUtils.copyProperties(source, target);
         return target;
     }

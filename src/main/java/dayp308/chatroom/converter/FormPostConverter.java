@@ -2,11 +2,9 @@ package dayp308.chatroom.converter;
 
 import dayp308.chatroom.entity.Post;
 import dayp308.chatroom.entity.PostCategory;
-import dayp308.chatroom.entity.User;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -28,9 +26,9 @@ public class FormPostConverter implements Converter<PostForm, Post> {
     public Post convert(PostForm source) {
         PostCategory category = categoryRepository.findById(source.getCategoryId()).orElseThrow();
         Post target = new Post();
-        target.setPostCategory(category);
-        target.setPostTitle(source.getTitle());
-        target.setPostContent(source.getContent());
+        target.setCategory(category);
+        target.setTitle(source.getTitle());
+        target.setContent(source.getContent());
         return target;
     }
 }

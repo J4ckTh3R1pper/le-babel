@@ -15,7 +15,7 @@ public class ChatServerService implements IChatServerService{
 
     private final ChatServerMapper chatServerMapper;
 
-    @Autowired
+//    @Autowired
     public ChatServerService(ChatServerMapper chatServerMapper) { this.chatServerMapper = chatServerMapper; }
 
     @Override

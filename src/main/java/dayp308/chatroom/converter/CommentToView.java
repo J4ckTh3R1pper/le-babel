@@ -28,18 +28,17 @@ public class CommentToView implements Converter<PostComment, CommentView> {
         CommentView target = new CommentView();
         CategoryMember member = categoryMemberRepository.getReferenceById(
                 new CategoryMemberId(
-                        source.getPost().getPostCategory().getId(),
-                        source.getCommentUser().getId()
+                        source.getPost().getCategory().getId(),
+                        source.getUser().getId()
                 )
         );
         target.setUserBriefView(briefViewConverter.convert(member));
         if (source.getParentComment() != null)
             target.setParentCommentId(source.getParentComment().getId());
-        target.setCommentId(source.getId());
+        target.setId(source.getId());
         target.setCommentBody(source.getCommentBody());
         target.setPostId(source.getPost().getId());
-        target.setLiked(false);
-        target.setCommentCreateTime(source.getCommentCreateTime());
+        target.setCreateTime(source.getCreateTime());
         target.setLikes( commentLikeRepository.countByCommentId( source.getId()) );
         return target;
     }

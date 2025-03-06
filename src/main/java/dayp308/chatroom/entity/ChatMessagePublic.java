@@ -18,7 +18,7 @@ public class ChatMessagePublic {
     @Column(name = "message_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private dayp308.chatroom.entity.User sender;
 
@@ -26,11 +26,11 @@ public class ChatMessagePublic {
     @Column(name = "message_text", nullable = false)
     private String messageText;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_to")
     private ChatMessagePublic replyTo;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "target_id", nullable = false)
     private dayp308.chatroom.entity.ChatChannel target;
 
