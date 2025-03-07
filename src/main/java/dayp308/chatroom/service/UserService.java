@@ -1,6 +1,7 @@
 package dayp308.chatroom.service;
 
 import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.UserDetailedProj;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.UserDTO;
 import dayp308.chatroom.exception.UserExistsException;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static dayp308.chatroom.repository.specification.CustomSpecifications.userMemberships;
+import static dayp308.chatroom.repository.specification.UserSpecs.userMemberships;
 
 @Service
 public class UserService {
@@ -59,6 +60,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDTO findById(Long id) {
         return conversionService.convert(userRepository.findById(id), UserDTO.class);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDetailedProj findUserDetailedProjById(Long id) {
+        return userRepository.findDetailById(id);
     }
 
     /***

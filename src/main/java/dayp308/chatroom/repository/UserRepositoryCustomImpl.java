@@ -1,6 +1,7 @@
 package dayp308.chatroom.repository;
 
 import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.UserDetailedProj;
 import dayp308.chatroom.entity.User_;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -18,17 +19,12 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     /*** 以用户名关键词搜索用户
      *
-     * @param nickName 用户名关键词
+     * @param id 用户名关键词
      *
      */
-    public List<User> findByNickName(String nickName) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> root = cq.from(User.class);
 
-        cq.where(cb.like(root.get(User_.NICK_NAME), "%" + nickName + "%"));
-
-        return em.createQuery(cq).getResultList();
+    public UserDetailedProj getUserDetailedProj(Long id) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        return null;
     }
-
 }

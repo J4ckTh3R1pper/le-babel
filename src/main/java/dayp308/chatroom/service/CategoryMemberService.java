@@ -9,14 +9,18 @@ import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.view.UserBriefView;
 import dayp308.chatroom.exception.CategoryDeletedException;
 import dayp308.chatroom.exception.CategoryPendingException;
+import dayp308.chatroom.exception.MemberNotExistException;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service
 public class CategoryMemberService {
@@ -58,18 +62,41 @@ public class CategoryMemberService {
 
     public void setUserRole(PostCategory category, User user, Role role) {
         checkAvailability(category);
-        CategoryMember member = categoryMemberRepository.getReferenceById(new CategoryMemberId(category.getId(), user.getId()));
+        CategoryMember member = categoryMemberRepository.getReferenceById(
+                new CategoryMemberId(category.getId(), user.getId()));
         member.setRole(role);
     }
 
-    public boolean hasMembership(int categoryId, long userId) {
-        return categoryMemberRepository.existsById(new CategoryMemberId(categoryId, userId));
+    public Instant muteUser(int categoryId, long userId, long seconds) {
+        User user = userRepository.getReferenceById(userId);
+        CategoryMember membership;
+        membership = categoryMemberRepository.getReferenceById(
+                new CategoryMemberId(categoryId, user.getId())
+        );
+        membership.setMuteExpirationDate(Instant.now().plusSeconds(Math.max(0, seconds)));
+        categoryMemberRepository.saveAndFlush(membership);
+        return membership.getMuteExpirationDate();
     }
 
-    public boolean hasAuthorityGreaterOrEquals(int categoryId, long userId, Role role) {
+    public void unmuteUser(int categoryId, long userId) {
+        User user = userRepository.getReferenceById(userId);
+        CategoryMember membership;
+        membership = categoryMemberRepository.getReferenceById(
+                new CategoryMemberId(categoryId, user.getId())
+        );
+        membership.setMuteExpirationDate(Instant.now());
+        categoryMemberRepository.saveAndFlush(membership);
+    }
+
+    public boolean hasMembership(int categoryId, User user) {
+        return categoryMemberRepository.existsById(new CategoryMemberId(categoryId, user.getId()));
+    }
+
+    public boolean hasAuthorityGreaterOrEquals(int categoryId, User user, Role role) {
         int roleOrdinal = role.ordinal();
         try {
-            return ( categoryMemberRepository.getReferenceById(new CategoryMemberId(categoryId, userId))
+            return ( categoryMemberRepository.getReferenceById(
+                    new CategoryMemberId(categoryId, user.getId()))
                             .getRole().ordinal() >= roleOrdinal
                     );
         } catch (Exception e) {
@@ -77,10 +104,11 @@ public class CategoryMemberService {
         }
     }
 
-    public boolean hasAuthority(int categoryId, long userId, Role role) {
+    public boolean hasAuthority(int categoryId, User user, Role role) {
         try {
             return
-            ( categoryMemberRepository.getReferenceById(new CategoryMemberId(categoryId, userId)).getRole().equals(role) );
+            ( categoryMemberRepository.getReferenceById(
+                    new CategoryMemberId(categoryId, user.getId())).getRole().equals(role) );
         } catch (Exception e) {
             return false;
         }

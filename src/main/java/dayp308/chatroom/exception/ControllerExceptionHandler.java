@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.NoSuchElementException;
+
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
@@ -28,7 +30,7 @@ public class ControllerExceptionHandler {
         return new ErrorResponseBody(e.getErrCode(), e.getMessage()).toString();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(EntityExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public String entityExists(final EntityExistsException e) {
@@ -39,6 +41,13 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public String notFound( final EntityNotFoundException e) {
+        return new ErrorResponseBody(404, e.getMessage()).toString();
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public String notFound( final NoSuchElementException e) {
         return new ErrorResponseBody(404, e.getMessage()).toString();
     }
 

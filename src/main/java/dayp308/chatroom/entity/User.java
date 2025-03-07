@@ -1,8 +1,12 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dayp308.chatroom.entity.enums.Gender;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -18,7 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "tb_user")
 @DynamicInsert
 @DynamicUpdate
@@ -70,21 +75,27 @@ public class User implements UserDetails {
     @Column(name = "gender", nullable = false)
     private Gender gender = Gender.UNKNOWN;
 
-//    @OneToMany(mappedBy = "user")
-//    private Set<CategoryMember> categoriesMember = new LinkedHashSet<>();
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private Set<CategoryMember> categoriesMember = new LinkedHashSet<>();
 
-//    @OneToMany(mappedBy = "sender")
-//    private Set<ChatMessagePrivate> chatMessagesPrivate = new LinkedHashSet<>();
-//
-//    @OneToMany(mappedBy = "target")
-//    private Set<ChatMessagePrivate> receivedChatMessagesPrivate = new LinkedHashSet<>();
-//
-//    @OneToMany(mappedBy = "sender")
-//    private Set<ChatMessagePublic> chatMessagesPublic = new LinkedHashSet<>();
-//
-//    @OneToMany(mappedBy = "publishUser")
-//    private Set<Post> posts = new LinkedHashSet<>();
+    @JsonManagedReference
+    @OneToMany(mappedBy = "sender")
+    private Set<ChatMessagePrivate> chatMessagesPrivate = new LinkedHashSet<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "target")
+    private Set<ChatMessagePrivate> receivedChatMessagesPrivate = new LinkedHashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "sender")
+    private Set<ChatMessagePublic> chatMessagesPublic = new LinkedHashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "publishUser")
+    private Set<Post> posts = new LinkedHashSet<>();
+
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "tb_user_bookmark_post",
@@ -93,6 +104,7 @@ public class User implements UserDetails {
     )
     private Set<Post> bookmarkedPosts = new LinkedHashSet<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "tb_user_bookmark_comment",
@@ -101,8 +113,40 @@ public class User implements UserDetails {
     )
     private Set<PostComment> bookmarkedComments = new LinkedHashSet<>();
 
-//    @OneToMany(mappedBy = "commentUser")
-//    private Set<PostComment> comments = new LinkedHashSet<>();
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "post_like",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
+    private Set<Post> likedPosts = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "comment_like",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )
+    private Set<PostComment> likedComments = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "subscription",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscribed_user_id")
+    )
+    private Set<User> subscriptions = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "subscriptions")
+    private Set<User> subscribers = new LinkedHashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private Set<PostComment> comments = new LinkedHashSet<>();
 
     @Override
     public boolean isAccountNonExpired() {

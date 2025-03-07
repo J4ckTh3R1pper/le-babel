@@ -20,6 +20,7 @@ import java.util.*;
 @Repository
 public class RedisPersistentTokenRepository {
 
+    public static final String USER_ID_KEY_INDEX = "userId_key_index";
     private final RedisTemplate<String, Object> redisTemplate;
     private final Jackson2HashMapper jackson2HashMapper;
 
@@ -34,7 +35,7 @@ public class RedisPersistentTokenRepository {
         redisTemplate.expireAt(serial, expiry);
         try {
             redisTemplate.executePipelined((RedisCallback<Object>) conn -> {
-                conn.hashCommands().hSet("userId_key_index".getBytes(), serial.getBytes(), token.getUserId().toString().getBytes());
+                conn.hashCommands().hSet(USER_ID_KEY_INDEX.getBytes(), serial.getBytes(), token.getUserId().toString().getBytes());
                 conn.execute(CommandType.HEXPIREAT.name(), "userId_key_index".getBytes(), String.valueOf(expiry.getEpochSecond()).getBytes(),
                         "FIELDS".getBytes(), "1".getBytes(), token.getToken().getBytes());
                 return null;

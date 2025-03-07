@@ -1,16 +1,24 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-@Data
 @Entity
+@Getter
+@Setter
 @Table(name = "tb_post_comment")
 @DynamicInsert
 @DynamicUpdate
@@ -20,10 +28,12 @@ public class PostComment {
     @Column(name = "comment_id", nullable = false)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "comment_user_id", nullable = false)
     private User user;
@@ -40,15 +50,22 @@ public class PostComment {
     @Column(name = "is_deleted", length = 1)
     private Boolean isDeleted = false;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "bookmarkedComments")
-    private List<User> bookmarkedUsers;
+    private Set<User> bookmarkedUsers = new LinkedHashSet<>();
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "likedComments")
+    private Set<User> usersLiked = new LinkedHashSet<>();
+
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
     private PostComment parentComment;
 
-//    @OneToMany(mappedBy = "parentComment")
-//    private List<PostComment> subComments;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "parentComment")
+    private Set<PostComment> subComments = new LinkedHashSet<>();
 
 
 }

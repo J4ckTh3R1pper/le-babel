@@ -4,7 +4,7 @@ import dayp308.chatroom.entity.PostComment;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
 import dayp308.chatroom.entity.view.comment.CommentView;
 import dayp308.chatroom.repository.CommentRepository;
-import dayp308.chatroom.repository.specification.CustomSpecifications;
+import dayp308.chatroom.repository.specification.CommentSpecs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +33,7 @@ public class CommentToBriefView implements Converter<PostComment, CommentBriefVi
 
     private Set<CommentView> getChildren(PostComment source) {
         Set<PostComment> sourceChildren = commentRepository.findAll(
-                CustomSpecifications.allSubCommentByComment(source), PageRequest.of(0, 5)).toSet();
+                CommentSpecs.allSubCommentByComment(source, false), PageRequest.of(0, 5)).toSet();
         Set<CommentView> children = new LinkedHashSet<>();
         sourceChildren.forEach( c -> {
             CommentView comment = commentToView.convert(c);

@@ -8,7 +8,7 @@ import java.time.Instant;
 
 public record UserDTO(Long id, String loginName, String nickName, String headImgUrl, String location, String introduce,
                       Boolean userLocked,
-                      @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") @DateTimeFormat(pattern = "yyyy-MM-dd") Instant lastLoginTime,
-                      @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") @DateTimeFormat(pattern = "yyyy-MM-dd") Instant createTime,
+                      Instant lastLoginTime,
+                      Instant createTime,
                       Gender gender) {
 }

@@ -1,5 +1,6 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -9,12 +10,13 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Setter
 @Getter
 @Entity
-@Data
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "tb_post_category")
@@ -25,11 +27,11 @@ public class PostCategory {
     private Integer id;
 
     @Column(name = "category_name", nullable = false, length = 16, unique = true)
-    private String categoryName;
+    private String name;
 
     @ColumnDefault("1")
     @Column(name = "category_rank", nullable = false)
-    private Integer categoryRank = 1;
+    private Integer rank = 1;
 
     @ColumnDefault("0")
     @Column(name = "is_deleted", nullable = false)
@@ -58,14 +60,18 @@ public class PostCategory {
     @ColumnDefault("''")
     @Column(name = "category_rule")
     private String rule = "";
-//    @OneToMany(mappedBy = "category")
-//    private Set<CategoryMember> categoryMembers = new LinkedHashSet<>();
 
-//    @OneToMany(mappedBy = "postCategory")
-//    private Set<Post> posts = new LinkedHashSet<>();
+    @JsonManagedReference
+    @OneToMany(mappedBy = "category")
+    private Set<CategoryMember> categoryMembers = new LinkedHashSet<>();
 
-//    @OneToMany(mappedBy = "category")
-//    private Set<ChatChannel> chatChannels = new LinkedHashSet<>();
+    @JsonManagedReference
+    @OneToMany(mappedBy = "category")
+    private Set<Post> posts = new LinkedHashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "category")
+    private Set<ChatChannel> chatChannels = new LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {

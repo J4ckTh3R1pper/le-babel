@@ -1,5 +1,6 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import jakarta.persistence.*;
@@ -12,8 +13,9 @@ import org.hibernate.annotations.Generated;
 import java.time.Instant;
 import java.util.Objects;
 
-@Data
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
@@ -24,11 +26,13 @@ public class CategoryMember {
     private CategoryMemberId id = new CategoryMemberId(); // 不初始化id会造成NPE
 
     @MapsId("categoryId")
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private PostCategory category;
 
     @MapsId("userId")
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

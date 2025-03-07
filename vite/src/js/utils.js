@@ -1,4 +1,3 @@
-import { axios as ax } from 'axios'
 
 export function asyncTimeout(milliseconds) {
     return new Promise(resolve => {
@@ -6,12 +5,32 @@ export function asyncTimeout(milliseconds) {
     });
 }
 
-export const axios =  ax.create({
-    baseURL: 'http://127.0.0.1:8080',
-    timeout: 5000,
-    headers: {
-        'content-type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-    },
-    withCredentials: true
-});
+/**
+ * 参数处理
+ * @param {*} params  参数
+ */
+export function tansParams(params) {
+    let result = ''
+    for (const propName of Object.keys(params)) {
+        const value = params[propName];
+        var part = encodeURIComponent(propName) + "=";
+        if (value !== null && value !== "" && typeof (value) !== "undefined") {
+            if (typeof value === 'object') {
+                for (const key of Object.keys(value)) {
+                    if (value[key] !== null && value[key] !== "" && typeof (value[key]) !== 'undefined') {
+                        let params = propName + '[' + key + ']';
+                        var subPart = encodeURIComponent(params) + "=";
+                        result += subPart + encodeURIComponent(value[key]) + "&";
+                    }
+                }
+            } else {
+                result += part + encodeURIComponent(value) + "&";
+            }
+        }
+    }
+    return result
+}
+
+export function blobValidate(data) {
+    return data.type !== 'application/json'
+}

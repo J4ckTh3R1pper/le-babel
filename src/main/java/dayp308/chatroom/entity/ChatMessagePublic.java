@@ -1,5 +1,6 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class ChatMessagePublic {
     @Column(name = "message_id", nullable = false)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private dayp308.chatroom.entity.User sender;
@@ -26,10 +28,12 @@ public class ChatMessagePublic {
     @Column(name = "message_text", nullable = false)
     private String messageText;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_to")
     private ChatMessagePublic replyTo;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "target_id", nullable = false)
     private dayp308.chatroom.entity.ChatChannel target;

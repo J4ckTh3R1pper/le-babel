@@ -9,6 +9,7 @@ import dayp308.chatroom.entity.view.PostDetailedView;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CommentRepository;
 import dayp308.chatroom.repository.PostLikeRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -42,14 +43,14 @@ public class PostToDetailedView implements Converter<Post, PostDetailedView> {
                 )
         );
         target.setUserBriefView(categoryMemberToBriefViewConverter.convert(member));
-        target.setLikes(postLikeRepository.countByPostId(source.getId()));
-        target.setComments(commentRepository.countByPostId(source.getId()));
+        target.setLikes(Hibernate.size(source.getUsersLiked()));
+        target.setComments(Hibernate.size(source.getComments()));
         try {
             target.setTags(jacksonObjectMapper.readValue(source.getTags(), List.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
+        target.setLiked(false);
         target.setCategoryId(source.getCategory().getId());
         target.setViews(source.getViews());
         return target;

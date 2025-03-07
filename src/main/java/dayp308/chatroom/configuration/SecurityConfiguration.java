@@ -20,10 +20,13 @@ import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
 
 @Configuration
@@ -60,6 +63,10 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/no_auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling( e -> {
+                    e.accessDeniedPage(null)
+                            .authenticationEntryPoint(authenticationEntryPoint());
+                })
                 .rememberMe(remember -> remember
                         .rememberMeServices(rememberMeServices(userDetailsService, redisPersistentTokenRepository))
                         .userDetailsService(userDetailsService)
@@ -121,5 +128,12 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new LoginFailedHandler();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
+        entryPoint.setRealmName("Access to Login page");
+        return entryPoint;
     }
 }

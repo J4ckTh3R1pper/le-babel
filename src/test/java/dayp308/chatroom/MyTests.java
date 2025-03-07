@@ -23,6 +23,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 
 @SpringBootTest
 
@@ -151,7 +154,22 @@ class MyTests {
 
     @Test
     void testPageComment() {
-        PagedResponse<CommentBriefView> resp = postService.getBriefCommentSliceByPost(17, 0, 25, null);
+        PagedResponse<CommentBriefView> resp = postService.getBriefCommentSliceByPost(17, 0, 25, false,null);
         System.out.println(resp.getContent());
+    }
+
+    @Test
+    void testUserDetail() {
+        UserDetailedProj proj = userRepository.findDetailById(126L);
+        System.out.println(proj.getFollowingCount());
+        System.out.println(proj.getFollowerCount());
+
+        Slice<UserDetailedProj> projections = userRepository.findDetailsById(
+                PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "followerCount"))
+
+        );
+        projections.getContent().forEach( p -> {
+            System.out.println(p.getCreateTime() + ":" + p.getFollowerCount() + "," + p.getFollowingCount());
+        });
     }
 }

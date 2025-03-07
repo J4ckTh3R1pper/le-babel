@@ -3,7 +3,7 @@ package dayp308.chatroom.converter;
 import dayp308.chatroom.entity.PostComment;
 import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.repository.CommentRepository;
-import dayp308.chatroom.repository.specification.CustomSpecifications;
+import dayp308.chatroom.repository.specification.CommentSpecs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class CommentToDetailedView implements Converter<PostComment, CommentDeta
     }
 
     protected Set<CommentDetailedView> getChildren(PostComment source) {
-        Set<PostComment> sourceChildren = commentRepository.findAll(CustomSpecifications.allSubCommentByComment(source));
+        Set<PostComment> sourceChildren = commentRepository.findAll(CommentSpecs.allSubCommentByComment(source, false));
         Set<CommentDetailedView> children = new LinkedHashSet<>();
         sourceChildren.forEach(c -> {
             CommentDetailedView child = commentToView.convert(c).getDetailedView();

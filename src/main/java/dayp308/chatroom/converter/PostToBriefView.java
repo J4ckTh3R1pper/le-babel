@@ -9,12 +9,12 @@ import dayp308.chatroom.entity.view.PostBriefView;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CommentRepository;
 import dayp308.chatroom.repository.PostLikeRepository;
+import dayp308.chatroom.util.MarkdownUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.commonmark.node.Image;
 import org.commonmark.node.Node;
-import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
-import org.commonmark.renderer.text.TextContentRenderer;
+import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -50,10 +50,11 @@ public class PostToBriefView implements Converter<Post, PostBriefView> {
         );
         target.setContent(cropContent(source.getContent()));
         target.setUserBriefView(categoryMemberToBriefViewConverter.convert(member));
-        target.setLikes(postLikeRepository.countByPostId(source.getId()));
-        target.setComments(commentRepository.countByPostId(source.getId()));
+        target.setLikeCount(Hibernate.size(source.getUsersLiked()));
+        target.setCommentCount(Hibernate.size(source.getComments()));
+        target.setBookmarks(Hibernate.size(source.getBookmarkedUsers()));
         try {
-            target.setTags(jacksonObjectMapper.readValue(source.getTags(), List.class));
+            target.setTagList(jacksonObjectMapper.readValue(source.getTags(), List.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -65,11 +66,8 @@ public class PostToBriefView implements Converter<Post, PostBriefView> {
     }
 
     public static String cropContent(String content) {
-        Parser parser = Parser.builder().build();
-        Node document = parser.parse(content);
-        TextContentRenderer renderer = TextContentRenderer.builder().build();
-        String strippedContent = renderer.render(document);
-        return strippedContent.substring(0, Math.min(strippedContent.length(), 50));
+        String stripped = MarkdownUtil.stripMarkdown(content);
+        return stripped.substring(0, Math.min(stripped.length(), 50));
     }
 
     public static List<String> getThumbnail(String md) {

@@ -13,11 +13,7 @@ public interface PostDTO {
     Category getCategory();
     Byte getStatus();
     Long getViews();
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Instant getLastUpdateTime();
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     Instant getCreateTime();
     String getTags();
 

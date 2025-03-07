@@ -30,6 +30,9 @@ spring:
         format_sql: true
         jdbc:
           fetch_size: 1048576
+  jackson:
+    deserialization:
+      read-unknown-enum-values-using-default-value: true
 
 #mybatis:
 #  type-aliases-package: 'dayp308.chatroom.bean'

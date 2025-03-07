@@ -1,20 +1,52 @@
-import { defineConfig } from 'vite'
+import {defineConfig, loadEnv} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {jsx} from "vue/jsx-runtime";
 import vueJsxPlugin from "@vitejs/plugin-vue-jsx";
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
+import Components from 'unplugin-vue-components/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  esbuild: {
-    loader: "jsx"
-  },
-  resolve: {
-    alias:{
-      'vue': 'vue/dist/vue.esm-bundler.js'
+export default defineConfig(({ mode}) => {
+  // 安装 @types/node 否则无法解析process
+  const env = loadEnv(mode, process.cwd())
+  const { VITE_BACKEND_PORT,VITE_BACKEND_HOST } = env;
+
+  return {
+    esbuild: {
+      loader: "jsx"
     },
-  },
-  plugins: [vue(), vueJsxPlugin()],
-  build: {
-    outDir: "dist"
+    server: {
+      port: 5173,
+      host: true,
+      open: true,
+      proxy: {
+        // https://cn.vitejs.dev/config/#server-proxy
+        '/api': {
+          target: 'http://' + VITE_BACKEND_HOST + VITE_BACKEND_PORT,
+          changeOrigin: true,
+        }
+      }
+    },
+    resolve: {
+      alias: {
+        'vue': 'vue/dist/vue.esm-bundler.js'
+      },
+    },
+    plugins: [
+        vue(), vueJsxPlugin(),
+        AutoImport({
+          resolvers: [ElementPlusResolver()]
+        }),
+        Components({
+          resolvers: [ElementPlusResolver()]
+        })
+    ],
+    build: {
+      outDir: "dist"
+    },
+    define: {
+      'process.env': {}
+    }
   }
 })

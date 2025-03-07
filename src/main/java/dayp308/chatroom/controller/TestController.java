@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.parameters.P;
@@ -28,7 +29,7 @@ public class TestController {
 
     @PreAuthorize("hasMemberShip(#categoryId)")
     @PostMapping("/api/test_moderator")
-    public ResponseEntity<String> testMembership(@RequestParam("categoryId") int categoryId, HttpServletRequest req, HttpServletResponse resp, Authentication auth) {
+    public ResponseEntity<String> testMembership(@RequestParam("categoryId") int categoryId, Authentication auth) {
         String response =
                 ( (User) auth.getPrincipal() ).getUsername() + " has membership in category " + categoryId;
         return new ResponseEntity<>(response, HttpStatus.OK);

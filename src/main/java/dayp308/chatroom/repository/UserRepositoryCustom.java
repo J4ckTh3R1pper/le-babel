@@ -1,10 +1,11 @@
 package dayp308.chatroom.repository;
 
 import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.UserDetailedProj;
 
 import java.util.List;
 
 public interface UserRepositoryCustom {
 
-    List<User> findByNickName(String nickName);
+    UserDetailedProj getUserDetailedProj(Long id);
 }

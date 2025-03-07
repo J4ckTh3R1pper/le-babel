@@ -10,11 +10,14 @@ import dayp308.chatroom.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
 
 @RestController
 public class CategoryController {
@@ -48,5 +51,19 @@ public class CategoryController {
     ) {
         categoryService.createCategory(form, (User) auth.getPrincipal());
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasMembershipGe(#categoryId, 'MODERATOR')")
+    @PostMapping("/api/category/mute_user")
+    public ResponseEntity<String> muteUser(@RequestParam int categoryId, @RequestParam("userId") long userId, @RequestParam long seconds) {
+        Instant expirationDate = categoryMemberService.muteUser(categoryId, userId, seconds);
+        return new ResponseEntity<>( "expirationDate:" + expirationDate.getEpochSecond() + "000", HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasMembershipGe(#categoryId, 'MODERATOR')")
+    @PostMapping("/api/category/unmute_user")
+    public ResponseEntity<String> unmuteUser(@RequestParam int categoryId, @RequestParam("userId") long userId) {
+        categoryMemberService.unmuteUser(categoryId, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

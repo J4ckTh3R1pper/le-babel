@@ -6,6 +6,7 @@ import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.view.comment.CommentView;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CommentLikeRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,7 @@ public class CommentToView implements Converter<PostComment, CommentView> {
         target.setCommentBody(source.getCommentBody());
         target.setPostId(source.getPost().getId());
         target.setCreateTime(source.getCreateTime());
-        target.setLikes( commentLikeRepository.countByCommentId( source.getId()) );
+        target.setLikes(Hibernate.size(source.getUsersLiked()));
         return target;
     }
 }

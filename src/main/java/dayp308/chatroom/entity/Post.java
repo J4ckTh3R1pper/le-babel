@@ -1,5 +1,8 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +22,7 @@ public class Post {
     @Column(name = "post_id", nullable = false)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "publish_user_id", nullable = false)
     private User publishUser;
@@ -30,6 +34,7 @@ public class Post {
     @Column(name = "post_content", nullable = false)
     private String content;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_category_id", nullable = false)
     private PostCategory category;
@@ -55,10 +60,16 @@ public class Post {
     @Column(name = "post_tags", nullable = false)
     private String tags = "[]";
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "bookmarkedPosts")
     private Set<User> bookmarkedUsers = new LinkedHashSet<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "post")
-    private Set<PostComment> postComments = new LinkedHashSet<>();
+    private Set<PostComment> comments = new LinkedHashSet<>();
 
+    @JsonManagedReference
+
+    @ManyToMany(mappedBy = "likedPosts", fetch = FetchType.LAZY)
+    private Set<User> usersLiked = new LinkedHashSet<>();
 }

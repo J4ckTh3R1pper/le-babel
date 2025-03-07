@@ -17,7 +17,7 @@ public class CommentView {
     protected String commentBody;
     protected Instant createTime;
     protected Long parentCommentId;
-    protected Long likes;
+    protected Integer likes;
 
     @Override
     public boolean equals(Object o) {

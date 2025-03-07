@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<PostCategory, Integer> {
-    List<PostCategory> findByCategoryNameContainsIgnoreCase(String searchKey);
+    List<PostCategory> findByNameContainsIgnoreCase(String searchKey);
 
 }

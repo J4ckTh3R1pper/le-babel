@@ -10,7 +10,7 @@ public class FormToPostCategory implements Converter<CategoryCreationForm, PostC
     @Override
     public PostCategory convert(CategoryCreationForm source) {
         PostCategory target = new PostCategory();
-        target.setCategoryName(source.getCategoryName());
+        target.setName(source.getCategoryName());
         target.setInfo(source.getCategoryInfo());
         target.setAvatar(source.getAvatar());
         return target;

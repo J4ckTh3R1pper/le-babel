@@ -2,6 +2,7 @@ package dayp308.chatroom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.UserDetailedProj;
 import dayp308.chatroom.entity.business.UserEditForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.UserDTO;
@@ -23,26 +24,26 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class UserController {
     private final UserService userService;
-    private final ObjectMapper objectMapper;
     private final FileService fileService;
     private final UserRepository userRepository;
+    private final ObjectMapper jacksonObjectMapper;
 
-    public UserController(UserService service, FileService fileService, UserRepository userRepository) {
+    public UserController(UserService service, FileService fileService, UserRepository userRepository, ObjectMapper jacksonObjectMapper) {
         this.userService = service;
-        this.objectMapper = new ObjectMapper();
         this.fileService = fileService;
         this.userRepository = userRepository;
+        this.jacksonObjectMapper = jacksonObjectMapper;
     }
 
     @PostMapping(value = "/api/user/register")
     public ResponseEntity<String> register(@Valid UserRegistrationForm form) throws InvalidFormException, EntityExistsException, JsonProcessingException {
-        return new ResponseEntity<>(objectMapper.writeValueAsString(userService.register(form)), HttpStatus.CREATED);
+        return new ResponseEntity<>(jacksonObjectMapper.writeValueAsString(userService.register(form)), HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/api/user/get_user_by_id")
-    public String getUser(@RequestParam("userId") Long userId) throws JsonProcessingException {
-        UserDTO user = userService.findById(userId);
-        return objectMapper.writeValueAsString(user);
+    @PostMapping(value = "/api/no_auth/user/get_user_by_id")
+    public ResponseEntity<String> getUser(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        UserDetailedProj user = userService.findUserDetailedProjById(userId);
+        return new ResponseEntity<>(jacksonObjectMapper.writeValueAsString(user), HttpStatus.OK);
     }
 
     @PostMapping(value = "/api/user/update_avatar")
