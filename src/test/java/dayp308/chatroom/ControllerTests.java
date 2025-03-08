@@ -6,13 +6,12 @@ import dayp308.chatroom.entity.business.PostPageRequest;
 import dayp308.chatroom.entity.enums.PostOrderType;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
-import dayp308.chatroom.entity.UserDTO;
+import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.UserService;
-import jakarta.servlet.http.Cookie;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,19 +56,37 @@ public class ControllerTests {
         return userRepository.findById(id, UserDTO.class);
     }
 
-    Cookie formLoginAndGetCookie(UserDTO user, String password) throws Exception {
-        Cookie[][] cookies = new Cookie[1][1];
+    String formLoginAndGetToken(UserDTO user, String password) throws Exception {
+        return formLoginAndGetToken(user.loginName(), password);
+    }
+
+    String formLoginAndGetToken(String loginName, String password) throws Exception {
+        AtomicReference<String> token =  new AtomicReference<>();
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/login")
-                        .formField("loginName", user.loginName())
+                        .formField("loginName", loginName)
                         .formField("password", password)
                         .formField("remember-me", "true")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
                 ).andExpect(status().is2xxSuccessful())
-                .andDo(result -> cookies[0] = result.getResponse().getCookies())
+                .andDo(result ->
+                        token.set(result.getResponse().getHeader(Constants.JWT_HEADER_NAME))
+                )
                 .andDo(print());
-        return cookies[0][0];
+        return token.get();
+    }
+
+    @Test
+    public void testLogin() throws Exception {
+        String password = RandomString.make(8);
+        UserDTO userDTO = randomUser(password);
+        try {
+            String token = formLoginAndGetToken(userDTO, password);
+            System.out.println(token);
+        } finally {
+            userRepository.deleteById(userDTO.id());
+        }
     }
 
     @Test
@@ -85,7 +106,7 @@ public class ControllerTests {
     }
 
     @Test
-    public void testLogin() {
+    public void testAuthority() {
         String password = RandomString.make(72);
         UserDTO uDto = randomUser(password);
 
@@ -94,30 +115,28 @@ public class ControllerTests {
                 userRepository.getReferenceById(uDto.id()),
                 null
         );
-        final Cookie[][] cookies = new Cookie[1][1];
+        String token;
         try {
-            cookies[0][0] =  formLoginAndGetCookie(uDto, password);
+            token = formLoginAndGetToken(uDto, password);
 
             mockMvc.perform(MockMvcRequestBuilders
                             .post("/api/omgwtfbbq")
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .cookie(cookies[0])
+                            .header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is2xxSuccessful())
-                    .andDo(result -> cookies[0] = result.getResponse().getCookies())
                     .andDo(print());
 
             mockMvc.perform(MockMvcRequestBuilders
                             .post("/api/test_moderator")
                             .param("categoryId", mDto.getCategoryId().toString())
-                            .cookie(cookies[0])
+                            .header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is2xxSuccessful())
-                    .andDo(result -> cookies[0] = result.getResponse().getCookies())
                     .andDo(print());
 
             mockMvc.perform(MockMvcRequestBuilders
                             .post("/api/test_moderator")
                             .param("categoryId", "5")
-                            .cookie(cookies[0])
+                            .header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is4xxClientError()).andDo(print());
 
         } catch (Exception e) {
@@ -130,7 +149,7 @@ public class ControllerTests {
 
     @Test
     public void testPostList() {
-        final Cookie[][] cookies = new Cookie[1][1];
+        String token;
         String password = RandomString.make(72);
         UserDTO user = randomUser(password);
         try {
@@ -144,7 +163,7 @@ public class ControllerTests {
                             )
             ).andExpect(status().is2xxSuccessful()).andDo(print());
 
-            cookies[0][0] = formLoginAndGetCookie(user, password);
+            token = formLoginAndGetToken(user, password);
 
             mockMvc.perform(MockMvcRequestBuilders
                     .post("/api/no_auth/post/get_posts")
@@ -154,7 +173,7 @@ public class ControllerTests {
                                                     1, PostOrderType.LAST_UPDATE_TIME,
                                                     null, 0, 15, false, true)
                                     )
-                            ).cookie(cookies[0])
+                            ).header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is2xxSuccessful()).andDo(print());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -190,8 +209,40 @@ public class ControllerTests {
     }
 
     @Test
+    public void testCategoryList() throws Exception {
+        String token;
+        String password = RandomString.make(72);
+        UserDTO user = randomUser(password);
+        token = formLoginAndGetToken(user, password);
+        try {
+            for(int i=1; i<6; ++i) {
+                mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/category/join_category")
+                        .header(Constants.JWT_HEADER_NAME, token)
+                        .param("categoryId", i+"")
+                ).andExpect(status().is2xxSuccessful()).andDo(print());
+            }
+            mockMvc.perform(MockMvcRequestBuilders
+                    .post("/api/category/get_joined_category")
+                    .header(Constants.JWT_HEADER_NAME, token)
+                    .param("pageNum", "0")
+                    .param("pageSize", "10")
+            ).andExpect(status().is2xxSuccessful()).andDo(print());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            List<CategoryMemberId> ids = new ArrayList<>();
+            for( int i=1; i<6; ++i) {
+                ids.add(new CategoryMemberId(i, user.id()));
+            }
+            categoryMemberRepository.deleteAllById(ids);
+            userRepository.deleteById(user.id());
+        }
+    }
+
+    @Test
     public void testDelete() throws Exception {
-        final Cookie[][] cookies = new Cookie[1][1];
+        String token;
         String password = RandomString.make(72);
         UserDTO user = randomUser(password);
         try {
@@ -200,12 +251,12 @@ public class ControllerTests {
                             .param("postId", "5")
             ).andExpect(status().is4xxClientError()).andDo(print());
 
-            cookies[0][0] = formLoginAndGetCookie(user, password);
+            token = formLoginAndGetToken(user, password);
 
             mockMvc.perform(MockMvcRequestBuilders
                     .post("/api/post/delete")
                     .param("postId", "17")
-                    .cookie(cookies[0])
+                    .header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is4xxClientError()).andDo(print());
         } catch (Exception e) {
             throw new RuntimeException(e);

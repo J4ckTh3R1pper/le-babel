@@ -1,13 +1,18 @@
 package dayp308.chatroom;
 
-import dayp308.chatroom.converter.PostToBriefView;
-import dayp308.chatroom.entity.*;
+import dayp308.chatroom.converter.post.PostToBriefView;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
+import dayp308.chatroom.entity.category.PostCategory;
+import dayp308.chatroom.entity.comment.CommentDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.business.CommentCreationForm;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
+import dayp308.chatroom.entity.post.PostDTO;
+import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.entity.user.UserDTO;
+import dayp308.chatroom.entity.user.UserDetailedProj;
 import dayp308.chatroom.entity.view.PagedResponse;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
 import dayp308.chatroom.entity.view.comment.CommentDetailResponse;
@@ -49,7 +54,7 @@ class MyTests {
     @Autowired
     private CategoryMemberService categoryMemberService;
 
-    UserDTO randomUser( String password ) {
+    UserDTO randomUser(String password ) {
         UserRegistrationForm form = new UserRegistrationForm();
         form.setLoginName(RandomString.make(8) + "@example.com");
         form.setNickName(RandomString.make(8));

@@ -2,6 +2,8 @@ package dayp308.chatroom.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import dayp308.chatroom.entity.id.PostLikeId;
+import dayp308.chatroom.entity.post.Post;
+import dayp308.chatroom.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 

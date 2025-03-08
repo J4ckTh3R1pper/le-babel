@@ -1,6 +1,6 @@
 package dayp308.chatroom.repository;
 
-import dayp308.chatroom.entity.Post;
+import dayp308.chatroom.entity.post.Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.domain.Specification;

@@ -1,6 +1,10 @@
 package dayp308.chatroom.repository.specification;
 
 import dayp308.chatroom.entity.*;
+import dayp308.chatroom.entity.comment.PostComment;
+import dayp308.chatroom.entity.comment.PostComment_;
+import dayp308.chatroom.entity.post.Post;
+import dayp308.chatroom.entity.post.Post_;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;

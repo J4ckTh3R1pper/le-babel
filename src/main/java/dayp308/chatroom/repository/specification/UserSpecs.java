@@ -1,6 +1,10 @@
 package dayp308.chatroom.repository.specification;
 
 import dayp308.chatroom.entity.*;
+import dayp308.chatroom.entity.member.CategoryMember;
+import dayp308.chatroom.entity.member.CategoryMember_;
+import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.entity.user.User_;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 

@@ -16,29 +16,29 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
+import org.springframework.security.web.authentication.*;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = false)
 public class SecurityConfiguration {
+
     @Autowired
     private final UserDetailsPasswordServiceImpl userDetailsPasswordService;
+
     @Autowired
     private final UserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private RedisPersistentTokenRepository redisPersistentTokenRepository;
 
     @Autowired
     public SecurityConfiguration(UserDetailsPasswordServiceImpl userDetailsPasswordService, UserDetailsServiceImpl userDetailsService) {
@@ -67,10 +67,13 @@ public class SecurityConfiguration {
                     e.accessDeniedPage(null)
                             .authenticationEntryPoint(authenticationEntryPoint());
                 })
-                .rememberMe(remember -> remember
-                        .rememberMeServices(rememberMeServices(userDetailsService, redisPersistentTokenRepository))
-                        .userDetailsService(userDetailsService)
+                .sessionManagement(s -> s
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .rememberMe(remember -> remember
+//                        .rememberMeServices(rememberMeServices(userDetailsService))
+//                )
                 .build();
     }
 
@@ -111,13 +114,8 @@ public class SecurityConfiguration {
     }
 
     @Autowired
-    public AbstractRememberMeServices rememberMeServices(UserDetailsServiceImpl userDetailsService, RedisPersistentTokenRepository tokenRepository) {
-        return new RememberServices(RememberServices.DEFAULT_PARAMETER, userDetailsService, tokenRepository);
-    }
-
-    @Autowired
-    public void setRedisPersistentTokenRepository(RedisPersistentTokenRepository redisPersistentTokenRepository) {
-        this.redisPersistentTokenRepository = redisPersistentTokenRepository;
+    public RememberMeServices rememberMeServices(UserDetailsServiceImpl userDetailsService) {
+        return new JwtRememberMeService(userDetailsService);
     }
 
     @Bean
@@ -133,7 +131,12 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
-        entryPoint.setRealmName("Access to Login page");
+        entryPoint.setRealmName("Access to Login page or include correct token in request");
         return entryPoint;
+    }
+
+    @Bean
+    public OncePerRequestFilter jwtAuthenticationFilter() {
+        return new JwtAuthFilter(userDetailsService);
     }
 }

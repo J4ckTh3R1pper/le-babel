@@ -2,10 +2,9 @@ package dayp308.chatroom.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import dayp308.chatroom.entity.id.SubscriptionId;
+import dayp308.chatroom.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter

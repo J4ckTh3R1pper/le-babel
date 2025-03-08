@@ -2,12 +2,21 @@ package dayp308.chatroom.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.category.CategoryMinimal;
+import dayp308.chatroom.entity.enums.CategoryOrderType;
+import dayp308.chatroom.entity.enums.Role;
+import dayp308.chatroom.entity.id.CategoryMemberId;
+import dayp308.chatroom.entity.member.CategoryMember_;
+import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.repository.CategoryMemberRepository;
+import dayp308.chatroom.repository.CategoryRepository;
+import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.tomcat.util.http.parser.Authorization;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 public class CategoryController {
@@ -25,12 +36,16 @@ public class CategoryController {
     private final CategoryMemberService categoryMemberService;
     private final ObjectMapper objectMapper;
     private final CategoryService categoryService;
+    private final PostRepository postRepository;
+    private final CategoryRepository categoryRepository;
 
-    public CategoryController(CategoryMemberRepository categoryMemberRepository, CategoryMemberService categoryMemberService, ObjectMapper objectMapper, CategoryService categoryService) {
+    public CategoryController(CategoryMemberRepository categoryMemberRepository, CategoryMemberService categoryMemberService, ObjectMapper objectMapper, CategoryService categoryService, PostRepository postRepository, CategoryRepository categoryRepository) {
         this.categoryMemberRepository = categoryMemberRepository;
         this.categoryMemberService = categoryMemberService;
         this.objectMapper = objectMapper;
         this.categoryService = categoryService;
+        this.postRepository = postRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping("/api/category/get_user")
@@ -51,6 +66,28 @@ public class CategoryController {
     ) {
         categoryService.createCategory(form, (User) auth.getPrincipal());
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/api/category/join_category")
+    public ResponseEntity<String> joinCategory(Authentication auth,
+                                               int categoryId) throws JsonProcessingException {
+        User user = (User) auth.getPrincipal();
+        CategoryMemberId id = categoryMemberService.addMember(
+                categoryRepository.getReferenceById(categoryId), user, Role.SUBSCRIBER);
+        return new ResponseEntity<>(objectMapper.writeValueAsString(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/api/category/get_joined_category")
+    public ResponseEntity<String> getJoinedCategory(Authentication auth,
+                                                    @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
+                                                    @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                    @RequestParam(value = "orderBy", defaultValue = "JOIN_DATE" ) CategoryOrderType orderBy,
+                                                    @RequestParam(value = "ascending", defaultValue = "false") Boolean ascending
+                                                    ) throws JsonProcessingException {
+        User user = (User) auth.getPrincipal();
+        List<CategoryMinimal> list = categoryService.getMinimalByUser(user, pageNum, pageSize, orderBy, ascending);
+        String responseBody = objectMapper.writeValueAsString(list);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     @PreAuthorize("hasMembershipGe(#categoryId, 'MODERATOR')")

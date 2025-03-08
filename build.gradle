@@ -54,6 +54,8 @@ dependencies {
     compileOnly group: 'jakarta.servlet.jsp', name: 'jakarta.servlet.jsp-api', version: '3.1.1'
     // https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl
     implementation group: 'org.glassfish.web', name: 'jakarta.servlet.jsp.jstl', version: '3.0.1'
+
+    // Hibernate JPA
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: hibernateVersion
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-hikaricp
@@ -64,6 +66,7 @@ dependencies {
     testCompileOnly group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
     testAnnotationProcessor group: 'org.hibernate.orm', name: 'hibernate-jpamodelgen', version: hibernateVersion
 
+    // Mybatis和PageHelper 已经弃用，留着防止依赖出错
     // https://mvnrepository.com/artifact/org.mybatis/mybatis
     implementation 'org.mybatis:mybatis:3.5.19'
     // https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper
@@ -75,7 +78,7 @@ dependencies {
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
-
+    // Mapstruct
     implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: mapstructVersion
 
@@ -90,9 +93,21 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
 
+    // Markdown解析
     implementation group: 'org.commonmark', name: 'commonmark', version: '0.24.0'
     // https://mvnrepository.com/artifact/net.coobird/thumbnailator
     implementation 'net.coobird:thumbnailator:0.4.20'
+
+    // JWT 解析和生成
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
 
 }
 sourceSets {

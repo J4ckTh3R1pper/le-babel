@@ -1,8 +1,8 @@
 package dayp308.chatroom.repository.specification;
 
-import dayp308.chatroom.entity.Post;
-import dayp308.chatroom.entity.PostCategory_;
-import dayp308.chatroom.entity.Post_;
+import dayp308.chatroom.entity.post.Post;
+import dayp308.chatroom.entity.category.PostCategory_;
+import dayp308.chatroom.entity.post.Post_;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -11,15 +11,15 @@ import org.springframework.data.jpa.domain.Specification;
 
 
 public class PostSpecs {
-    static Predicate visible(Root<Post> root, CriteriaBuilder builder) {
+    private static Predicate isVisible(Root<Post> root, CriteriaBuilder builder) {
         return builder.equal(root.get(Post_.STATUS), (byte) 1);
     }
 
-    static Predicate likeKeyword(Root<Post> root,CriteriaBuilder builder, String keyword) {
+    private static Predicate likeKeyword(Root<Post> root,CriteriaBuilder builder, String keyword) {
         return builder.like(builder.lower(root.get(Post_.TITLE)), "%" + keyword.toLowerCase() + "%");
     }
 
-    static Predicate categoryEquals(Root<Post> root, CriteriaBuilder builder, int categoryId) {
+    private static Predicate categoryIdEquals(Root<Post> root, CriteriaBuilder builder, int categoryId) {
         return builder.equal(root.join(Post_.CATEGORY).get(PostCategory_.ID), categoryId);
     }
 
@@ -29,9 +29,9 @@ public class PostSpecs {
             if ( keyword != null && !keyword.isBlank() )
                 p = likeKeyword(root, builder, keyword);
             if ( categoryId != null )
-                p = builder.and(p, categoryEquals(root, builder, categoryId));
+                p = builder.and(p, categoryIdEquals(root, builder, categoryId));
             if ( visibleOnly )
-                return builder.and(p, visible(root, builder));
+                return builder.and(p, isVisible(root, builder));
             return p;
         });
     }

@@ -2,14 +2,14 @@ package dayp308.chatroom.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
 import dayp308.chatroom.entity.business.CommentPageRequest;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.business.PostPageRequest;
 import dayp308.chatroom.entity.view.LikeablePagedResponse;
-import dayp308.chatroom.entity.view.PostBriefView;
-import dayp308.chatroom.entity.view.PostDetailedView;
+import dayp308.chatroom.entity.view.post.PostBriefView;
+import dayp308.chatroom.entity.view.post.PostDetailedView;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
 import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.repository.UserRepository;

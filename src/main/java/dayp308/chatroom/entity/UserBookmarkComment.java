@@ -1,7 +1,9 @@
 package dayp308.chatroom.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import dayp308.chatroom.entity.comment.PostComment;
 import dayp308.chatroom.entity.id.UserBookmarkCommentId;
+import dayp308.chatroom.entity.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;

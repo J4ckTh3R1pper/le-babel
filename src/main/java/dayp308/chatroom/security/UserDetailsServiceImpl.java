@@ -1,6 +1,6 @@
 package dayp308.chatroom.security;
 
-import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,8 +1,7 @@
 package dayp308.chatroom.security;
 
-import dayp308.chatroom.entity.Post;
-import dayp308.chatroom.entity.User;
-import dayp308.chatroom.entity.CommentDTO;
+import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.entity.comment.CommentDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.PostService;

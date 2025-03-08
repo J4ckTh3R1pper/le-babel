@@ -1,8 +1,8 @@
 package dayp308.chatroom.repository;
 
-import dayp308.chatroom.entity.CategoryMember;
-import dayp308.chatroom.entity.CategoryMemberDTO;
-import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.member.CategoryMember;
+import dayp308.chatroom.entity.member.CategoryMemberDTO;
+import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;

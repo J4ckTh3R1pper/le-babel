@@ -1,21 +1,19 @@
 package dayp308.chatroom.service;
 
-import dayp308.chatroom.entity.CategoryMember;
-import dayp308.chatroom.entity.User;
+import dayp308.chatroom.entity.member.CategoryMember;
+import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.id.CategoryMemberId;
-import dayp308.chatroom.entity.PostCategory;
-import dayp308.chatroom.entity.CategoryMemberDTO;
+import dayp308.chatroom.entity.category.PostCategory;
+import dayp308.chatroom.entity.member.CategoryMemberDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.view.UserBriefView;
 import dayp308.chatroom.exception.CategoryDeletedException;
 import dayp308.chatroom.exception.CategoryPendingException;
-import dayp308.chatroom.exception.MemberNotExistException;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.UserRepository;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -50,7 +48,9 @@ public class CategoryMemberService {
 
     public CategoryMemberId addMember(PostCategory category, User user, @Nullable Role role) {
         checkAvailability(category);
-        if (categoryMemberRepository.findByUser(user).isPresent()) throw new EntityExistsException();
+        if (categoryMemberRepository.findById(
+                new CategoryMemberId(category.getId(), user.getId())
+        ).isPresent()) throw new EntityExistsException("User has already joined");
 
         CategoryMember member = new CategoryMember();
         member.setCategory(category);

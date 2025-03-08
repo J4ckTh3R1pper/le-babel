@@ -1,9 +1,9 @@
 package dayp308.chatroom.service;
 
-import dayp308.chatroom.entity.User;
-import dayp308.chatroom.entity.UserDetailedProj;
+import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.entity.user.UserDetailedProj;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
-import dayp308.chatroom.entity.UserDTO;
+import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.exception.UserExistsException;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.UserRepository;

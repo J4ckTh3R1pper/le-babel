@@ -1,16 +1,9 @@
 package dayp308.chatroom.repository;
 
-import dayp308.chatroom.entity.User;
-import dayp308.chatroom.entity.UserDetailedProj;
-import dayp308.chatroom.entity.User_;
+import dayp308.chatroom.entity.user.UserDetailedProj;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-
-import java.util.List;
 
 public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 

@@ -2,6 +2,7 @@ package dayp308.chatroom.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import dayp308.chatroom.entity.category.PostCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

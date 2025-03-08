@@ -1,13 +1,12 @@
 package dayp308.chatroom.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import dayp308.chatroom.entity.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -22,7 +21,7 @@ public class ChatMessagePublic {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
-    private dayp308.chatroom.entity.User sender;
+    private User sender;
 
     @Lob
     @Column(name = "message_text", nullable = false)
