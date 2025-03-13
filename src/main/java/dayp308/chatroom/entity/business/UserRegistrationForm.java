@@ -14,10 +14,13 @@ import lombok.ToString;
 public class UserRegistrationForm {
 
     @Email
+    @NotNull
     private String loginName;
     @NotBlank
     private String nickName;
 
     @Size(min = 8, max = 72)
     private String password;
+    private String uuid;
+    private String captcha;
 }

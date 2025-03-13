@@ -1,0 +1,60 @@
+import request from "@/js/utils/request.js";
+
+export function loginRequest(loginName, password, captcha, uuid, rememberMe) {
+    const data = {
+        loginName: loginName,
+        password: password,
+        captcha: captcha,
+        uuid: uuid,
+        rememberMe: rememberMe
+    }
+    return request.postForm({
+        url: '/login',
+        headers: {
+            isToken: false,
+            repeatSubmit: false
+        },
+        method: 'post',
+        data: data,
+    })
+}
+
+// 注册方法
+export function registerRequest(data) {
+    return request({
+        url: '/register',
+        headers: {
+            isToken: false
+        },
+        method: 'post',
+        data: data
+    })
+}
+
+// 获取用户详细信息
+export function getInfoRequest() {
+    return request({
+        url: '/no_auth/user/get_info',
+        method: 'get'
+    })
+}
+
+// 退出方法
+export function logoutRequest() {
+    return request({
+        url: '/logout',
+        method: 'post'
+    })
+}
+
+// 获取验证码
+export function getCaptchaRequest() {
+    return request({
+        url: '/captcha',
+        headers: {
+            isToken: false
+        },
+        method: 'get',
+        timeout: 20000
+    })
+}

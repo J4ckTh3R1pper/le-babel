@@ -11,6 +11,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 	@Value("${dayp308.chatroom.viteAddress}")
 	private String viteAddress;
 
+	@Value("${dayp308.chatroom.imgPath}")
+	private String imgPath;
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/images/**").addResourceLocations("file:" + imgPath);
+	}
+
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")

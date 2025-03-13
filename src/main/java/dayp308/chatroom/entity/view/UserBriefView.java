@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 public class UserBriefView {
-    private Long userId;
+    private Long id;
     private String nickName;
     private String headImgUrl;
-    private String role;
+    private Integer role;
     private Integer level;
     private String location;
     private String title;

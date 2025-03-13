@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.log.LogMessage;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.ott.OneTimeTokenAuthenticationToken;
@@ -28,6 +29,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
 
+    @Autowired
     public JwtAuthFilter(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
@@ -77,6 +79,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     protected void addTokenToResponseHeader(HttpServletRequest req, HttpServletResponse resp, UserDetails user) {
         String newToken = JwtOperations.issueToken(user, requestedRememberMe(req, parameter)).toString();
+        resp.setHeader("Access-Control-Expose-Headers", "Authorization");
         resp.addHeader(Constants.JWT_HEADER_NAME, Constants.TOKEN_PREFIX + newToken);
     }
 

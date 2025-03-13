@@ -2,7 +2,7 @@ package dayp308.chatroom.deprecated.model;
 
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class Channel {
     private String channelName;
     private int channelId;

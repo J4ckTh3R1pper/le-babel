@@ -4,9 +4,12 @@ import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.user.UserDetailedProj;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.user.UserDTO;
+import dayp308.chatroom.exception.InvalidFormException;
 import dayp308.chatroom.exception.UserExistsException;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -14,7 +17,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,30 +41,9 @@ public class UserService {
         this.categoryMemberRepository = categoryMemberRepository;
     }
 
-    /***
-     *
-     * @param loginName 用户输入的邮箱
-     * @param password 用户输入的加密密码
-     * @return 用户或密码错误时返回false
-     */
-    @Transactional(readOnly = true)
-    public boolean checkLogin(String loginName, String password) {
-        return userRepository.existsByLoginNameAndPassword(loginName, password);
-    }
-
-    @Transactional(readOnly = true)
-    public UserDTO login(String loginName, String plainPassword) throws Exception {
-        String passwordMd5 = DigestUtils.md5Hex(plainPassword);
-        if (!userRepository.existsByLoginNameAndPassword(loginName, DigestUtils.md5Hex(passwordMd5))) {
-            throw new Exception("email or password incorrect");
-        }
-        User user = userRepository.findByLoginNameAndPassword(loginName, passwordMd5);
-        return conversionService.convert(user, UserDTO.class);
-    }
-
     @Transactional(readOnly = true)
     public UserDTO findById(Long id) {
-        return conversionService.convert(userRepository.findById(id), UserDTO.class);
+        return userRepository.findById(id, UserDTO.class);
     }
 
     @Transactional(readOnly = true)
@@ -110,14 +94,17 @@ public class UserService {
      */
     public long register(UserRegistrationForm form) {
         User user = new User();
+        if (userRepository.existsByLoginName(form.getLoginName())
+            ) throw new InvalidFormException("e-mail已存在！", InvalidFormException.ErrorCode.INVALID_LOGIN_NAME);
         user.setLoginName(form.getLoginName());
+
+        if (userRepository.existsByNickName(form.getNickName())
+        ) throw new InvalidFormException("昵称已存在！",  InvalidFormException.ErrorCode.INVALID_NICKNAME);
         user.setNickName(form.getNickName());
+
         user.setPassword(passwordEncoder.encode(form.getPassword()));
-        try {
+
             userRepository.saveAndFlush(user);
-        } catch (DataIntegrityViolationException e) {
-            throw new UserExistsException("User e-mail already exists");
-        }
         return user.getId();
     }
 
@@ -125,5 +112,6 @@ public class UserService {
         userRepository.saveAndFlush(user);
         return userRepository.findById(user.getId(), UserDTO.class);
     }
+
 
 }

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class Message {
     private String text;
     private int owner;

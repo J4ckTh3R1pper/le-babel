@@ -5,6 +5,7 @@ import vueJsxPlugin from "@vitejs/plugin-vue-jsx";
 import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 import Components from 'unplugin-vue-components/vite'
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode}) => {
@@ -30,12 +31,19 @@ export default defineConfig(({ mode}) => {
     },
     resolve: {
       alias: {
-        'vue': 'vue/dist/vue.esm-bundler.js'
+        'vue': 'vue/dist/vue.esm-bundler.js',
+        '@': path.resolve(__dirname, 'src')
       },
     },
     plugins: [
         vue(), vueJsxPlugin(),
         AutoImport({
+          imports: [
+              'vue',
+              'pinia',
+              'vue-router',
+          ],
+
           resolvers: [ElementPlusResolver()]
         }),
         Components({

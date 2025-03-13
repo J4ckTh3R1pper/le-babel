@@ -6,7 +6,6 @@ import dayp308.chatroom.entity.category.CategoryMinimal;
 import dayp308.chatroom.entity.enums.CategoryOrderType;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
-import dayp308.chatroom.entity.member.CategoryMember_;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.repository.CategoryMemberRepository;
@@ -15,8 +14,6 @@ import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.tomcat.util.http.parser.Authorization;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class CategoryController {
@@ -78,17 +74,31 @@ public class CategoryController {
     }
 
     @PostMapping("/api/category/get_joined_category")
-    public ResponseEntity<String> getJoinedCategory(Authentication auth,
-                                                    @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
-                                                    @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                    @RequestParam(value = "orderBy", defaultValue = "JOIN_DATE" ) CategoryOrderType orderBy,
-                                                    @RequestParam(value = "ascending", defaultValue = "false") Boolean ascending
+    public ResponseEntity<String> getJoinedCategory(
+            Authentication auth,
+            @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "orderBy", defaultValue = "JOIN_DATE" ) CategoryOrderType orderBy,
+            @RequestParam(value = "ascending", defaultValue = "false") Boolean ascending
                                                     ) throws JsonProcessingException {
         User user = (User) auth.getPrincipal();
-        List<CategoryMinimal> list = categoryService.getMinimalByUser(user, pageNum, pageSize, orderBy, ascending);
+        List<CategoryMinimal> list = categoryService.getMinimalList(user, pageNum, pageSize, orderBy, ascending);
         String responseBody = objectMapper.writeValueAsString(list);
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
+
+    @PostMapping("/api/no_auth/category/get_category_list")
+    public ResponseEntity<String> getCategoryList(
+            @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "orderBy", defaultValue = "JOIN_DATE" ) CategoryOrderType orderBy,
+            @RequestParam(value = "ascending", defaultValue = "false") Boolean ascending
+    ) throws JsonProcessingException {
+        List<CategoryMinimal> list = categoryService.getMinimalList(null, pageNum, pageSize, orderBy, ascending);
+        String responseBody = objectMapper.writeValueAsString(list);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+    }
+
 
     @PreAuthorize("hasMembershipGe(#categoryId, 'MODERATOR')")
     @PostMapping("/api/category/mute_user")

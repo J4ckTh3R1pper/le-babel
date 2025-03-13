@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import java.io.Serializable;
-@Component
+//@Component
 public class ServerMember implements Serializable {
 	@JsonUnwrapped
     private User user;

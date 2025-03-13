@@ -19,7 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-@ComponentScan(excludeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = {ChatServerEndpointExporter.class})})
+//@ComponentScan(excludeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = {ChatServerEndpointExporter.class})})
 class ChatSpringbootApplicationTests {
 
     private final ChatServerService chatServerService;

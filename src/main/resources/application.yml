@@ -1,4 +1,6 @@
 spring:
+  main:
+    web-application-type: servlet
   application:
     name: 'chat_springboot'
   datasource:
@@ -22,8 +24,8 @@ spring:
         - classpath:/static/
         - classpath:/dist/
         - classpath:/public/
-        - file:${dayp308.chatroom.fileStorePath}
-        - file:${dayp308.chatroom.resourcePath}
+#        - file:${dayp308.chatroom.fileStorePath}
+#        - file:${dayp308.chatroom.assetsPath}
   jpa:
     properties:
       hibernate:

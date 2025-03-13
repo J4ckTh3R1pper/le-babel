@@ -24,7 +24,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<MethodIn
     private final CategoryMemberService categoryMemberService;
     private final PostService postService;
 
-    @Autowired
+//    @Autowired
     public CustomAuthorizationManager(CategoryMemberService categoryMemberService, PostService postService) {
         this.categoryMemberService = categoryMemberService;
         this.postService = postService;
@@ -34,7 +34,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<MethodIn
     public AuthorizationDecision check(Supplier<Authentication> authentication, MethodInvocation invocation) {
         ExpressionParser parser = new SpelExpressionParser();
         Expression expression = parser.parseExpression(invocation.getMethod().getAnnotation(PreAuthorize.class).value());
-        CustomMethodSecurityExpressionHandler handler = new CustomMethodSecurityExpressionHandler(this.categoryMemberService, this.postService);
+        CustomMethodSecurityExpressionHandler handler = new CustomMethodSecurityExpressionHandler(categoryMemberService, postService);
         EvaluationContext ctx = handler.createEvaluationContext(authentication, invocation);
         boolean granted = Boolean.TRUE.equals(expression.getValue(ctx, Boolean.class));
         return new AuthorizationDecision(granted);

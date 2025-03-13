@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dayp308.chatroom.util.MarkdownUtil.getThumbnails;
+
 @Component
 public class PostToBriefView implements Converter<Post, PostBriefView> {
     private final CategoryMemberRepository categoryMemberRepository;
@@ -61,35 +63,14 @@ public class PostToBriefView implements Converter<Post, PostBriefView> {
         }
 
         target.setCategoryId(source.getCategory().getId());
-        target.setThumbnails((getThumbnail(source.getContent())));
+        target.setThumbnails(getThumbnails(source.getContent()));
         target.setViews(source.getViews());
         return target;
     }
 
     public static String cropContent(String content) {
         String stripped = MarkdownUtil.stripMarkdown(content);
-        return stripped.substring(0, Math.min(stripped.length(), 50));
-    }
-
-    public static List<String> getThumbnail(String md) {
-        if (md.isBlank()) return List.of();
-        Parser parser = Parser.builder().build();
-        List<String> thumbnails = new ArrayList();
-        Node document = parser.parse(md);
-        Node node = document.getFirstChild().getFirstChild();
-        int count = 0;
-        while (count < 3 && node != null ) {
-            if (node instanceof Image) {
-                String dest = ((Image) node).getDestination();
-                thumbnails.add(
-                        FilenameUtils.getPath(dest) +
-                                FilenameUtils.getBaseName(dest) +
-                                "-thumbnail.webp");
-            }
-            node = node.getNext();
-            ++count;
-        }
-        return thumbnails;
+        return stripped.substring(0, Math.min(stripped.length() - 1, 49));
     }
 
 }

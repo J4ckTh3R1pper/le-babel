@@ -1,7 +1,7 @@
 import axios from 'axios'
 import {ElLoading, ElMessage, ElMessageBox, ElNotification} from "element-plus";
 import {blobValidate, tansParams} from "./utils.js";
-import errCodes from "./errCodes.js";
+import errCodes from "../errCodes.js";
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 
 let downloadLoadingInstance;
@@ -19,6 +19,8 @@ const service = axios.create({
 service.interceptors.response.use(res => {
         // 未设置状态码则默认成功状态
         const code = res.data.code || 200;
+        const token = res.headers['Authorization']
+        if ( token ) sessionStorage.setItem("access_token", token)
         // 获取错误信息
         const msg = errCodes[code] || res.data.msg || errCodes['default']
         // 二进制数据则直接返回
@@ -37,7 +39,7 @@ service.interceptors.response.use(res => {
             ElNotification.error({ title: msg })
             return Promise.reject('error')
         } else {
-            return  Promise.resolve(res.data)
+            return Promise.resolve(res.data)
         }
     },
     error => {

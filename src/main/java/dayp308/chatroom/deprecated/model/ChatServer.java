@@ -5,8 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.stereotype.Component;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-@Component
+//@JsonInclude(JsonInclude.Include.NON_EMPTY)
+//@Component
 public class ChatServer {
     private int id;
     private String name;

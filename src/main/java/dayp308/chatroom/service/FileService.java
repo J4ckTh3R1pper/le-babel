@@ -16,25 +16,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 
 @Service
 public class FileService {
-    private final SimpleDateFormat dateFormat;
-
-    @Value("${dayp308.chatroom.fileStorePath}")
-    private String filePath;
-
-    @Value("${dayp308.chatroom.assetsPath}")
-    private String assetsPath;
-
 
     @Value("${dayp308.chatroom.imgPath}")
     private String imgPath;
 
-    public FileService() {
-        this.dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
-    }
+    private String thumbnailDir = "thumbnails";
 
     public String uploadImage(MultipartFile imageFile) throws FileUploadException {
         if (imageFile.isEmpty())
@@ -44,12 +33,13 @@ public class FileService {
         String storeName = FileUtil.getMD5(imageFile) + "." + extension;
         try {
             InputStream stream = imageFile.getInputStream();
-            File fileDir = new File(imgPath);
+            File fileDir = new File(imgPath + "/" + thumbnailDir);
             if (!fileDir.exists())
                 fileDir.mkdirs();
-            Path path = Path.of(fileDir.getPath(), storeName);
-            Path thumbnailPath = Path.of(fileDir.getPath(), "thumbnails");
+            Path path = Path.of(imgPath, storeName);
+            Path thumbnailPath = Path.of(fileDir.getPath());
             Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
+            // 生成缩略图
             Thumbnails.of(path.toFile())
                     .outputFormat("webp")
                     .size(1280, 720)

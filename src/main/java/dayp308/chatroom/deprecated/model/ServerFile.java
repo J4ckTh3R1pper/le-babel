@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
+//@Component
 public class ServerFile {
     private Integer fileId;
     private String fileName;

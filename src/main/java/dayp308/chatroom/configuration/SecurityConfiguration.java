@@ -1,5 +1,6 @@
 package dayp308.chatroom.configuration;
 
+import dayp308.chatroom.repository.RedisCaptchaRepository;
 import dayp308.chatroom.security.*;
 import dayp308.chatroom.repository.RedisPersistentTokenRepository;
 import dayp308.chatroom.service.RememberServices;
@@ -34,32 +35,37 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @EnableMethodSecurity(prePostEnabled = false)
 public class SecurityConfiguration {
 
-    @Autowired
     private final UserDetailsPasswordServiceImpl userDetailsPasswordService;
 
-    @Autowired
     private final UserDetailsServiceImpl userDetailsService;
 
+    private final RedisCaptchaRepository redisCaptchaRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+
     @Autowired
-    public SecurityConfiguration(UserDetailsPasswordServiceImpl userDetailsPasswordService, UserDetailsServiceImpl userDetailsService) {
+    public SecurityConfiguration(UserDetailsPasswordServiceImpl userDetailsPasswordService, UserDetailsServiceImpl userDetailsService, RedisCaptchaRepository redisCaptchaRepository) {
         this.userDetailsPasswordService = userDetailsPasswordService;
         this.userDetailsService = userDetailsService;
+        this.redisCaptchaRepository = redisCaptchaRepository;
     }
 
-    @Bean
+//    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(formLogin -> formLogin
                         .usernameParameter("loginName")
                         .passwordParameter("password")
-                        .loginPage("/login")
+                        .loginProcessingUrl("/api/login")
                         .successHandler(authenticationSuccessHandler())
                         .failureHandler(authenticationFailureHandler())
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/register").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/register").permitAll()
+                        .requestMatchers("/api/get_captcha").permitAll()
                         .requestMatchers("/api/no_auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -70,16 +76,14 @@ public class SecurityConfiguration {
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .addFilterAt(captchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .rememberMe(remember -> remember
-//                        .rememberMeServices(rememberMeServices(userDetailsService))
-//                )
                 .build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(new BCryptPasswordEncoder(8));
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(passwordEncoder);
         provider.setUserDetailsService(userDetailsService);
         provider.setUserDetailsPasswordService(userDetailsPasswordService);
 
@@ -88,55 +92,49 @@ public class SecurityConfiguration {
         return providerManager;
     }
 
-    @Bean
+//    @Bean
     public Advisor preAuthorize(CustomAuthorizationManager manager) {
         return AuthorizationManagerBeforeMethodInterceptor.preAuthorize(manager);
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return userDetailsService;
-    }
-
-    @Bean
-    public UserDetailsPasswordService userDetailsPasswordService() {
-        return userDetailsPasswordService;
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(4);
+        return passwordEncoder;
     }
 
-    @Autowired
+//    @Autowired
     public void configure(AuthenticationManagerBuilder builder) throws Exception {
         builder.eraseCredentials(false);
     }
 
-    @Autowired
-    public RememberMeServices rememberMeServices(UserDetailsServiceImpl userDetailsService) {
-        return new JwtRememberMeService(userDetailsService);
-    }
-
-    @Bean
+//    @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new FormLoginAuthenticationSuccessHandler();
     }
 
-    @Bean
+//    @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new LoginFailedHandler();
     }
 
-    @Bean
+//    @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
         entryPoint.setRealmName("Access to Login page or include correct token in request");
         return entryPoint;
     }
 
-    @Bean
+//    @Bean
     public OncePerRequestFilter jwtAuthenticationFilter() {
         return new JwtAuthFilter(userDetailsService);
+    }
+
+//    @Bean
+    public CaptchaUsernamePasswordAuthenticationFilter captchaAuthenticationFilter() {
+        CaptchaUsernamePasswordAuthenticationFilter filter =
+                new CaptchaUsernamePasswordAuthenticationFilter(redisCaptchaRepository, authenticationManager());
+        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+        filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+        return filter;
     }
 }
