@@ -3,20 +3,20 @@ import {defineStore} from "pinia";
 const useAppStore = defineStore(
     'app',
     {
-        state : () => ({
+        state: () => ({
             sidebar: {
                 opened : true,
                 noAnim: false,
                 hidden: false
             }
         }),
-        actions : {
+        actions: {
             toggleSidebar(noAnim) {
-                this.noAnim = noAnim
+                this.sidebar.noAnim = noAnim
                 this.sidebar.opened = !this.sidebar.opened
             },
             closeSidebar(noAnim) {
-                this.noAnim = noAnim
+                this.sidebar.noAnim = noAnim
                 this.sidebar.opened = false
             },
             setSidebarHidden(value) {

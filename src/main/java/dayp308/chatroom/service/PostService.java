@@ -132,7 +132,7 @@ public class PostService {
             view.setLiked(true);
             post.setViews(post.getViews() + 1);
             postRepository.saveAndFlush(post);
-            view.setViews(view.getViews() + 1);
+            view.setViewCount(view.getViewCount() + 1);
         }
         return view;
     }
@@ -281,8 +281,10 @@ public class PostService {
         checkMute(category, membership);
         post.setPublishUser(user);
         postRepository.saveAndFlush(post);
-        membership.setExperience(membership.getExperience() + 3);
-        categoryMemberRepository.saveAndFlush( membership );
+        if ( membership.getRole().ordinal() > 0 ) {
+            membership.setExperience(membership.getExperience() + 3);
+            categoryMemberRepository.saveAndFlush( membership );
+        }
         return postRepository.findById(post.getId(), PostDTO.class).orElseThrow();
     }
 
@@ -297,13 +299,16 @@ public class PostService {
         checkMute(category, membership);
         comment.setUser(user);
         commentRepository.saveAndFlush(comment);
-        membership.setExperience(membership.getExperience() + 3);
-        categoryMemberRepository.saveAndFlush( membership );
+        if ( membership.getRole().ordinal() > 0 ) {
+            membership.setExperience(membership.getExperience() + 3);
+            categoryMemberRepository.saveAndFlush( membership );
+        }
         post.setLastUpdateTime(Instant.now());
         postRepository.saveAndFlush(post);
         return commentRepository.findById(comment.getId(), CommentDTO.class).orElseThrow();
     }
 
+    @Transactional
     public void addPostLike(long postId, User user) {
         PostLike like = new PostLike();
         like.setPost(postRepository.getReferenceById(postId));
@@ -315,6 +320,7 @@ public class PostService {
         }
     }
 
+    @Transactional
     public void addCommentLike(long commentId, User user) {
         CommentLike like = new CommentLike();
         like.setComment(commentRepository.getReferenceById(commentId));

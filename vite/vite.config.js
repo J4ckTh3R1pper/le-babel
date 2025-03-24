@@ -6,11 +6,13 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 import Components from 'unplugin-vue-components/vite'
 import path from "path";
+import process from "node:process";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode}) => {
   // 安装 @types/node 否则无法解析process
   const env = loadEnv(mode, process.cwd())
+  console.log(env)
   const { VITE_BACKEND_PORT,VITE_BACKEND_HOST } = env;
 
   return {
@@ -24,7 +26,7 @@ export default defineConfig(({ mode}) => {
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/api': {
-          target: 'http://' + VITE_BACKEND_HOST + VITE_BACKEND_PORT,
+          target: 'http://' + VITE_BACKEND_HOST + ":" + VITE_BACKEND_PORT,
           changeOrigin: true,
         }
       }
@@ -53,8 +55,5 @@ export default defineConfig(({ mode}) => {
     build: {
       outDir: "dist"
     },
-    define: {
-      'process.env': {}
-    }
   }
 })

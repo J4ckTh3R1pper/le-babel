@@ -11,16 +11,11 @@ import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CommentRepository;
 import dayp308.chatroom.repository.PostLikeRepository;
 import dayp308.chatroom.util.MarkdownUtil;
-import org.apache.commons.io.FilenameUtils;
-import org.commonmark.node.Image;
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
 import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static dayp308.chatroom.util.MarkdownUtil.getThumbnails;
@@ -57,14 +52,14 @@ public class PostToBriefView implements Converter<Post, PostBriefView> {
         target.setCommentCount(Hibernate.size(source.getComments()));
         target.setBookmarks(Hibernate.size(source.getBookmarkedUsers()));
         try {
-            target.setTagList(jacksonObjectMapper.readValue(source.getTags(), List.class));
+            target.setTags(jacksonObjectMapper.readValue(source.getTags(), List.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
         target.setCategoryId(source.getCategory().getId());
         target.setThumbnails(getThumbnails(source.getContent()));
-        target.setViews(source.getViews());
+        target.setViewCount(source.getViews());
         return target;
     }
 

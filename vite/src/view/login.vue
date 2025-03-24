@@ -1,13 +1,13 @@
 <script setup>
 import {useRoute, useRouter} from "vue-router";
 import request from "@/js/utils/request.js";
-import useUserStore from "@/js/module/user.js";
+import useLoginUserStore from "@/js/module/login_user.js";
 import {getCaptchaRequest} from "@/js/api/login.js";
 const route = useRoute();
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 
-const userStore = useUserStore();
+const userStore = useLoginUserStore();
 
 const loginForm = ref({
   loginName: "",
@@ -35,10 +35,14 @@ redirect.value = newRoute.query && newRoute.query.redirect;
 
 function getCaptcha() {
     getCaptchaRequest().then( res => {
-        captchaImgUrl.value = "data:image/gif;base64," + res.img;
+        captchaImgUrl.value = res.img;
         loginForm.value.uuid = res.uuid;
     })
 }
+
+onMounted(() => {
+  getCaptcha()
+})
 
 function handleLogin() {
     proxy.$refs.loginRef.validate( valid => {
@@ -113,8 +117,8 @@ function handleLogin() {
             style="width:100%;"
             @click.prevent="handleLogin"
         >
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
+          <span v-if="!loading">登录</span>
+          <span v-else>登录中...</span>
         </el-button>
         <div style="float: right;">
           <router-link class="link-type" :to="'/register'">立即注册</router-link>

@@ -8,6 +8,7 @@ import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -49,7 +50,7 @@ public class SecurityConfiguration {
         this.redisCaptchaRepository = redisCaptchaRepository;
     }
 
-//    @Bean
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -62,11 +63,9 @@ public class SecurityConfiguration {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/api/login").permitAll()
-                        .requestMatchers("/api/register").permitAll()
-                        .requestMatchers("/api/get_captcha").permitAll()
-                        .requestMatchers("/api/no_auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/no_auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/no_auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling( e -> {
@@ -76,7 +75,7 @@ public class SecurityConfiguration {
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterAt(captchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAt(captchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -92,7 +91,7 @@ public class SecurityConfiguration {
         return providerManager;
     }
 
-//    @Bean
+//    @Bean 带上这个Bean会导致无法启动
     public Advisor preAuthorize(CustomAuthorizationManager manager) {
         return AuthorizationManagerBeforeMethodInterceptor.preAuthorize(manager);
     }
@@ -102,35 +101,35 @@ public class SecurityConfiguration {
         return passwordEncoder;
     }
 
-//    @Autowired
+    @Autowired
     public void configure(AuthenticationManagerBuilder builder) throws Exception {
         builder.eraseCredentials(false);
     }
 
-//    @Bean
+    @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new FormLoginAuthenticationSuccessHandler();
     }
 
-//    @Bean
+    @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new LoginFailedHandler();
     }
 
-//    @Bean
+    @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
         entryPoint.setRealmName("Access to Login page or include correct token in request");
         return entryPoint;
     }
 
-//    @Bean
+    @Bean
     public OncePerRequestFilter jwtAuthenticationFilter() {
         return new JwtAuthFilter(userDetailsService);
     }
 
-//    @Bean
-    public CaptchaUsernamePasswordAuthenticationFilter captchaAuthenticationFilter() {
+    @Bean
+    public UsernamePasswordAuthenticationFilter captchaAuthenticationFilter() {
         CaptchaUsernamePasswordAuthenticationFilter filter =
                 new CaptchaUsernamePasswordAuthenticationFilter(redisCaptchaRepository, authenticationManager());
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler());

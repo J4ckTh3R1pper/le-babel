@@ -22,10 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PostController {
@@ -57,7 +54,8 @@ public class PostController {
         return new ResponseEntity<>("comment: " + id, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("isOwnerOfPost(#postId) or hasAuthorityPostGe(#postId, 'MODERATOR')")
+    @PreAuthorize(
+            "@authz.isOwnerOfPost(#root, #postId) or @authz.hasAuthorityPostGe(#root, #postId, 'MODERATOR')")
     @PostMapping("/api/post/delete")
     public ResponseEntity<String> deletePost(@RequestParam("postId") long postId) {
         postService.deletePost(postRepository.getReferenceById(postId));
@@ -65,7 +63,7 @@ public class PostController {
     }
 
     @PreAuthorize(
-            "isOwnerOfComment(#commentId) or hasAuthorityCommentGe(#commentId, 'MODERATOR')")
+            "@authz.isOwnerOfComment(#root, #commentId) or @authz.hasAuthorityCommentGe(#root, #commentId, 'MODERATOR')")
     @PostMapping("/api/comment/delete")
     public ResponseEntity<String> deleteComment(@RequestParam("commentId") long commentId) {
         postService.deleteComment(postService.getCommentById(commentId));
@@ -135,11 +133,11 @@ public class PostController {
 
     @PostMapping("/api/no_auth/post/thread")
     public ResponseEntity<String> getThread(
-            @RequestParam("postId") long postId, Authentication auth) throws JsonProcessingException {
+            @RequestParam("id") long id, Authentication auth) throws JsonProcessingException {
         User user = null;
         if ( auth != null && auth.isAuthenticated() )
             user = (User) auth.getPrincipal();
-        PostDetailedView view = postService.getPostDetailedView(postId, user);
+        PostDetailedView view = postService.getPostDetailedView(id, user);
 
         return new ResponseEntity<>(
                 jacksonObjectMapper.writeValueAsString(view),

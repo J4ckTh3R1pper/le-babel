@@ -41,15 +41,24 @@ public class UserController {
         this.redisCaptchaRepository = redisCaptchaRepository;
     }
 
-    @PostMapping(value = "/api/register")
-    public ResponseEntity<String> register(@Valid UserRegistrationForm form) throws InvalidFormException, EntityExistsException, JsonProcessingException {
+    @PostMapping(value = "/api/no_auth/register")
+    public ResponseEntity<String> register(@Valid @RequestBody UserRegistrationForm form) throws InvalidFormException, EntityExistsException, JsonProcessingException {
         if ( !redisCaptchaRepository.checkCaptcha(form.getUuid(), form.getCaptcha()) )
             throw new InvalidFormException("Invalid captcha", InvalidFormException.ErrorCode.INVALID_CAPTCHA);
         return new ResponseEntity<>(jacksonObjectMapper.writeValueAsString(userService.register(form)), HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/api/captcha")
-    public ResponseEntity<String> getCaptcha(@RequestParam("captcha") String captcha) throws JsonProcessingException {
+    @PostMapping(value = "/api/no_auth/captcha")
+    public ResponseEntity<String> getCaptcha() throws JsonProcessingException {
+        Captcha cap = new GifCaptcha(130, 48, 5);
+        String uuid = redisCaptchaRepository.saveCaptcha(cap);
+        String resp = jacksonObjectMapper.writeValueAsString(
+                new CaptchaResponse(cap.toBase64(), uuid));
+        return new ResponseEntity<>(resp, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/api/no_auth/captcha")
+    public ResponseEntity<String> getCaptchaGet() throws JsonProcessingException {
         Captcha cap = new GifCaptcha(130, 48, 5);
         String uuid = redisCaptchaRepository.saveCaptcha(cap);
         String resp = jacksonObjectMapper.writeValueAsString(

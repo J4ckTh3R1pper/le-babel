@@ -100,14 +100,14 @@ public class CategoryController {
     }
 
 
-    @PreAuthorize("hasMembershipGe(#categoryId, 'MODERATOR')")
+    @PreAuthorize("@authz.hasMembershipGe(#root, #categoryId, 'MODERATOR')")
     @PostMapping("/api/category/mute_user")
     public ResponseEntity<String> muteUser(@RequestParam int categoryId, @RequestParam("userId") long userId, @RequestParam long seconds) {
         Instant expirationDate = categoryMemberService.muteUser(categoryId, userId, seconds);
         return new ResponseEntity<>( "expirationDate:" + expirationDate.getEpochSecond() + "000", HttpStatus.OK);
     }
 
-    @PreAuthorize("hasMembershipGe(#categoryId, 'MODERATOR')")
+    @PreAuthorize("@authz.hasMembershipGe(#root, #categoryId, 'MODERATOR')")
     @PostMapping("/api/category/unmute_user")
     public ResponseEntity<String> unmuteUser(@RequestParam int categoryId, @RequestParam("userId") long userId) {
         categoryMemberService.unmuteUser(categoryId, userId);

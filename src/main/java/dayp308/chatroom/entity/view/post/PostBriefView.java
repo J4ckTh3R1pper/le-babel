@@ -17,9 +17,9 @@ public class PostBriefView {
     private Integer categoryId;
     private Instant createTime;
     private Instant lastUpdateTime;
-    private List<String> tagList;
-    private Long views;
-    private Integer LikeCount;
+    private List<String> tags;
+    private Long viewCount;
+    private Integer likeCount;
     private Integer bookmarks;
     private Integer commentCount;
     private List<String> thumbnails;

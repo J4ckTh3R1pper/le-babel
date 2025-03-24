@@ -8,21 +8,13 @@ export function loginRequest(loginName, password, captcha, uuid, rememberMe) {
         uuid: uuid,
         rememberMe: rememberMe
     }
-    return request.postForm({
-        url: '/login',
-        headers: {
-            isToken: false,
-            repeatSubmit: false
-        },
-        method: 'post',
-        data: data,
-    })
+    return request.postForm('/login', data)
 }
 
 // 注册方法
 export function registerRequest(data) {
     return request({
-        url: '/register',
+        url: '/no_auth/register',
         headers: {
             isToken: false
         },
@@ -50,7 +42,7 @@ export function logoutRequest() {
 // 获取验证码
 export function getCaptchaRequest() {
     return request({
-        url: '/captcha',
+        url: '/no_auth/captcha',
         headers: {
             isToken: false
         },

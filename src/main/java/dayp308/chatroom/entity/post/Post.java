@@ -10,6 +10,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -22,6 +25,7 @@ import java.util.Set;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GenericField(projectable = Projectable.YES)
     @Column(name = "post_id", nullable = false)
     private Long id;
 
@@ -31,10 +35,13 @@ public class Post {
     private User publishUser;
 
     @Column(name = "post_title", nullable = false, length = 64)
+    @GenericField(name = "title", projectable = Projectable.YES)
     private String title;
 
     @Lob
     @Column(name = "post_content", nullable = false)
+    @FullTextField(name = "content")
+    @GenericField(projectable = Projectable.YES)
     private String content;
 
     @JsonBackReference

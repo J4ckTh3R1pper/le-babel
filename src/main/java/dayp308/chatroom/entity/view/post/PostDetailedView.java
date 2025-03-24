@@ -18,8 +18,8 @@ public class PostDetailedView {
     private Instant createTime;
     private Instant lastUpdateTime;
     private List<String> tags;
-    private Long views;
-    private Integer likes;
-    private Integer comments;
+    private Long viewCount;
+    private Integer likeCount;
+    private Integer commentCount;
     private Boolean liked;
 }

@@ -4,7 +4,7 @@ import {defineStore} from "pinia";
 import defaultAvatar from '@/assets/img/default_user_avatar.png'
 import {isEmpty, isHttp} from '@/js/utils/validate.js'
 
-const useUserStore = defineStore(
+const useLoginUserStore = defineStore(
     'user',
     {
         state: () => ({
@@ -26,8 +26,8 @@ const useUserStore = defineStore(
                 const rememberMe = userInfo.rememberMe
                 return new Promise((resolve, reject) => {
                     loginRequest(loginName, password, captcha, uuid, rememberMe).then(res => {
-                        // setToken(res.token)
-                        // this.token = res.token
+                        setToken(res.token)
+                        this.token = res.token
                         resolve()
                     }).catch(error => {
                         reject(error)
@@ -76,4 +76,4 @@ const useUserStore = defineStore(
         }
     })
 
-export default useUserStore
+export default useLoginUserStore

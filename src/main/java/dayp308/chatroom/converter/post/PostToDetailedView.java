@@ -44,8 +44,8 @@ public class PostToDetailedView implements Converter<Post, PostDetailedView> {
                 )
         );
         target.setUserBriefView(categoryMemberToBriefViewConverter.convert(member));
-        target.setLikes(Hibernate.size(source.getUsersLiked()));
-        target.setComments(Hibernate.size(source.getComments()));
+        target.setLikeCount(Hibernate.size(source.getUsersLiked()));
+        target.setCommentCount(Hibernate.size(source.getComments()));
         try {
             target.setTags(jacksonObjectMapper.readValue(source.getTags(), List.class));
         } catch (JsonProcessingException e) {
@@ -53,7 +53,7 @@ public class PostToDetailedView implements Converter<Post, PostDetailedView> {
         }
         target.setLiked(false);
         target.setCategoryId(source.getCategory().getId());
-        target.setViews(source.getViews());
+        target.setViewCount(source.getViews());
         return target;
     }
 

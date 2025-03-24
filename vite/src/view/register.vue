@@ -3,7 +3,10 @@
 import useUserStore from "@/js/module/user.js";
 import {getCaptchaRequest, registerRequest} from "@/js/api/login.js";
 import {ElMessageBox} from "element-plus";
+import {useRoute, useRouter} from "vue-router";
 const { proxy } = getCurrentInstance();
+const route = useRoute()
+const router = useRouter()
 
 const registerForm = ref({
   loginName: "",
@@ -22,9 +25,13 @@ watch(route, (newRoute) => {
   redirect.value = newRoute.query && newRoute.query.redirect;
 }, { immediate: true });
 
+onMounted(() => {
+  getCaptcha()
+})
+
 function getCaptcha() {
   getCaptchaRequest().then( res => {
-    captchaImgUrl.value = "data:image/gif;base64," + res.img;
+    captchaImgUrl.value = res.img;
     registerForm.value.uuid = res.uuid;
   })
 }
@@ -46,6 +53,9 @@ const registerRules = {
     { min: 8, max: 32, message: "用户密码长度必须介于 8 和 32 之间", trigger: "blur" },
     { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
   ],
+  nickName: [
+    { required: true, trigger: "blur", message: "请输入您的昵称" }
+  ],
   confirmPassword: [
     { required: true, trigger: "blur", message: "请再次输入您的密码" },
     { required: true, validator: confirmPassword, trigger: "blur" }
@@ -58,8 +68,15 @@ function handleRegister() {
   proxy.$refs.registerRef.validate( valid => {
     if (valid) {
       loading.value = true;
-      registerRequest(registerForm.value).then(() => {
-        const username = registerForm.value.loginName;
+      let data = {
+        loginName: registerForm.value.loginName,
+        password: registerForm.value.password,
+        nickName: registerForm.value.nickName,
+        uuid: registerForm.value.uuid,
+        captcha: registerForm.value.captcha
+      }
+      registerRequest(data).then(() => {
+        const username = data.loginName;
         ElMessageBox.alert("<span style='color: red;'>" + "恭喜你，您的账号 " + username + " 注册成功！</span>", "系统提示", {
           dangerouslyUseHTMLString: true,
           type: "success",
@@ -69,6 +86,7 @@ function handleRegister() {
 
       }).catch(() => {
         getCaptcha()
+        loading.value = false
       })
     }
   })
@@ -87,6 +105,15 @@ function handleRegister() {
             size="large"
             auto-complete="off"
             placeholder="注册邮箱"
+        >
+        </el-input>
+      </el-form-item>
+      <el-form-item prop="nickName">
+        <el-input v-model="registerForm.nickName"
+                  type="text"
+                  size="large"
+                  autocomplete="off"
+                  placeholder="昵称"
         >
         </el-input>
       </el-form-item>
@@ -134,8 +161,8 @@ function handleRegister() {
             style="width:100%;"
             @click.prevent="handleRegister"
         >
-          <span v-if="!loading">注 册</span>
-          <span v-else>注 册 中...</span>
+          <span v-if="!loading">注册</span>
+          <span v-else>注册中...</span>
         </el-button>
         <div style="float: right;">
           <router-link class="link-type" :to="'/login'">使用已有账户登录</router-link>

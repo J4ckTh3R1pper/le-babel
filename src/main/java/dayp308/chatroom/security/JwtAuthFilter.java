@@ -34,6 +34,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return request.getServletPath().startsWith("/api/no_auth");
+    }
+
     private final String parameter = Constants.REMEMBER_ME_PARAM;
 
     @Override

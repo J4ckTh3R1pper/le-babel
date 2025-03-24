@@ -88,8 +88,8 @@ public class UserService {
 
     /*** 注册用户
      *
-     * @param form Controller层传入的DTO类
-     * @return 注册完成的用户DTO对象
+     * @param form Controller层传入的表单
+     * @return 注册完成的用户的ID
      * @throws UserExistsException 邮箱或用户名重复时抛出
      */
     public long register(UserRegistrationForm form) {

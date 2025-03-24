@@ -23,7 +23,7 @@ public class FileService {
     @Value("${dayp308.chatroom.imgPath}")
     private String imgPath;
 
-    private String thumbnailDir = "thumbnails";
+    private String thumbnailDir = "thumbnails/";
 
     public String uploadImage(MultipartFile imageFile) throws FileUploadException {
         if (imageFile.isEmpty())
@@ -33,7 +33,7 @@ public class FileService {
         String storeName = FileUtil.getMD5(imageFile) + "." + extension;
         try {
             InputStream stream = imageFile.getInputStream();
-            File fileDir = new File(imgPath + "/" + thumbnailDir);
+            File fileDir = new File(imgPath + thumbnailDir);
             if (!fileDir.exists())
                 fileDir.mkdirs();
             Path path = Path.of(imgPath, storeName);
