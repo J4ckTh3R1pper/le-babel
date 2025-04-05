@@ -58,14 +58,4 @@ public class CategoryMember {
     @Column(name = "join_date")
     private Instant joinDate = Instant.now();
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof CategoryMember that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }

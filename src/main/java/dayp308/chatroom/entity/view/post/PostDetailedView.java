@@ -1,17 +1,19 @@
 package dayp308.chatroom.entity.view.post;
 
-import dayp308.chatroom.entity.view.UserBriefView;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
-@Component
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostDetailedView {
     private Long id;
-    private UserBriefView userBriefView;
+    private Long userId;
     private String title;
     private String content;
     private Integer categoryId;
@@ -19,7 +21,7 @@ public class PostDetailedView {
     private Instant lastUpdateTime;
     private List<String> tags;
     private Long viewCount;
-    private Integer likeCount;
-    private Integer commentCount;
+    private Long likeCount;
+    private Long commentCount;
     private Boolean liked;
 }

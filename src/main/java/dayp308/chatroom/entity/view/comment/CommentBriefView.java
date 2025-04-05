@@ -2,18 +2,20 @@ package dayp308.chatroom.entity.view.comment;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
-@NoArgsConstructor
+@Getter
 public class CommentBriefView extends CommentView {
-    private Set<CommentView> children = new LinkedHashSet<>();
-    @Setter(AccessLevel.NONE)
+    private List<CommentView> children = new ArrayList<>();
     private int childCount;
 
-    public void setChildren(Set<CommentView> children) {
+    protected CommentBriefView() {}
+
+    public void setChildren(List<CommentView> children) {
         this.children = children;
         this.childCount = children.size();
     }

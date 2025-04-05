@@ -6,7 +6,6 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Data
-@Component
 public class UserEditForm {
     private String nickName;
     @Size(max = 32)

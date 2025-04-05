@@ -3,9 +3,10 @@ package dayp308.chatroom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dayp308.chatroom.entity.category.CategoryMinimal;
-import dayp308.chatroom.entity.enums.CategoryOrderType;
+import dayp308.chatroom.entity.category.PostCategory_;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
+import dayp308.chatroom.entity.member.MemberMinimal;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.repository.CategoryMemberRepository;
@@ -14,6 +15,10 @@ import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,70 +49,73 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("/api/category/get_user")
+    @GetMapping("/api/no_auth/category/get_user")
     public ResponseEntity<String> getUserBriefView(
-                                                  @RequestParam("categoryId") int categoryId,
-                                                  @RequestParam("userId") long userId,
-                                                  HttpServletRequest request) throws JsonProcessingException {
+            @RequestParam("categoryId") int categoryId,
+            @RequestParam("userId") long userId
+    ) throws JsonProcessingException {
         return new ResponseEntity<>(
                 objectMapper.writeValueAsString(categoryMemberService.getUserBriefView(categoryId, userId)),
                 HttpStatus.OK
         );
     }
 
+    @GetMapping("/api/no_auth/category/get_member")
+    public ResponseEntity<MemberMinimal> getMemberCache(
+            @RequestParam("categoryId") int categoryId,
+            @RequestParam("userId") long userId
+    ) {
+        return new ResponseEntity<>(
+                categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class),
+                HttpStatus.OK
+        );
+    }
+
     @PostMapping("/api/category/create_request")
-    public ResponseEntity<String> createCategoryRequest(
+    public ResponseEntity<Integer> createCategoryRequest(
             @RequestParam CategoryCreationForm form,
             Authentication auth
     ) {
-        categoryService.createCategory(form, (User) auth.getPrincipal());
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        int id = categoryService.createCategory(form, (User) auth.getPrincipal());
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @PostMapping("/api/category/join_category")
-    public ResponseEntity<String> joinCategory(Authentication auth,
-                                               int categoryId) throws JsonProcessingException {
+    public ResponseEntity<Integer> joinCategory(Authentication auth,
+                                               int categoryId) {
         User user = (User) auth.getPrincipal();
         CategoryMemberId id = categoryMemberService.addMember(
                 categoryRepository.getReferenceById(categoryId), user, Role.SUBSCRIBER);
-        return new ResponseEntity<>(objectMapper.writeValueAsString(id), HttpStatus.OK);
+        return new ResponseEntity<>(id.getCategoryId(), HttpStatus.OK);
     }
 
-    @PostMapping("/api/category/get_joined_category")
-    public ResponseEntity<String> getJoinedCategory(
+    @GetMapping("/api/category/get_joined_category")
+    public Slice<CategoryMinimal> getJoinedCategory(
             Authentication auth,
-            @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
-            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "orderBy", defaultValue = "JOIN_DATE" ) CategoryOrderType orderBy,
-            @RequestParam(value = "ascending", defaultValue = "false") Boolean ascending
-                                                    ) throws JsonProcessingException {
+            Pageable pageable
+    ) {
         User user = (User) auth.getPrincipal();
-        List<CategoryMinimal> list = categoryService.getMinimalList(user, pageNum, pageSize, orderBy, ascending);
-        String responseBody = objectMapper.writeValueAsString(list);
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        return categoryService.getMinimalSlice(user, pageable);
     }
 
-    @PostMapping("/api/no_auth/category/get_category_list")
-    public ResponseEntity<String> getCategoryList(
-            @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
-            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "orderBy", defaultValue = "JOIN_DATE" ) CategoryOrderType orderBy,
-            @RequestParam(value = "ascending", defaultValue = "false") Boolean ascending
-    ) throws JsonProcessingException {
-        List<CategoryMinimal> list = categoryService.getMinimalList(null, pageNum, pageSize, orderBy, ascending);
-        String responseBody = objectMapper.writeValueAsString(list);
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+    @GetMapping("/api/no_auth/category/get_category_list")
+    public Slice<CategoryMinimal> getCategoryList(
+            @PageableDefault(
+                    sort = PostCategory_.RANK, direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return categoryRepository.findAll(pageable, CategoryMinimal.class);
     }
 
 
-    @PreAuthorize("@authz.hasMembershipGe(#root, #categoryId, 'MODERATOR')")
+    @PreAuthorize("@authz.hasMembershipGe(#categoryId, 'MODERATOR')")
     @PostMapping("/api/category/mute_user")
     public ResponseEntity<String> muteUser(@RequestParam int categoryId, @RequestParam("userId") long userId, @RequestParam long seconds) {
         Instant expirationDate = categoryMemberService.muteUser(categoryId, userId, seconds);
         return new ResponseEntity<>( "expirationDate:" + expirationDate.getEpochSecond() + "000", HttpStatus.OK);
     }
 
-    @PreAuthorize("@authz.hasMembershipGe(#root, #categoryId, 'MODERATOR')")
+    @PreAuthorize("@authz.hasMembershipGe(#categoryId, 'MODERATOR')")
     @PostMapping("/api/category/unmute_user")
     public ResponseEntity<String> unmuteUser(@RequestParam int categoryId, @RequestParam("userId") long userId) {
         categoryMemberService.unmuteUser(categoryId, userId);

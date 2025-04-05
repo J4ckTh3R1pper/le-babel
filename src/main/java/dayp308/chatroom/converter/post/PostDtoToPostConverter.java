@@ -29,7 +29,7 @@ public class PostDtoToPostConverter implements Converter<PostDTO, Post> {
         PostCategory postCategory = categoryRepository.findById(source.getCategory().getId()).orElseThrow();
         Post target = new Post();
         BeanUtils.copyProperties(source, target);
-        target.setPublishUser(user);
+        target.setUser(user);
         target.setCategory(postCategory);
         return target;
     }

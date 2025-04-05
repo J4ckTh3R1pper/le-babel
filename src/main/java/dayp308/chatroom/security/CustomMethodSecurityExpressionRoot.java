@@ -33,40 +33,40 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot {
         this.postService = postService;
     }
 
-    public boolean hasMemberShip(int categoryId) {
-        return this.categoryMemberService.hasMembership(categoryId, ((User) this.getPrincipal()));
-    }
-
-    public boolean hasMembershipGe(int categoryId, String role) {
-        return this.categoryMemberService.hasAuthorityGreaterOrEquals(
-                categoryId, ((User) this.getPrincipal()), Role.valueOf(role)
-        );
-    }
-
-    public boolean hasAuthorityPostGe(long postId, String role) {
-        int categoryId = postService.getPostIdsById(postId).getCategory().getId();
-        return this.categoryMemberService.hasAuthorityGreaterOrEquals(
-                categoryId, ((User) this.getPrincipal()), Role.valueOf(role));
-    }
-
-    public boolean isOwnerOfPost(long postId) {
-        long authenticatedUserId = ( (User) this.getPrincipal() ).getId();
-        return postService.getPostIdsById(postId).getPublishUser().getId() == authenticatedUserId;
-    }
-
-    public boolean isOwnerOfComment(long commentId) {
-        long authenticatedUserId = ( (User) this.getPrincipal() ).getId();
-        return postService.getCommentIdsById(commentId).getUser().getId() == authenticatedUserId;
-    }
-
-    public boolean hasAuthorityCommentGe(long commentId, String role) {
-        CommentDTO comment = postService.getCommentById(commentId);
-        return hasAuthorityPostGe(comment.getPost().getId(), role);
-    }
-
-    public boolean hasMembershipEquals(int categoryId, String role) {
-        return this.categoryMemberService.hasAuthority(
-                categoryId, ((User) this.getPrincipal()), Role.valueOf(role)
-        );
-    }
+//    public boolean hasMemberShip(int categoryId) {
+//        return this.categoryMemberService.hasMembership(categoryId, ((User) this.getPrincipal()));
+//    }
+//
+//    public boolean hasMembershipGe(int categoryId, String role) {
+//        return this.categoryMemberService.hasAuthorityGreaterOrEquals(
+//                categoryId, ((User) this.getPrincipal()), Role.valueOf(role)
+//        );
+//    }
+//
+//    public boolean hasAuthorityPostGe(long postId, String role) {
+//        int categoryId = postService.getPostIdsById(postId).getCategory().getId();
+//        return this.categoryMemberService.hasAuthorityGreaterOrEquals(
+//                categoryId, ((User) this.getPrincipal()), Role.valueOf(role));
+//    }
+//
+//    public boolean isOwnerOfPost(long postId) {
+//        long authenticatedUserId = ( (User) this.getPrincipal() ).getId();
+//        return postService.getPostIdsById(postId).getUser().getId() == authenticatedUserId;
+//    }
+//
+//    public boolean isOwnerOfComment(long commentId) {
+//        long authenticatedUserId = ( (User) this.getPrincipal() ).getId();
+//        return postService.getCommentIdsById(commentId).getUser().getId() == authenticatedUserId;
+//    }
+//
+//    public boolean hasAuthorityCommentGe(long commentId, String role) {
+//        CommentDTO comment = postService.getCommentById(commentId);
+//        return hasAuthorityPostGe(comment.getPost().getId(), role);
+//    }
+//
+//    public boolean hasMembershipEquals(int categoryId, String role) {
+//        return this.categoryMemberService.hasAuthority(
+//                categoryId, ((User) this.getPrincipal()), Role.valueOf(role)
+//        );
+//    }
 }

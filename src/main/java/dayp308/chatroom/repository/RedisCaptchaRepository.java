@@ -37,8 +37,14 @@ public class RedisCaptchaRepository {
         Object value = redisTemplate.opsForValue().get(key);
         if (value != null) {
             String captchaText = value.toString().toLowerCase();
-            return captchaText.equals(captcha);
+            return captchaText.equals(value);
         }
         return false;
+    }
+
+    @Transactional
+    public void removeCaptcha(String uuid) {
+        String key = KEY_PREFIX + uuid;
+        redisTemplate.delete(key);
     }
 }

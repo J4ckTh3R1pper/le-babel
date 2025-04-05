@@ -2,7 +2,7 @@ package dayp308.chatroom.entity.post;
 
 public interface PostIdOnly {
     Long getId();
-    User getPublishUser();
+    User getUser();
     Category getCategory();
 
     interface User {

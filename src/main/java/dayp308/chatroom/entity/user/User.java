@@ -94,7 +94,7 @@ public class User implements UserDetails {
     private Set<ChatMessagePublic> chatMessagesPublic = new LinkedHashSet<>();
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "publishUser")
+    @OneToMany(mappedBy = "user")
     private Set<Post> posts = new LinkedHashSet<>();
 
     @JsonIgnore

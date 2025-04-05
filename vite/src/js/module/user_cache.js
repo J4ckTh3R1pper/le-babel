@@ -1,32 +1,35 @@
 import {defineStore} from "pinia";
-import {getUserBriefView} from "@/js/api/user.js";
+import {getUserBriefView, getUserCache} from "@/js/api/user.js";
 
 const useUserCacheStore = defineStore(
     'user_cache',
     {
         state: () => ({
-            cacheMap: new Map(),
+            memberMap: new Map(),
+            userMap: new Map()
         }),
         actions: {
-            async getUser(categoryId, userId) {
-                if ( !this.cacheMap.has(categoryId) ) {
-                    this.cacheMap.set(categoryId, new Map())
-                    return this.addUser(categoryId, userId)
+            async getUser(userId) {
+                let user;
+                if ( !this.userMap.has(userId) ) {
+                    this.userMap.set(userId, this.addUser(userId))
+                    return this.addUser(userId)
                 }
-                const category = this.cacheMap.get(categoryId)
-                if ( category.has(userId) )
-                    return category.get(userId)
-                else return this.addUser(categoryId, userId)
             },
-            async addUser(categoryId, userId) {
+            async addUser(userId) {
                 let user = null
-                getUserBriefView(categoryId, userId).then(res => {
+                this.getUserCache(userId).then(res => {
                     user = res.data
                 })
-                this.cacheMap.get(categoryId).set(userId, user)
                 return user
             },
         }
 })
+
+const ghostUser = {
+    nickName: "ghost",
+    headImgUrl: "/assets/images/default_user_avatar.png",
+    location: ""
+}
 
 export default useUserCacheStore

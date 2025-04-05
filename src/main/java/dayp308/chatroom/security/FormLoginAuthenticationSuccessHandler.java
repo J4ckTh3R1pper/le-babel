@@ -1,26 +1,38 @@
 package dayp308.chatroom.security;
 
 import dayp308.chatroom.Constants;
+import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.repository.RedisCaptchaRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+import static dayp308.chatroom.security.CaptchaUsernamePasswordAuthenticationFilter.obtainUuid;
 
 public class FormLoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final String parameter = Constants.REMEMBER_ME_PARAM;
+    private final RedisCaptchaRepository redisCaptchaRepository;
+
+    public FormLoginAuthenticationSuccessHandler(RedisCaptchaRepository redisCaptchaRepository) {
+        this.redisCaptchaRepository = redisCaptchaRepository;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.setContentType("application/json;charset=UTF-8");
 
         addTokenToResponseHeader(request, response, (UserDetails) authentication.getPrincipal());
+        redisCaptchaRepository.removeCaptcha(obtainUuid(request));
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("login successful, welcome, "+ authentication.getPrincipal());
+        response.getWriter().write("login successful, welcome, "+ ((User) authentication.getPrincipal()).getNickName());
     }
 
     protected void addTokenToResponseHeader(HttpServletRequest req, HttpServletResponse resp, UserDetails user) {
@@ -36,4 +48,5 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
         }
         return false;
     }
+
 }

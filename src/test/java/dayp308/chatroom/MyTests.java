@@ -4,23 +4,26 @@ import dayp308.chatroom.converter.post.PostToBriefView;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.entity.category.PostCategory;
 import dayp308.chatroom.entity.comment.CommentDTO;
+import dayp308.chatroom.entity.enums.PostOrderType;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.business.CommentCreationForm;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.post.PostDTO;
+import dayp308.chatroom.entity.post.Post_;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.entity.user.UserDetailedProj;
-import dayp308.chatroom.entity.view.PagedResponse;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
-import dayp308.chatroom.entity.view.comment.CommentDetailResponse;
+import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.repository.*;
+import dayp308.chatroom.repository.projection.PostProjection;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.UserService;
+import jakarta.persistence.NoResultException;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -148,19 +151,8 @@ class MyTests {
 
     @Test
     void testCommentTree() {
-        CommentDetailResponse view = postService.getCommentDetailedView(32, null);
+        CommentDetailedView view = postService.getCommentDetailedView(32, null);
         System.out.println(view.toString());
-    }
-    @Test
-    void testCommentTreeCropped() {
-        CommentBriefView view = postService.getCommentBriefView(32);
-        System.out.println(view.toString());
-    }
-
-    @Test
-    void testPageComment() {
-        PagedResponse<CommentBriefView> resp = postService.getBriefCommentSliceByPost(17, 0, 25, false,null);
-        System.out.println(resp.getContent());
     }
 
     @Test
@@ -176,5 +168,26 @@ class MyTests {
         projections.getContent().forEach( p -> {
             System.out.println(p.getCreateTime() + ":" + p.getFollowerCount() + "," + p.getFollowingCount());
         });
+    }
+
+    @Test
+    void testPostDetailProj() {
+        User user = userRepository.getReferenceById(135L);
+        PostProjection projection = null;
+        PostProjection projection2 = null;
+        try {
+            projection2 = postRepository.findProjById(17, null);
+            projection = postRepository.findProjById(18, null);
+        } catch (NoResultException e) {
+            e.printStackTrace();
+        }
+        System.out.println(projection);
+        System.out.println(projection2);
+    }
+    @Test
+    void testPostBriefSlice() {
+        User user = userRepository.getReferenceById(135L);
+        Slice<PostProjection> slice = postRepository.findAllProjById(2, user,true, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, Post_.LAST_UPDATE_TIME)));
+        System.out.println(slice.getContent());
     }
 }

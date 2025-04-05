@@ -1,6 +1,7 @@
 package dayp308.chatroom.repository;
 
 
+import dayp308.chatroom.entity.category.CategoryMinimal;
 import dayp308.chatroom.entity.category.PostCategory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -16,5 +17,5 @@ import java.util.function.Function;
 @Repository
 public interface CategoryRepository extends JpaRepository<PostCategory, Integer>, JpaSpecificationExecutor<PostCategory> {
     List<PostCategory> findByNameContainsIgnoreCase(String searchKey);
-
+    <T> Slice<T> findAll(Pageable pageable, Class<T> clazz);
 }

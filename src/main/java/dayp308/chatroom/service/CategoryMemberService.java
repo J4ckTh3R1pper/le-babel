@@ -88,15 +88,15 @@ public class CategoryMemberService {
         categoryMemberRepository.saveAndFlush(membership);
     }
 
-    public boolean hasMembership(int categoryId, User user) {
-        return categoryMemberRepository.existsById(new CategoryMemberId(categoryId, user.getId()));
+    public boolean hasMembership(PostCategory category, User user) {
+        return categoryMemberRepository.existsById(new CategoryMemberId(category.getId(), user.getId()));
     }
 
-    public boolean hasAuthorityGreaterOrEquals(int categoryId, User user, Role role) {
+    public boolean hasAuthorityGreaterOrEquals(PostCategory category, User user, Role role) {
         int roleOrdinal = role.ordinal();
         try {
             return ( categoryMemberRepository.getReferenceById(
-                    new CategoryMemberId(categoryId, user.getId()))
+                    new CategoryMemberId(category.getId(), user.getId()))
                             .getRole().ordinal() >= roleOrdinal
                     );
         } catch (Exception e) {
@@ -104,11 +104,11 @@ public class CategoryMemberService {
         }
     }
 
-    public boolean hasAuthority(int categoryId, User user, Role role) {
+    public boolean hasAuthority(PostCategory category, User user, Role role) {
         try {
             return
             ( categoryMemberRepository.getReferenceById(
-                    new CategoryMemberId(categoryId, user.getId())).getRole().equals(role) );
+                    new CategoryMemberId(category.getId(), user.getId())).getRole().equals(role) );
         } catch (Exception e) {
             return false;
         }

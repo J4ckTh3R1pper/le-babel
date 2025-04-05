@@ -11,15 +11,15 @@ import org.springframework.data.jpa.domain.Specification;
 
 
 public class PostSpecs {
-    private static Predicate isVisible(Root<Post> root, CriteriaBuilder builder) {
+    public static Predicate isVisible(Root<Post> root, CriteriaBuilder builder) {
         return builder.equal(root.get(Post_.STATUS), (byte) 1);
     }
 
-    private static Predicate likeKeyword(Root<Post> root,CriteriaBuilder builder, String keyword) {
+    public static Predicate likeKeyword(Root<Post> root,CriteriaBuilder builder, String keyword) {
         return builder.like(builder.lower(root.get(Post_.TITLE)), "%" + keyword.toLowerCase() + "%");
     }
 
-    private static Predicate categoryIdEquals(Root<Post> root, CriteriaBuilder builder, int categoryId) {
+    public static Predicate categoryIdEquals(Root<Post> root, CriteriaBuilder builder, int categoryId) {
         return builder.equal(root.join(Post_.CATEGORY).get(PostCategory_.ID), categoryId);
     }
 

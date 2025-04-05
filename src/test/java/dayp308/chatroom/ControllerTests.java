@@ -1,14 +1,18 @@
 package dayp308.chatroom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pig4cloud.captcha.SpecCaptcha;
+import com.pig4cloud.captcha.base.Captcha;
 import dayp308.chatroom.entity.business.CommentPageRequest;
 import dayp308.chatroom.entity.business.PostPageRequest;
 import dayp308.chatroom.entity.enums.PostOrderType;
 import dayp308.chatroom.entity.id.CategoryMemberId;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
+import dayp308.chatroom.entity.post.Post_;
 import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.CategoryRepository;
+import dayp308.chatroom.repository.RedisCaptchaRepository;
 import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.UserService;
@@ -23,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,6 +51,14 @@ public class ControllerTests {
     private CategoryRepository categoryRepository;
     @Autowired
     private ObjectMapper jacksonObjectMapper;
+    @Autowired
+    private RedisCaptchaRepository redisCaptchaRepository;
+
+    Map.Entry<String, String> mockCaptcha() {
+        Captcha captcha = new SpecCaptcha();
+        String uuid = redisCaptchaRepository.saveCaptcha(captcha);
+        return Map.entry(uuid, captcha.text());
+    }
 
     UserDTO randomUser( String password ) {
         UserRegistrationForm form = new UserRegistrationForm();
@@ -61,11 +74,14 @@ public class ControllerTests {
     }
 
     String formLoginAndGetToken(String loginName, String password) throws Exception {
+        Map.Entry<String, String> captcha = mockCaptcha();
         AtomicReference<String> token =  new AtomicReference<>();
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/login")
                         .formField("loginName", loginName)
                         .formField("password", password)
+                        .formField("captcha", captcha.getValue())
+                        .formField("uuid", captcha.getKey())
                         .formField("remember-me", "true")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .accept(MediaType.APPLICATION_JSON)
@@ -154,26 +170,24 @@ public class ControllerTests {
         UserDTO user = randomUser(password);
         try {
             mockMvc.perform(MockMvcRequestBuilders
-                            .post("/api/no_auth/post/get_posts")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(jacksonObjectMapper.writeValueAsString(new PostPageRequest(
-                                    1, PostOrderType.LAST_UPDATE_TIME,
-                                            null, 0, 15, false, true)
-                                    )
-                            )
+                            .get("/api/no_auth/post/get_posts")
+//                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("categoryId", "1")
+                            .param("page", "2")
+                            .param("size", "15")
+                            .param("sort", Post_.CREATE_TIME+",desc")
             ).andExpect(status().is2xxSuccessful()).andDo(print());
 
             token = formLoginAndGetToken(user, password);
 
             mockMvc.perform(MockMvcRequestBuilders
-                    .post("/api/no_auth/post/get_posts")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(jacksonObjectMapper.writeValueAsString(
-                                            new PostPageRequest(
-                                                    1, PostOrderType.LAST_UPDATE_TIME,
-                                                    null, 0, 15, false, true)
-                                    )
-                            ).header(Constants.JWT_HEADER_NAME, token)
+                            .get("/api/no_auth/post/get_posts")
+//                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("categoryId", "1")
+                            .param("page", "1")
+                            .param("size", "5")
+                            .param("sort", Post_.CREATE_TIME+",desc")
+                            .header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is2xxSuccessful()).andDo(print());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -186,11 +200,11 @@ public class ControllerTests {
     @Test
     public void testGetUserProj() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/no_auth/user/get_user_by_id")
+                        .get("/api/no_auth/user/get_info")
                         .param("userId", "126")
         ).andExpect(status().is2xxSuccessful()).andDo(print());
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/no_auth/user/get_user_by_id")
+                        .get("/api/no_auth/user/get_full_info")
                         .param("userId", "126")
         ).andExpect(status().is2xxSuccessful()).andDo(print());
     }
@@ -198,13 +212,8 @@ public class ControllerTests {
     @Test
     public void testCommentSlice() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/no_auth/post/get_comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jacksonObjectMapper.writeValueAsString(
-                                new CommentPageRequest(
-                                    17L, 0, 15, false, true
-                                )
-                        ))
+                .get("/api/no_auth/post/get_comments")
+
         ).andExpect(status().is4xxClientError()).andDo(print());
     }
 
@@ -248,14 +257,14 @@ public class ControllerTests {
         try {
             mockMvc.perform(MockMvcRequestBuilders
                     .post("/api/post/delete")
-                            .param("postId", "5")
+                            .param("postId", "2")
             ).andExpect(status().is4xxClientError()).andDo(print());
 
             token = formLoginAndGetToken(user, password);
 
             mockMvc.perform(MockMvcRequestBuilders
                     .post("/api/post/delete")
-                    .param("postId", "17")
+                    .param("id", "2")
                     .header(Constants.JWT_HEADER_NAME, token)
             ).andExpect(status().is4xxClientError()).andDo(print());
         } catch (Exception e) {

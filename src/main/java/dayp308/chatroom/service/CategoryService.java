@@ -3,7 +3,6 @@ package dayp308.chatroom.service;
 import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.entity.category.CategoryMinimal;
 import dayp308.chatroom.entity.category.PostCategory;
-import dayp308.chatroom.entity.enums.CategoryOrderType;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.category.CategoryDTO;
 import dayp308.chatroom.entity.enums.Role;
@@ -21,8 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CategoryService {
@@ -55,13 +52,13 @@ public class CategoryService {
         return category.getId();
     }
 
-    public List<CategoryMinimal> getMinimalList(@Nullable User user, int pageNum, int pageSize, CategoryOrderType orderType, boolean asc) {
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
+    public Slice<CategoryMinimal> getMinimalSlice(@Nullable User user, Pageable pageable) {
+        Pageable p1 = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
         Slice<CategoryMinimal> slice =
-                categoryRepository.findBy(CategorySpecs.getAllCategories(user, orderType.getColumn(), asc),
-                q -> q.as(CategoryMinimal.class).page(pageable)
+                categoryRepository.findBy(CategorySpecs.getAllCategories(user, pageable.getSort()),
+                q -> q.as(CategoryMinimal.class).page(p1)
         );
-        return slice.getContent();
+        return slice;
     }
 
 

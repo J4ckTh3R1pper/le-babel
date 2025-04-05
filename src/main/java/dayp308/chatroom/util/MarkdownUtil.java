@@ -28,7 +28,7 @@ public class MarkdownUtil {
         Visitor visitor = new ImageVisitor(urls);
         Node document = parser.parse(markdown);
         document.accept(visitor);
-        List<String> subList = urls.subList(0, Math.min(Math.min(urls.size() - 1, 2), 0));
+        List<String> subList = urls.isEmpty() ? urls : urls.subList(0, Math.min(urls.size() - 1, 2));
         return subList.stream().map(s ->
                 FilenameUtils.getPath(s) + "thumbnails/" +
                 FilenameUtils.getBaseName(s) +

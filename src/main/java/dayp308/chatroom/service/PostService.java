@@ -11,42 +11,34 @@ import dayp308.chatroom.entity.member.CategoryMember;
 import dayp308.chatroom.entity.post.PostDTO;
 import dayp308.chatroom.entity.enums.PostOrderType;
 import dayp308.chatroom.entity.id.CategoryMemberId;
-import dayp308.chatroom.entity.id.CommentLikeId;
-import dayp308.chatroom.entity.id.PostLikeId;
 import dayp308.chatroom.entity.post.Post;
 import dayp308.chatroom.entity.post.PostIdOnly;
 import dayp308.chatroom.entity.user.User;
-import dayp308.chatroom.entity.view.LikeablePagedResponse;
+import dayp308.chatroom.entity.view.comment.CommentUtil;
 import dayp308.chatroom.entity.view.post.PostBriefView;
 import dayp308.chatroom.entity.view.post.PostDetailedView;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
-import dayp308.chatroom.entity.view.comment.CommentDetailResponse;
 import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.exception.CategoryDeletedException;
 import dayp308.chatroom.exception.CategoryMutedException;
 import dayp308.chatroom.exception.CategoryPendingException;
 import dayp308.chatroom.exception.UserMutedException;
 import dayp308.chatroom.repository.*;
+import dayp308.chatroom.repository.projection.CommentProjection;
+import dayp308.chatroom.repository.projection.PostProjection;
 import dayp308.chatroom.repository.specification.CommentSpecs;
-import dayp308.chatroom.repository.specification.PostSpecs;
-import dayp308.chatroom.util.PageUtil;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityExistsException;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -61,9 +53,10 @@ public class PostService {
     private final CategoryMemberRepository categoryMemberRepository;
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final CommentUtil commentUtil;
 
     @Autowired
-    public PostService(PostRepository postRepository, CategoryService categoryService, UserService userService, ConversionService conversionService, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository, CategoryMemberRepository categoryMemberRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository) {
+    public PostService(PostRepository postRepository, CategoryService categoryService, UserService userService, ConversionService conversionService, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository, CategoryMemberRepository categoryMemberRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, CommentUtil commentUtil) {
         this.postRepository = postRepository;
         this.categoryService = categoryService;
         this.userService = userService;
@@ -74,6 +67,7 @@ public class PostService {
         this.categoryMemberRepository = categoryMemberRepository;
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
+        this.commentUtil = commentUtil;
     }
 
     @Transactional(readOnly = true)
@@ -96,8 +90,7 @@ public class PostService {
     }
 
     @Transactional
-    public boolean likePost(long postId, User user) {
-        Post post = postRepository.getReferenceById(postId);
+    public boolean likePost(Post post, User user) {
         PostLike like = new PostLike(post, user);
         if (!postLikeRepository.exists(Example.of(like)))
             postLikeRepository.saveAndFlush(like);
@@ -109,8 +102,7 @@ public class PostService {
     }
 
     @Transactional
-    public boolean likeComment(long commentId, User user) {
-        PostComment comment = commentRepository.getReferenceById(commentId);
+    public boolean likeComment(PostComment comment, User user) {
         CommentLike like = new CommentLike(comment, user);
         if (!commentLikeRepository.exists(Example.of(like)))
             commentLikeRepository.saveAndFlush(like);
@@ -121,20 +113,38 @@ public class PostService {
         return true;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PostDetailedView getPostDetailedView(long id, @Nullable User user) {
-        Post post = postRepository.getReferenceById(id);
+        PostProjection post = postRepository.findProjById(id, user);
         PostDetailedView view = conversionService.convert(
                 post,
                 PostDetailedView.class
         );
-        if ( user != null && postLikeRepository.existsById(new PostLikeId(id, user.getId())) ) {
-            view.setLiked(true);
-            post.setViews(post.getViews() + 1);
-            postRepository.saveAndFlush(post);
-            view.setViewCount(view.getViewCount() + 1);
-        }
         return view;
+    }
+
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Slice<PostBriefView> getPostSlice(
+            @Nullable Integer categoryId,
+            @Nullable User user,
+            Pageable pageable,
+            boolean visibleOnly
+    ) {
+        Slice<PostProjection> slice = postRepository.findAllProjById(categoryId, user, visibleOnly, pageable);
+        Object views = conversionService.convert(slice.getContent(),
+                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostProjection.class)),
+                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostBriefView.class))
+        );
+        return new SliceImpl<>((List<PostBriefView>) views, pageable, slice.hasNext());
+    }
+
+    @Transactional
+    public Long increaseViewCount(long id, long count) {
+        Post post = postRepository.getReferenceById(id);
+        post.setViewCount(post.getViewCount() + count);
+        postRepository.saveAndFlush(post);
+        return post.getViewCount();
     }
 
     /*** 获取评论的详细信息，包括所有回复
@@ -143,116 +153,34 @@ public class PostService {
      * @return 返回给前端的View对象
      */
     @Transactional(readOnly = true)
-    public CommentDetailResponse getCommentDetailedView(long commentId, @Nullable User user) {
-        PostComment comment = (PostComment) Hibernate.unproxy(commentRepository.getReferenceById(commentId));
-        CommentDetailedView view = conversionService.convert(comment, CommentDetailedView.class);
-        CommentDetailResponse response = new CommentDetailResponse();
-        response.setView(view);
-        if (user != null) {
-            Set<CommentLikeId> commentIds = new HashSet<>();
-            view.dfs( c -> {
-                commentIds.add( new CommentLikeId(user.getId(), c.getId()) );
-            });
-            commentIds.add(new CommentLikeId(user.getId(), commentId));
-            response.setLikedIds(
-                    commentLikeRepository.findAllById(commentIds)
-                            .stream()
-                            .map(l -> l.getComment().getId()).collect(Collectors.toSet()));
-        }
-        return response;
+    public CommentDetailedView getCommentDetailedView(long commentId, @Nullable User user) {
+        CommentProjection projection = commentRepository.findProjectionById(commentId, user == null ? null : user.getId());
+        CommentDetailedView view = commentUtil.getCommentDetailedView(projection, user);
+        return view;
     }
 
     @Transactional(readOnly = true)
-    public CommentBriefView getCommentBriefView(long commentId) {
-        PostComment comment = (PostComment) Hibernate.unproxy(commentRepository.getReferenceById(commentId));
-        System.out.println(conversionService.canConvert(PostComment.class, CommentBriefView.class));
-        return conversionService.convert(comment, CommentBriefView.class);
+    public CommentBriefView getCommentBriefView(CommentProjection comment, @Nullable User user) {
+        CommentBriefView view = commentUtil.getCommentBriefView(comment, user);
+        return view;
     }
 
     /*** 获取评论列表并分页，如果用户已登录则同时返回用户点赞与否
      *
-     * @param postId 要获取评论的帖子ID
-     * @param pageNum 页码
-     * @param pageSize 每页元素数量
+     * @param post 要获取评论的帖子对象
+     * @param pageable 分页对象
      * @param user Controller层返回的已登录用户对象，未登录为null
      * @return 分页视图对象
      */
     @Transactional(readOnly = true)
-    public LikeablePagedResponse<CommentBriefView> getBriefCommentSliceByPost(
-            long postId, int pageNum, int pageSize, boolean ascending, User user) {
-        Post post = postRepository.getReferenceById(postId);
-        Slice<PostComment> slice = commentRepository.findAll(
-                CommentSpecs.nonSubCommentByPost(post, false),
-                PageRequest.of(pageNum, pageSize,
-                        Sort.by(
-                                ascending ? Sort.Direction.ASC : Sort.Direction.DESC,
-                                "createTime"
-                        )
-                ));
-
-        List<CommentBriefView> content = (List<CommentBriefView>) conversionService.convert(slice.getContent(),
-                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostComment.class)),
-                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentBriefView.class))
-                );
-
-        LikeablePagedResponse<CommentBriefView> resp = PageUtil.sliceToLikeResponse(slice, content);
-        if (user == null) resp.setLikedIds(new HashSet<>());
-        else resp.setLikedIds(getCommentBriefLikeSet(content, user));
-        return resp;
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Long> getCommentBriefLikeSet(List<CommentBriefView> comments, User user) {
-        Set<CommentLikeId> likeIds = new HashSet<>();
-        comments.forEach(comment -> {
-            comment.getChildren().forEach(child ->
-                    likeIds.add(new CommentLikeId(comment.getId(), child.getId())));
-            likeIds.add(new CommentLikeId(user.getId(),comment.getId()));
-        });
-        return commentLikeRepository.findAllById(likeIds)
-                .stream().map( l -> l.getComment().getId())
-                .collect(Collectors.toSet());
-    }
-
-    @Transactional(readOnly = true)
-    public LikeablePagedResponse<PostBriefView> getPostSlice(
-            PostOrderType orderType,
-            @Nullable Integer categoryId,
-            @Nullable String keyword,
-            int pageNum,
-            int pageSize,
-            boolean ascending,
-            boolean visibleOnly,
-            @Nullable User user
-    ) {
-        PageRequest pageable = PageRequest.of(pageNum, pageSize,
-                Sort.by(
-                        ascending ? Sort.Direction.ASC : Sort.Direction.DESC,
-                        orderType.getColumn())
-        );
-        Slice<Post> slice = postRepository.findAll(
-                PostSpecs.build(categoryId, keyword, visibleOnly),
-                pageable
-        );
-        List<PostBriefView> views = (List<PostBriefView>) conversionService.convert(slice.getContent(),
-                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(Post.class)),
-                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostBriefView.class))
-                );
-        LikeablePagedResponse<PostBriefView> resp = PageUtil.sliceToLikeResponse(slice, views);
-        if (user != null) resp.setLikedIds(getPostBriefLikeSet(slice.getContent(), user));
-            else resp.setLikedIds(new HashSet<>());
-        return resp;
-    }
-
-    @Transactional(readOnly = true)
-    public Set<Long> getPostBriefLikeSet(List<Post> posts, User user) {
-        Set<PostLikeId> likeIds = new HashSet<>();
-        posts.forEach(post -> {
-            likeIds.add(new PostLikeId(post.getId(), user.getId()));
-        });
-        return postLikeRepository.findAllById(likeIds)
-                .stream().map( l -> l.getPost().getId())
-                .collect(Collectors.toSet());
+    public Slice<CommentBriefView> getBriefCommentSliceByPost(
+            Post post, @Nullable User user, Pageable pageable) {
+        Slice<CommentProjection> projections = commentRepository.findProjectionsByPostId(
+                post.getId(), user == null ? null : user.getId(), pageable);
+        List<CommentBriefView> views = projections.getContent().stream().map(
+                c -> commentUtil.getCommentBriefView(c, user)
+        ).toList();
+        return new SliceImpl<>(views, pageable, projections.hasNext());
     }
 
     @Transactional(readOnly = true)
@@ -279,7 +207,7 @@ public class PostService {
         CategoryMember membership = categoryMemberRepository.findById(new CategoryMemberId(category.getId(), user.getId())).orElse(null);
         membership = checkAndCreateMembership(user, post, membership);
         checkMute(category, membership);
-        post.setPublishUser(user);
+        post.setUser(user);
         postRepository.saveAndFlush(post);
         if ( membership.getRole().ordinal() > 0 ) {
             membership.setExperience(membership.getExperience() + 3);
@@ -308,36 +236,12 @@ public class PostService {
         return commentRepository.findById(comment.getId(), CommentDTO.class).orElseThrow();
     }
 
-    @Transactional
-    public void addPostLike(long postId, User user) {
-        PostLike like = new PostLike();
-        like.setPost(postRepository.getReferenceById(postId));
-        like.setUser(user);
-        try {
-            postLikeRepository.saveAndFlush(like);
-        } catch (EntityExistsException e) {
-            throw new EntityExistsException("Post already liked");
-        }
-    }
-
-    @Transactional
-    public void addCommentLike(long commentId, User user) {
-        CommentLike like = new CommentLike();
-        like.setComment(commentRepository.getReferenceById(commentId));
-        like.setUser(user);
-        try {
-            commentLikeRepository.saveAndFlush(like);
-        } catch (EntityExistsException e) {
-            throw new EntityExistsException("Comment already liked");
-        }
-    }
-
     public void deletePost(Post post) {
         post.setStatus((byte) 0);
         postRepository.saveAndFlush(post);
     }
 
-    public void deleteComment(CommentDTO dto) {
+    public void deleteComment(PostComment dto) {
         PostComment comment = Objects.requireNonNull(conversionService.convert(dto, PostComment.class));
         comment.setIsDeleted(true);
         commentRepository.saveAndFlush(comment);

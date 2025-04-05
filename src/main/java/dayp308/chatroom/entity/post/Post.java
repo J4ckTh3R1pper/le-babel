@@ -32,7 +32,7 @@ public class Post {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "publish_user_id", nullable = false)
-    private User publishUser;
+    private User user;
 
     @Column(name = "post_title", nullable = false, length = 64)
     @GenericField(name = "title", projectable = Projectable.YES)
@@ -55,7 +55,7 @@ public class Post {
 
     @ColumnDefault("0")
     @Column(name = "post_views", nullable = false)
-    private Long views = 0L;
+    private Long viewCount = 0L;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "last_update_time", nullable = false)
@@ -71,7 +71,7 @@ public class Post {
     private String tags = "[]";
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "bookmarkedPosts")
+    @ManyToMany( mappedBy = "bookmarkedPosts")
     private Set<User> bookmarkedUsers = new LinkedHashSet<>();
 
     @JsonManagedReference
@@ -79,7 +79,6 @@ public class Post {
     private Set<PostComment> comments = new LinkedHashSet<>();
 
     @JsonManagedReference
-
-    @ManyToMany(mappedBy = "likedPosts", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "likedPosts")
     private Set<User> usersLiked = new LinkedHashSet<>();
 }

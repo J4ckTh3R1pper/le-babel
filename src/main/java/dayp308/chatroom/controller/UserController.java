@@ -48,41 +48,31 @@ public class UserController {
         return new ResponseEntity<>(jacksonObjectMapper.writeValueAsString(userService.register(form)), HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/api/no_auth/captcha")
-    public ResponseEntity<String> getCaptcha() throws JsonProcessingException {
-        Captcha cap = new GifCaptcha(130, 48, 5);
-        String uuid = redisCaptchaRepository.saveCaptcha(cap);
-        String resp = jacksonObjectMapper.writeValueAsString(
-                new CaptchaResponse(cap.toBase64(), uuid));
-        return new ResponseEntity<>(resp, HttpStatus.CREATED);
-    }
-
     @GetMapping(value = "/api/no_auth/captcha")
     public ResponseEntity<String> getCaptchaGet() throws JsonProcessingException {
         Captcha cap = new GifCaptcha(130, 48, 5);
         String uuid = redisCaptchaRepository.saveCaptcha(cap);
         String resp = jacksonObjectMapper.writeValueAsString(
                 new CaptchaResponse(cap.toBase64(), uuid));
-        return new ResponseEntity<>(resp, HttpStatus.CREATED);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/api/no_auth/user/get_full_info")
-    public ResponseEntity<String> getFullInfo(@RequestParam("userId") Long userId) throws JsonProcessingException {
+    @GetMapping(value = "/api/no_auth/user/get_full_info")
+    public ResponseEntity<UserDetailedProj> getFullInfo(@RequestParam("id") Long userId) throws JsonProcessingException {
         UserDetailedProj user = userService.findUserDetailedProjById(userId);
-        return new ResponseEntity<>(jacksonObjectMapper.writeValueAsString(user), HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/api/no_auth/user/get_info")
-    public ResponseEntity<String> getUserInfo(@RequestParam("userId") Long userId) throws JsonProcessingException {
+    @GetMapping(value = "/api/no_auth/user/get_info")
+    public ResponseEntity<UserMinimal> getUserInfo(@RequestParam("id") Long userId) throws JsonProcessingException {
         UserMinimal user = userRepository.findById(userId, UserMinimal.class);
-        return new ResponseEntity<>(jacksonObjectMapper.writeValueAsString(user), HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
 
     @PostMapping(value = "/api/user/update_avatar")
     public ResponseEntity<String> updateAvatar(
             @RequestPart("image") MultipartFile imageFile,
-            @RequestPart("token") String token,
             Authentication auth
     ) throws FileUploadException {
 
@@ -98,12 +88,12 @@ public class UserController {
         user.setIntroduce(form.getIntroduce());
         user.setGender(form.getGender());
         userService.updateUser(user);
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/api/no_auth/user/get_overall_exp")
-    public ResponseEntity<String> getOverallExp(@RequestParam("userId") long userId) {
+    public ResponseEntity<Integer> getOverallExp(@RequestParam("userId") long userId) {
         int exp = userService.getOverallExp(userRepository.getReferenceById(userId));
-        return new ResponseEntity<>(exp + "", HttpStatus.OK);
+        return new ResponseEntity<>(exp, HttpStatus.OK);
     }
 }

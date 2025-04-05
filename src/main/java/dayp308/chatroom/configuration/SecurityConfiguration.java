@@ -3,6 +3,9 @@ package dayp308.chatroom.configuration;
 import dayp308.chatroom.repository.RedisCaptchaRepository;
 import dayp308.chatroom.security.*;
 import dayp308.chatroom.repository.RedisPersistentTokenRepository;
+import dayp308.chatroom.service.CategoryMemberService;
+import dayp308.chatroom.service.CategoryService;
+import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.RememberServices;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = false)
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     private final UserDetailsPasswordServiceImpl userDetailsPasswordService;
@@ -58,8 +61,6 @@ public class SecurityConfiguration {
                         .usernameParameter("loginName")
                         .passwordParameter("password")
                         .loginProcessingUrl("/api/login")
-                        .successHandler(authenticationSuccessHandler())
-                        .failureHandler(authenticationFailureHandler())
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
@@ -75,7 +76,7 @@ public class SecurityConfiguration {
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-//                .addFilterAt(captchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(captchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -91,7 +92,7 @@ public class SecurityConfiguration {
         return providerManager;
     }
 
-//    @Bean 带上这个Bean会导致无法启动
+//    @Bean FIXME: 带上这个Bean会导致无法启动
     public Advisor preAuthorize(CustomAuthorizationManager manager) {
         return AuthorizationManagerBeforeMethodInterceptor.preAuthorize(manager);
     }
@@ -107,16 +108,6 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new FormLoginAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    public AuthenticationFailureHandler authenticationFailureHandler() {
-        return new LoginFailedHandler();
-    }
-
-    @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
         entryPoint.setRealmName("Access to Login page or include correct token in request");
@@ -129,11 +120,12 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public UsernamePasswordAuthenticationFilter captchaAuthenticationFilter() {
+    public CaptchaUsernamePasswordAuthenticationFilter captchaAuthenticationFilter() {
         CaptchaUsernamePasswordAuthenticationFilter filter =
                 new CaptchaUsernamePasswordAuthenticationFilter(redisCaptchaRepository, authenticationManager());
-        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
-        filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+        filter.setUsernameParameter("loginName");
+        filter.setPasswordParameter("password");
+        filter.setFilterProcessesUrl("/api/login");
         return filter;
     }
 }

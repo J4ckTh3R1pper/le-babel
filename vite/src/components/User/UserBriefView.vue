@@ -1,6 +1,6 @@
 <script setup>
 import {isEmpty} from "@/js/utils/validate.js";
-import defaultAvatar from '@/assets/img/default_user_avatar.png'
+import defaultAvatar from '@/assets/images/default_user_avatar.png'
 
 const {
   id, nickName, headImgUrl, role, level, location, title

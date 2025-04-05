@@ -8,3 +8,11 @@ export function getUserBriefView(categoryId, userId) {
         }
     })
 }
+
+export function getUserCache (userId) {
+    return service.get("/no_auth/user/get_info", {
+        params: {
+            id: userId
+        }
+    })
+}

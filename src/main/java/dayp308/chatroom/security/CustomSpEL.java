@@ -1,14 +1,17 @@
 package dayp308.chatroom.security;
 
-import dayp308.chatroom.entity.comment.CommentDTO;
+import dayp308.chatroom.entity.category.PostCategory;
+import dayp308.chatroom.entity.comment.PostComment;
 import dayp308.chatroom.entity.enums.Role;
+import dayp308.chatroom.entity.post.Post;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.SpringSessionContext;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component("authz")
 public class CustomSpEL {
@@ -21,51 +24,50 @@ public class CustomSpEL {
         this.postService = postService;
     }
 
-    public boolean hasMemberShip(MethodSecurityExpressionOperations root, int categoryId) {
-        return categoryMemberService.hasMembership(categoryId,
-                (User) root.getAuthentication().getPrincipal()
+    public boolean hasMemberShip(PostCategory category) {
+        return categoryMemberService.hasMembership(category,
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
         );
     }
 
-    public boolean hasMembershipGe(MethodSecurityExpressionOperations root, int categoryId, String role) {
+    public boolean hasMembershipGe(PostCategory category, String role) {
         return this.categoryMemberService.hasAuthorityGreaterOrEquals(
-                categoryId,
-                (User) root.getAuthentication().getPrincipal(),
+                category,
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
                 Role.valueOf(role)
         );
     }
 
-    public boolean hasAuthorityPostGe(MethodSecurityExpressionOperations root, long postId, String role) {
-        int categoryId = postService.getPostIdsById(postId).getCategory().getId();
+    public boolean hasAuthorityGe(Post post, String role) {
         return this.categoryMemberService.hasAuthorityGreaterOrEquals(
-                categoryId,
-                (User) root.getAuthentication().getPrincipal(),
+                post.getCategory(),
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
                 Role.valueOf(role));
     }
+    
+    public boolean hasAuthorityGe(PostComment comment, String role) {
+        return hasAuthorityGe(comment.getPost(), role);
+    }
 
-    public boolean isOwnerOfPost(MethodSecurityExpressionOperations root, long postId) {
+    public boolean isOwner(Post post) {
         long authenticatedUserId = (
-            (User) root.getAuthentication().getPrincipal()
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
         ).getId();
-        return postService.getPostIdsById(postId).getPublishUser().getId() == authenticatedUserId;
+        return post.getUser().getId() == authenticatedUserId;
     }
 
-    public boolean isOwnerOfComment(MethodSecurityExpressionOperations root, long commentId) {
+    public boolean isOwner(PostComment comment) {
         long authenticatedUserId = (
-            (User) root.getAuthentication().getPrincipal()
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
         ).getId();
-        return postService.getCommentIdsById(commentId).getUser().getId() == authenticatedUserId;
+        return comment.getUser().getId() == authenticatedUserId;
     }
 
-    public boolean hasAuthorityCommentGe(MethodSecurityExpressionOperations root, long commentId, String role) {
-        CommentDTO comment = postService.getCommentById(commentId);
-        return hasAuthorityPostGe(root, comment.getPost().getId(), role);
-    }
 
-    public boolean hasMembershipEquals(MethodSecurityExpressionOperations root, int categoryId, String role) {
+    public boolean hasMembershipEquals(PostCategory category, String role) {
         return this.categoryMemberService.hasAuthority(
-                categoryId,
-                (User) root.getAuthentication().getPrincipal(),
+                category,
+                (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
                 Role.valueOf(role)
         );
     }

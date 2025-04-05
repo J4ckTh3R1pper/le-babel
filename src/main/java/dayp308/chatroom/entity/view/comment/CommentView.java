@@ -1,23 +1,27 @@
 package dayp308.chatroom.entity.view.comment;
 
-import dayp308.chatroom.entity.view.UserBriefView;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Component
 public class CommentView {
     protected Long id;
     protected Long postId;
-    protected UserBriefView userBriefView;
+    protected Long userId;
     protected String commentBody;
     protected Instant createTime;
-    protected Long parentCommentId;
-    protected Integer likes;
+    protected Long likeCount;
+    protected Boolean liked;
+
+    protected CommentView(){}
 
     @Override
     public boolean equals(Object o) {

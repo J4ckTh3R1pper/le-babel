@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dayp308.chatroom.entity.view.ErrorResponseBody;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NoResultException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,6 +45,12 @@ public class ControllerExceptionHandler {
         return new ErrorResponseBody(404, e.getMessage()).toString();
     }
 
+    @ExceptionHandler(NoResultException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public String notFound( final NoResultException e) {
+        return new ErrorResponseBody(404, e.getMessage()).toString();
+    }
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody

@@ -1,7 +1,7 @@
 import {getInfoRequest, loginRequest, logoutRequest} from "@/js/api/login.js";
 import {getToken, setToken, removeToken} from "@/js/utils/auth.js";
 import {defineStore} from "pinia";
-import defaultAvatar from '@/assets/img/default_user_avatar.png'
+import defaultAvatar from '@/assets/images/default_user_avatar.png'
 import {isEmpty, isHttp} from '@/js/utils/validate.js'
 
 const useLoginUserStore = defineStore(
