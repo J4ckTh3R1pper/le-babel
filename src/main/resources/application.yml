@@ -37,6 +37,8 @@ spring:
         jdbc:
           fetch_size: 1048576
   jackson:
+    serialization:
+      write-dates-as-timestamps: true
     deserialization:
       read-unknown-enum-values-using-default-value: true
 

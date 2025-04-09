@@ -1,18 +1,18 @@
 import service from '@/js/utils/request.js'
 
-export function getUserBriefView(categoryId, userId) {
-    return service.get('/category/get_user', {
+export function getUserCache (userId) {
+    return service.get("/no_auth/user/get_minimal", {
         params: {
-            categoryId: categoryId,
-            userId: userId
+            id: userId
         }
     })
 }
 
-export function getUserCache (userId) {
-    return service.get("/no_auth/user/get_info", {
+export function getMemberCache (categoryId, userId) {
+    return service.get("/no_auth/category/get_member", {
         params: {
-            id: userId
+            categoryId: categoryId,
+            userId: userId
         }
     })
 }

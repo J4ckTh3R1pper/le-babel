@@ -26,7 +26,7 @@ export function registerRequest(data) {
 // 获取用户详细信息
 export function getInfoRequest() {
     return request({
-        url: '/no_auth/user/get_info',
+        url: '/no_auth/user/get_full_info',
         method: 'get'
     })
 }

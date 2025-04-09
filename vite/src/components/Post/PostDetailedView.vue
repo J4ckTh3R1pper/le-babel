@@ -6,11 +6,12 @@ import Time from "@/components/Time.vue";
 import Markdown from "@/components/Markdown/index.vue"
 
 const {
-  id, categoryId, title, userBriefView, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, liked
+  postId, categoryId, title, userId, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, liked
 } = defineProps({
-  id: Number,
+  postId: Number,
   categoryId: Number,
   title: String,
+  userId: Number,
   content: String,
   createTime: Number,
   lastUpdateTime: Number,
@@ -18,10 +19,6 @@ const {
   likeCount: Number,
   commentCount: Number,
   liked: Boolean,
-  userBriefView: {
-    type: Object,
-    default: () => {}
-  },
   tags: {
     type: Array,
     default: () => []
@@ -33,39 +30,23 @@ const {
 <template>
   <div class="post-detailed-view">
     <user-brief-view
-        :id="userBriefView.id"
-        :head-img-url="userBriefView.headImgUrl"
-        :role="userBriefView.role"
-        :level="userBriefView.level"
-        :location="userBriefView.location"
-        :nick-name="userBriefView.nickName"
-        :title="userBriefView.title"
+      :user-id="userId"
+      :category-id="categoryId"
     />
   </div>
   <span>{{title}}</span>
   <Markdown :md-text="content"/>
-  <div class="data">
-    <span class="views">
-      <el-icon><View /></el-icon>
-      {{viewCount}}
-    </span>
-    <span class="comments">
-      <el-icon><ChatDotSquare /></el-icon>
-      {{commentCount}}
-    </span>
-    <span class="like">
-      <el-icon>
-        <StarFilled v-if="liked"/>
-        <Star v-else/>
-      </el-icon>
-      {{likeCount}}
-    </span>
-    <span class="createTime">
-      <el-icon><Clock /></el-icon>
-      <Time :timestamp="createTime"/>
-    </span>
-  </div>
-
+  <PostData
+    :post-id="postId"
+    :view-count="viewCount"
+    :comment-count="commentCount"
+    :like-count="likeCount"
+    :liked="liked"
+  />
+  <span class="createTime">
+    <el-icon><Clock /></el-icon>
+    <Time :timestamp="createTime"/>
+  </span>
 </template>
 
 <style scoped lang="scss">

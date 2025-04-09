@@ -9,12 +9,12 @@ const useLoginUserStore = defineStore(
     {
         state: () => ({
             token: getToken(),
-            id: '',
-            nickName: '',
-            headImgUrl: '',
-            location: '',
-            roles: [],
-            permissions: []
+            id: null,
+            nickName: null,
+            headImgUrl: null,
+            location: null,
+            roles: null,
+            permissions: null
         }),
         actions: {
             // 登录

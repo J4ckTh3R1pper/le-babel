@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {getUserBriefView, getUserCache} from "@/js/api/user.js";
+import {getUserCache,getMemberCache} from "@/js/api/user.js";
 
 const useUserCacheStore = defineStore(
     'user_cache',
@@ -9,20 +9,49 @@ const useUserCacheStore = defineStore(
             userMap: new Map()
         }),
         actions: {
-            async getUser(userId) {
+            async fetchUser(userId) {
                 let user;
-                if ( !this.userMap.has(userId) ) {
-                    this.userMap.set(userId, this.addUser(userId))
-                    return this.addUser(userId)
+                if (!this.userMap.has(userId)) {
+                    await getUserCache(userId).then(res => {
+                        user = res.data
+                    }).catch(r => {
+                        user = ghostUser
+                    })
+                    this.userMap.set(userId, user)
                 }
             },
-            async addUser(userId) {
-                let user = null
-                this.getUserCache(userId).then(res => {
-                    user = res.data
-                })
-                return user
-            },
+            async fetchMember(categoryId, userId) {
+                let member;
+                if (!this.memberMap.has(categoryId))
+                    this.memberMap.set(categoryId, new Map());
+                if (!this.memberMap.get(categoryId).has(userId)) {
+                    await getMemberCache(categoryId, userId).then(res => {
+                        if (res.data == null)
+                            reject()
+                        member = res.data
+                    }).catch(r => {
+                        member = defaultMember
+                    }).finally(() => {
+                        this.memberMap.get(categoryId).set(userId, member)
+                    })
+                }
+            }
+        },
+        getters: {
+            getUserBriefView: (state) => {
+                return (categoryId, userId) => {
+                    const user = state.getUserCache(userId)
+                    const member = state.getMemberCache(categoryId, userId)
+                    return {
+                        nickName: user.nickName,
+                        headImgUrl: user.headImgUrl,
+                        location: user.location,
+                        role: member.role,
+                        level: member.experience / 100,
+                        title: member.title
+                    }
+                }
+            }
         }
 })
 
@@ -30,6 +59,12 @@ const ghostUser = {
     nickName: "ghost",
     headImgUrl: "/assets/images/default_user_avatar.png",
     location: ""
+}
+
+const defaultMember = {
+    role: 0,
+    experience: 0,
+    title: null
 }
 
 export default useUserCacheStore

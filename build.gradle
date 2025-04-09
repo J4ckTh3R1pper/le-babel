@@ -133,30 +133,6 @@ tasks.named('test') {
 
 ext {
     staticDir = './src/main/webapp/static'
-    viteDir = './vite'
-    nodeJsOutDir = './src/main/resources/static/dist'
-}
-
-tasks.register('compileScss') {
-    inputs.dir staticDir
-    def tree = fileTree(staticDir + "/scss") {
-        exclude("module", ".sass-cache")
-    }
-    tree.each {
-        File scssFile ->
-            exec {
-                workingDir(staticDir)
-                commandLine 'sass', "scss/${scssFile.name}", "css/${scssFile.name.replaceFirst(~/\.[^.]+$/, '.css')}"
-            }
-    }
-}
-
-tasks.register('compileJs') {
-    inputs.dir nodeJsDir
-    exec {
-        workingDir(nodeJsDir)
-        commandLine 'yarn', 'build'
-    }
 }
 
 bootJar {

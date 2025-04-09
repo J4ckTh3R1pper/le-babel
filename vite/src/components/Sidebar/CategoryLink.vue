@@ -1,7 +1,7 @@
 <template>
   <el-tooltip placement="top">
     <template #content>{{info}}</template>
-    <el-menu-item router="true" :index="id" >
+    <el-menu-item router="true" :index="url" >
       <el-avatar :src="imgUrl"/>
       <el-text>{{name}}</el-text>
     </el-menu-item>
@@ -9,12 +9,13 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import {useRoute, useRouter} from "vue-router";
 
 const route = useRoute()
 const router = useRouter()
 
-const props = defineProps({
+const {imgUrl, name, categoryId, info} = defineProps({
   // route object
   imgUrl: {
     type: String,
@@ -24,7 +25,7 @@ const props = defineProps({
     type: String,
     required: true
   },
-  id: {
+  categoryId: {
     type: Number | String,
     required: true
   },
@@ -34,4 +35,7 @@ const props = defineProps({
   }
 })
 
+const url = computed(() => {
+  return "/c/" + categoryId
+})
 </script>

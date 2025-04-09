@@ -6,10 +6,12 @@ import com.pig4cloud.captcha.SpecCaptcha;
 import com.pig4cloud.captcha.base.Captcha;
 import dayp308.chatroom.entity.business.CaptchaResponse;
 import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.entity.user.UserDetailedProj;
 import dayp308.chatroom.entity.business.UserEditForm;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
 import dayp308.chatroom.entity.user.UserMinimal;
+import dayp308.chatroom.entity.user.UserMinimalImpl;
 import dayp308.chatroom.exception.FileUploadException;
 import dayp308.chatroom.exception.InvalidFormException;
 import dayp308.chatroom.repository.RedisCaptchaRepository;
@@ -17,6 +19,7 @@ import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.FileService;
 import dayp308.chatroom.service.UserService;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.NoResultException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 public class UserController {
@@ -58,17 +64,34 @@ public class UserController {
     }
 
     @GetMapping(value = "/api/no_auth/user/get_full_info")
-    public ResponseEntity<UserDetailedProj> getFullInfo(@RequestParam("id") Long userId) throws JsonProcessingException {
-        UserDetailedProj user = userService.findUserDetailedProjById(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public UserDetailedProj getFullInfo(
+        @RequestParam(value = "id", required = false) Long userId,
+        Authentication auth
+    ) {
+        UserDetailedProj user;
+        if ( userId != null )
+            user = userService.findUserDetailedProjById(userId);
+        else if ( auth != null ) {
+            User detail = (User) auth.getPrincipal();
+            user = userService.findUserDetailedProjById(detail.getId());
+        } else throw new NoResultException();
+        return user;
     }
 
-    @GetMapping(value = "/api/no_auth/user/get_info")
-    public ResponseEntity<UserMinimal> getUserInfo(@RequestParam("id") Long userId) throws JsonProcessingException {
-        UserMinimal user = userRepository.findById(userId, UserMinimal.class);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    @GetMapping(value = "/api/no_auth/user/get_minimal")
+    public UserMinimal getMinimal(
+            @RequestParam(value = "id", required = false) Long userId,
+            Authentication auth
+        ) {
+        UserMinimal user;
+        if (userId != null)
+            user = userRepository.findById(userId, UserMinimal.class);
+        else if (auth != null) {
+            User detail =  (User) auth.getPrincipal();
+            user = new UserMinimalImpl(detail.getNickName(), detail.getHeadImgUrl(), detail.getLocation());
+        } else throw new NoResultException();
+        return user;
     }
-
 
     @PostMapping(value = "/api/user/update_avatar")
     public ResponseEntity<String> updateAvatar(

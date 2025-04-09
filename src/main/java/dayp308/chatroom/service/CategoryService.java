@@ -4,7 +4,6 @@ import dayp308.chatroom.entity.business.CategoryCreationForm;
 import dayp308.chatroom.entity.category.CategoryMinimal;
 import dayp308.chatroom.entity.category.PostCategory;
 import dayp308.chatroom.entity.user.User;
-import dayp308.chatroom.entity.category.CategoryDTO;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.exception.CategoryDeletedException;
 import dayp308.chatroom.exception.CategoryPendingException;
@@ -61,9 +60,4 @@ public class CategoryService {
         return slice;
     }
 
-
-    private void checkAvailability(CategoryDTO dto) {
-        if (dto.isDeleted()) throw new CategoryDeletedException("category has been deleted");
-        if (dto.isPending()) throw new CategoryPendingException("category is currently pending");
-    }
 }

@@ -2,6 +2,8 @@ package dayp308.chatroom.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import dayp308.chatroom.entity.category.CategoryDTO;
 import dayp308.chatroom.entity.category.CategoryMinimal;
 import dayp308.chatroom.entity.category.PostCategory_;
 import dayp308.chatroom.entity.enums.Role;
@@ -14,6 +16,7 @@ import dayp308.chatroom.repository.CategoryRepository;
 import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
+import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -60,15 +63,22 @@ public class CategoryController {
         );
     }
 
+    @GetMapping("/api/no_auth/category/get_info")
+    public ResponseEntity<CategoryDTO> getCategoryInfo(@RequestParam("id") int id) {
+        return new ResponseEntity<>(
+            categoryRepository.findById(id, CategoryDTO.class),
+            HttpStatus.OK
+        );
+    }
+
     @GetMapping("/api/no_auth/category/get_member")
-    public ResponseEntity<MemberMinimal> getMemberCache(
+    public MemberMinimal getMemberCache(
             @RequestParam("categoryId") int categoryId,
             @RequestParam("userId") long userId
     ) {
-        return new ResponseEntity<>(
-                categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class),
-                HttpStatus.OK
-        );
+        return categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class)
+                .orElseThrow(() -> new NoResultException());
+
     }
 
     @PostMapping("/api/category/create_request")

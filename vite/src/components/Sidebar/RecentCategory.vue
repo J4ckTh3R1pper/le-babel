@@ -15,8 +15,8 @@ const recent = useRecentCategoryStore()
       <span>最近访问</span>
     </template>
     <el-menu-item-group>
-      <category-link v-for="item in recent.list"
-                     :id="item.id"
+      <CategoryLink v-for="item in recent.list"
+                     :category-id="item.id"
                      :name="item.name"
                      :info="item.info"
                      :img-url="item.avatar"/>

@@ -2,22 +2,20 @@
 import UserBriefView from "@/components/User/UserBriefView.vue";
 import {ChatDotSquare, Clock, View} from "@element-plus/icons-vue";
 import Time from "@/components/Time.vue";
+import PostData from "./PostData.vue";
 
 const {
-  id, title, userBriefView, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails
+  postId, title, userId, categoryId, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails, liked
 } = defineProps({
-  id: Number,
+  postId: Number,
   title: String,
   content: String,
   createTime: Number,
   lastUpdateTime: Number,
   viewCount: Number,
   likeCount: Number,
+  liked: Boolean,
   commentCount: Number,
-  userBriefView: {
-    type: Object,
-    default: () => {}
-  },
   thumbnails: {
     type: Array,
     default: () => []
@@ -33,35 +31,27 @@ const {
 
 <template>
   <div class="post-brief-view">
-    <user-brief-view
-        :id="userBriefView.id"
-        :head-img-url="userBriefView.headImgUrl"
-        :role="userBriefView.role"
-        :level="userBriefView.level"
-        :location="userBriefView.location"
-        :nick-name="userBriefView.nickName"
-        :title="userBriefView.title"
+    <UserBriefView
+      :user-id="userId"
+      :category-id="categoryId"
     />
   </div>
-  <el-link :href="`/postDetail?id=${id}`">{{title}}</el-link>
+  <el-link :href="`/postDetail?id=${postId}`">{{title}}</el-link>
   <span class="content">{{content}}</span>
   <div v-if="thumbnails.length > 0" class="thumbnails">
     <el-image v-for="url in thumbnails" :src="'/api' + url" />
   </div>
-  <div class="data">
-    <span class="views">
-      <el-icon><View /></el-icon>
-      {{viewCount}}
-    </span>
-    <span class="comments">
-      <el-icon><ChatDotSquare /></el-icon>
-      {{commentCount}}
-    </span>
-    <span class="createTime">
-      <el-icon><Clock /></el-icon>
-      <Time :timestamp="createTime"/>
-    </span>
-  </div>
+  <PostData
+    :post-id="postId"
+    :view-count="viewCount"
+    :comment-count="commentCount"
+    :like-count="likeCount"
+    :liked="liked"
+  />
+  <span class="createTime">
+    <el-icon><Clock /></el-icon>
+    <Time :timestamp="createTime"/>
+  </span>
 </template>
 
 <style scoped lang="scss">
@@ -70,10 +60,6 @@ const {
     flex-direction: column;
   }
   .thumbnails {
-    display: flex;
-    flex-direction: row;
-  }
-  .data {
     display: flex;
     flex-direction: row;
   }
