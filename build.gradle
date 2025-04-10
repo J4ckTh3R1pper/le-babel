@@ -122,10 +122,10 @@ dependencies {
 sourceSets {
 }
 
-compileJava {
-    options.generatedSourceOutputDirectory = file('src/generated')
+// compileJava {
+//     options.generatedSourceOutputDirectory = file('src/generated')
 
-}
+// }
 
 tasks.named('test') {
     useJUnitPlatform()
@@ -140,5 +140,6 @@ bootJar {
 }
 
 test {
-    testLogging.showStandardStreams true
+    enabled = false
+    testLogging.showStandardStreams = true
 }

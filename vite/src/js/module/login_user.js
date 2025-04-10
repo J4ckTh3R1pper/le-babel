@@ -11,10 +11,9 @@ const useLoginUserStore = defineStore(
             token: getToken(),
             id: null,
             nickName: null,
-            headImgUrl: null,
+            headImgUrl: defaultAvatar,
             location: null,
             roles: null,
-            permissions: null
         }),
         actions: {
             // 登录
@@ -26,8 +25,6 @@ const useLoginUserStore = defineStore(
                 const rememberMe = userInfo.rememberMe
                 return new Promise((resolve, reject) => {
                     loginRequest(loginName, password, captcha, uuid, rememberMe).then(res => {
-                        setToken(res.token)
-                        this.token = res.token
                         resolve()
                     }).catch(error => {
                         reject(error)
@@ -38,25 +35,17 @@ const useLoginUserStore = defineStore(
             getInfo() {
                 return new Promise((resolve, reject) => {
                     getInfoRequest().then(res => {
-                        const user = res.user
+                        const user = res
                         let avatar = user.headImgUrl || ""
                         if (!isHttp(avatar)) {
                             avatar = (isEmpty(avatar)) ? defaultAvatar : '/api' + avatar
                         }
-                        if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-                            this.roles = res.roles
-                            this.permissions = res.permissions
-                        } else {
-                            this.roles = ['ROLE_DEFAULT']
-                        }
                         this.id = user.id
-                        this.name = user.nickName
+                        this.nickName = user.nickName
                         this.headImgUrl = avatar
                         this.location = user.location
-                        resolve(res)
-                    }).catch(error => {
-                        reject(error)
-                    })
+                        resolve()
+                    }).catch(error => { reject(error)})
                 })
             },
             // 退出系统

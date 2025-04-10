@@ -34,10 +34,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getServletPath().startsWith("/api/no_auth");
-    }
+    // @Override
+    // protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    //     return request.getServletPath().startsWith("/api/images");
+    // }
 
     private final String parameter = Constants.REMEMBER_ME_PARAM;
 

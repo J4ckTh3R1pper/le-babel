@@ -2,11 +2,9 @@ package dayp308.chatroom.configuration;
 
 import dayp308.chatroom.repository.RedisCaptchaRepository;
 import dayp308.chatroom.security.*;
-import dayp308.chatroom.repository.RedisPersistentTokenRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import dayp308.chatroom.service.PostService;
-import dayp308.chatroom.service.RememberServices;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +18,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
@@ -54,6 +54,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> {
+            web.ignoring().requestMatchers("/api/images/**");
+        };
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -64,12 +71,12 @@ public class SecurityConfiguration {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/no_auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/no_auth/**").permitAll()
+                        // .requestMatchers("/api/images/**").permitAll()
+                        .requestMatchers("/api/no_auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling( e -> {
+                    // e.disable();
                     e.accessDeniedPage(null)
                             .authenticationEntryPoint(authenticationEntryPoint());
                 })
@@ -90,11 +97,6 @@ public class SecurityConfiguration {
         ProviderManager providerManager = new ProviderManager(provider);
 
         return providerManager;
-    }
-
-//    @Bean FIXME: 带上这个Bean会导致无法启动
-    public Advisor preAuthorize(CustomAuthorizationManager manager) {
-        return AuthorizationManagerBeforeMethodInterceptor.preAuthorize(manager);
     }
 
     @Bean

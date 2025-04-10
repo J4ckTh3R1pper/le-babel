@@ -1,7 +1,8 @@
 import axios from 'axios'
-import {ElLoading, ElMessage, ElMessageBox, ElNotification} from "element-plus";
+// import {ElLoading, ElMessage, ElMessageBox, ElNotification} from "element-plus";
 import {blobValidate, tansParams} from "./utils.js";
 import errCodes from "../errCodes.js";
+import { getToken, setToken } from './auth.js';
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 
 let downloadLoadingInstance;
@@ -9,18 +10,18 @@ const service = axios.create({
     // axios中请求配置有baseURL选项，表示请求URL公共部分
     baseURL: '/api',
     // 超时
-    timeout: 10000,
+    timeout: 50000,
     withCredentials: true,
     headers: {
-        'Authorization': sessionStorage.getItem("access_token")
+        'Authorization': getToken()
     }
 })
 
 service.interceptors.response.use(res => {
         // 未设置状态码则默认成功状态
         const code = res.data.code || 200;
-        const token = res.headers['Authorization']
-        if ( token ) sessionStorage.setItem("access_token", token)
+        const token = res.headers['authorization']
+        if ( token ) setToken(token)
         // 获取错误信息
         const msg = errCodes[code] || res.data.msg || errCodes['default']
         // 二进制数据则直接返回

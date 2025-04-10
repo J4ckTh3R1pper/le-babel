@@ -2,7 +2,11 @@
 import MarkdownIt from "markdown-it";
 import MarkdownItHighlightJS from "markdown-it-highlightjs";
 
-const md = new MarkdownIt();
+const md = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true
+});
 md.use(MarkdownItHighlightJS);
 
 const btn_replacement = '<pre><button class="cpy-btn"><i class="fa-regular fa-clipboard fa-fw"></i><span class="cpy-tooltip">复制代码</span></button>';

@@ -45,8 +45,8 @@ public class PostToBriefView implements Converter<PostProjection, PostBriefView>
     }
 
     public static String cropContent(String content) {
-        String stripped = MarkdownUtil.stripMarkdown(content);
-        return stripped.substring(0, Math.min(stripped.length() - 1, 49));
+        String[] splitted = MarkdownUtil.stripMarkdown(content).split("(\\r?\\n|<br/>)",2);
+        return splitted[0].trim();
     }
 
 }

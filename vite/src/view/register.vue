@@ -1,8 +1,7 @@
 <script setup>
 
-import useUserStore from "@/js/module/user.js";
+import useUserStore from "@/js/module/login_user.js";
 import {getCaptchaRequest, registerRequest} from "@/js/api/login.js";
-import {ElMessageBox} from "element-plus";
 import {useRoute, useRouter} from "vue-router";
 const { proxy } = getCurrentInstance();
 const route = useRoute()

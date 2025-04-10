@@ -17,7 +17,6 @@ import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import jakarta.persistence.NoResultException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -76,8 +75,8 @@ public class CategoryController {
             @RequestParam("categoryId") int categoryId,
             @RequestParam("userId") long userId
     ) {
-        return categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class)
-                .orElseThrow(() -> new NoResultException());
+        MemberMinimal member = categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class);
+        return member;
 
     }
 
@@ -109,14 +108,13 @@ public class CategoryController {
     }
 
     @GetMapping("/api/no_auth/category/get_category_list")
-    public Slice<CategoryMinimal> getCategoryList(
+    public List<CategoryMinimal> getCategoryList(
             @PageableDefault(
                     sort = PostCategory_.RANK, direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
-        return categoryRepository.findAll(pageable, CategoryMinimal.class);
+        return categoryRepository.findBy(pageable, CategoryMinimal.class);
     }
-
 
     @PreAuthorize("@authz.hasMembershipGe(#categoryId, 'MODERATOR')")
     @PostMapping("/api/category/mute_user")

@@ -13,7 +13,7 @@ const useUserCacheStore = defineStore(
                 let user;
                 if (!this.userMap.has(userId)) {
                     await getUserCache(userId).then(res => {
-                        user = res.data
+                        user = res
                     }).catch(r => {
                         user = ghostUser
                     })
@@ -26,22 +26,22 @@ const useUserCacheStore = defineStore(
                     this.memberMap.set(categoryId, new Map());
                 if (!this.memberMap.get(categoryId).has(userId)) {
                     await getMemberCache(categoryId, userId).then(res => {
-                        if (res.data == null)
+                        if (res == null)
                             reject()
-                        member = res.data
+                        member = res
                     }).catch(r => {
                         member = defaultMember
                     }).finally(() => {
                         this.memberMap.get(categoryId).set(userId, member)
                     })
                 }
-            }
+            },
         },
         getters: {
-            getUserBriefView: (state) => {
+            getUserBriefView(state) {
                 return (categoryId, userId) => {
-                    const user = state.getUserCache(userId)
-                    const member = state.getMemberCache(categoryId, userId)
+                    const user = state.userMap.get(userId)
+                    const member = state.memberMap.get(categoryId, userId)
                     return {
                         nickName: user.nickName,
                         headImgUrl: user.headImgUrl,
@@ -53,6 +53,7 @@ const useUserCacheStore = defineStore(
                 }
             }
         }
+            
 })
 
 const ghostUser = {

@@ -44,44 +44,48 @@ if (loginUser.id != null) {
 </script>
 
 <template>
-<div class="category-view">
-    <el-scrollbar>
-        <el-container>
-            <el-header class="header">
-                <span class="left">
-                    <el-avatar class="avatar" :src="avatar"/>
-                    <span class="name">{{ name }}</span>
-                </span>
-                <span class="right">
-                    <el-button round :icon="Plus">发表新帖</el-button>
-                    <el-button :type="membership.role > 0 ? '' : 'primary'" round>
-                        {{ membership.role > 0 ? '已关注' : '关注' }}
-                    </el-button>
-                </span>
-            </el-header>
-            <el-main>
-                <PostList
-                    :category-id="categoryId"
-                    :size="15"
-                />
-            </el-main>
-            <el-aside class="info">
-                <div>
-                    <InlineMarkdown :md-text="info"/>
-                </div>
-                <div>
-                    <InlineMarkdown :md-text="rule"/>
-                </div>
-                <div v-if="loginUser.id != null">
-                    <UserBriefView :category-id="categoryId" :user-id="loginUser.id"/>
-                </div>
-            </el-aside>
-        </el-container>
-    </el-scrollbar>
-</div>
+    <el-container>
+        <el-header class="header">
+            <span class="left">
+                <el-avatar class="avatar" :src="avatar"/>
+                <span class="name">{{ name }}</span>
+            </span>
+            <span class="right">
+                <el-button round :icon="Plus">发表新帖</el-button>
+                <el-button :type="membership.role > 0 ? '' : 'primary'" round>
+                    {{ membership.role > 0 ? '已关注' : '关注' }}
+                </el-button>
+            </span>
+        </el-header>
+        <el-main>
+            <PostList
+                :category-id="categoryId"
+                :size="15"
+            />
+        </el-main>
+        <el-aside class="info">
+            <div>
+                <InlineMarkdown :md-text="info"/>
+            </div>
+            <div>
+                <InlineMarkdown :md-text="rule"/>
+            </div>
+            <div v-if="loginUser.id != null">
+                <UserBriefView :category-id="categoryId" :user-id="loginUser.id"/>
+            </div>
+        </el-aside>
+    </el-container>
 </template>
 
 <style lang="scss" scoped>
+.el-container {
+    height: 100%;
+}
+
+.el-main {
+    overflow: hidden;
+    padding: 0;
+}
 .header {
     display: flex;
     flex-direction: column;

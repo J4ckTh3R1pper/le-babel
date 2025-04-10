@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.NoResultException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -70,6 +71,13 @@ public class ControllerExceptionHandler {
     @ResponseBody
     public String fileUploadException(final FileUploadException e) {
         return new ErrorResponseBody(500, e.getMessage()).toString();
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public String authorizationDeniedException(final AuthorizationDeniedException e) {
+        return new ErrorResponseBody(401, e.getMessage()).toString();
     }
 
     @ExceptionHandler(AccessDeniedException.class)

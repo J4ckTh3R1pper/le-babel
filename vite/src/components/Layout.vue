@@ -2,16 +2,24 @@
 
 import Sidebar from "@/components/Sidebar/index.vue";
 import Header from "@/components/Header/index.vue"
+import useAppStore from "@/js/module/app";
+import { storeToRefs } from "pinia";
+
+const appStore = useAppStore()
+const {sidebar} = storeToRefs(appStore)
+
 </script>
 
 <template>
   <div class="app-wrapper">
     <el-container>
-      <Header />
-      <el-container>
+      <el-header height="50px" class="header-wrapper">
+        <Header />
+      </el-header>
+      <el-container class="container">
         <Sidebar/>
         <el-main>
-          <router-view></router-view>
+          <router-view/>
         </el-main>
       </el-container>
     </el-container>
@@ -32,5 +40,17 @@ import Header from "@/components/Header/index.vue"
     position: fixed;
     top: 0;
   }
+}
+
+.el-container {
+  height: calc(100vh - 50px);
+}
+
+.header-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  align-items: stretch;
+  padding: 0;
 }
 </style>

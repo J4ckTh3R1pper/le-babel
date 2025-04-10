@@ -8,11 +8,14 @@ import dayp308.chatroom.entity.post.Post;
 import dayp308.chatroom.entity.post.Post_;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
+import dayp308.chatroom.entity.business.LikeResponse;
 import dayp308.chatroom.entity.business.PostForm;
 import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.entity.view.post.PostBriefView;
 import dayp308.chatroom.entity.view.post.PostDetailedView;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
+import dayp308.chatroom.repository.CommentLikeRepository;
+import dayp308.chatroom.repository.PostLikeRepository;
 import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.PostService;
@@ -39,14 +42,18 @@ public class PostController {
     private final UserRepository userRepository;
     private final ObjectMapper jacksonObjectMapper;
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Autowired
-    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository) {
+    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository) {
         this.postService = postService;
         this.userService = userService;
         this.userRepository = userRepository;
         this.jacksonObjectMapper = jacksonObjectMapper;
         this.postRepository = postRepository;
+        this.postLikeRepository = postLikeRepository;
+        this.commentLikeRepository = commentLikeRepository;
     }
 
     @PostMapping("/api/post/create")
@@ -77,18 +84,22 @@ public class PostController {
         return new ResponseEntity<>("deleted comment: " + comment.getId(), HttpStatus.OK);
     }
 
-    @PostMapping("/api/post/like")
-    public ResponseEntity<Boolean> likePost(@RequestParam("id") Post post, Authentication auth) throws EntityNotFoundException {
-       return new ResponseEntity<>(
-               postService.likePost(post, ( (User) auth.getPrincipal() )),
-               HttpStatus.OK);
+    @PutMapping("/api/post/like")
+    public LikeResponse likePost(@RequestParam("id") Post post, Authentication auth) throws EntityNotFoundException {
+        Boolean liked = postService.likePost(post, ( (User) auth.getPrincipal() ));
+        return new LikeResponse(
+            postLikeRepository.countByPostId(post.getId()),
+            liked
+        );
     }
 
-    @PostMapping("/api/comment/like")
-    public ResponseEntity<String> likeComment(@RequestParam("id") PostComment comment, Authentication auth) throws EntityNotFoundException {
-        return new ResponseEntity<>(
-                "liked:" + postService.likeComment(comment, ( (User) auth.getPrincipal() )),
-                HttpStatus.OK);
+    @PutMapping("/api/comment/like")
+    public LikeResponse likeComment(@RequestParam("id") PostComment comment, Authentication auth) throws EntityNotFoundException {
+        Boolean liked = postService.likeComment(comment, ( (User) auth.getPrincipal() ));
+        return new LikeResponse(
+            commentLikeRepository.countByCommentId(comment.getId()),
+            liked
+        );
     }
 
     @GetMapping("/api/no_auth/post/get_posts")

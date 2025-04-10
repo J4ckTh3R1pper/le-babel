@@ -23,7 +23,10 @@ export function getPostSlice(categoryId, pageNum, pageSize, sort) {
 }
 
 export function likePost(postId) {
-    return service.post("/post/like", {
-        id: postId
-    })
+    return service.put("/post/like?id=" + postId)
+}
+
+
+export function likeComment(commentId) {
+    return service.put("/comment/like?id=" + commentId)
 }

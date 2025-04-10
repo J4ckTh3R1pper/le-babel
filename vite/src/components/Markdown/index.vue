@@ -12,9 +12,11 @@ const props = defineProps({
 const md = useMarkdownStore();
 
 
-const result = computed(() => {
-  return md.instance.render(props.mdText);
-})
+const result = ref('')
+
+watch(() => mdText, () => {
+    result.value = instance.renderInline(mdText)
+}, {immediate: true})
 
 // 初始化粘贴按钮行为
 let cpy_btn = new ClipboardJS('.cpy-btn', {

@@ -8,7 +8,7 @@
       <el-icon><ChatDotSquare /></el-icon>
       {{commentCount}}
     </span>
-    <span class="like" @click="like">
+    <span class="like" :class="{'liked': liked}" @click="like">
       <el-icon>
         <StarFilled v-if="liked"/>
         <Star v-else/>
@@ -20,7 +20,7 @@
 
 <script setup>
 
-import likePost from '@/js/api/post.js'
+import {likePost} from '@/js/api/post.js'
 
 
 const props = defineProps({
@@ -39,9 +39,8 @@ const postId = props["postId"]
 
 function like() {
   likePost(postId).then(res => {
-    liked.value = res.data
-    if (liked.value) likeCount += 1
-    else likeCount -= 1
+    liked.value = res.liked
+    likeCount.value = res.count
   })
 }
 </script>
@@ -51,5 +50,31 @@ function like() {
     display: flex;
     flex-direction: row;
     align-items: baseline;
+    // justify-content: space-around;
+
+
+    .views,.comments,.like {
+      display: flex;
+      border-radius: 16px;
+      padding: 8px 16px;
+      margin: 0px 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .comments,.like {
+      cursor: pointer;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.127);
+      }
+    }
+    .liked {
+      color: #FFFFFF;
+      border-color: rgb(255, 77, 77);
+      background-color: rgb(255, 77, 77);
+      &:hover {
+        color: black;
+        border-color: black;
+      }
+    }
 }
 </style>

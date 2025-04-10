@@ -12,10 +12,13 @@ const {mdText} = defineProps({
 })
 
 const md = useMarkdownStore()
+const instance = md.instance
 
-const result = computed(() => {
-    return md.renderInline(mdText)
-})
+const result = ref('')
+
+watch(() => mdText, () => {
+    result.value = instance.renderInline(mdText)
+}, {immediate: true})
 
 </script>
 

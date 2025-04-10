@@ -4,15 +4,15 @@ import Register from "@/view/register.vue";
 
 export const constantRoutes = [
     {
-        path: '/',
+        path: '/login',
         component: Login,
-        hidden: true,
+        hidden: false,
         meta: { title: '登录'}
     },
     {
         path: '/register',
         component: Register,
-        hidden: true,
+        hidden: false,
         meta: { title: '注册'}
     },
     {
@@ -21,26 +21,26 @@ export const constantRoutes = [
         redirect: '/index',
         children: [
             {
-                path: '/index',
-                component: () => import('@/view/index'),
+                path: '',
+                component: () => import('@/components/index.vue'),
                 name: 'Index',
                 meta: { title: '首页', icon: 'dashboard', affix: true }
             }
         ]
     },
-    {
-        path: '/user',
-        component: Layout,
-        hidden: true,
-        redirect: 'noredirect',
-        children: [
-            {
-                path: 'profile',
-                component: () => import('@/views/system/user/profile/index'),
-                name: 'Profile',
-                meta: { title: '个人中心', icon: 'user' }
-            }
-        ]
-    }
+    // {
+    //     path: '/user',
+    //     component: Layout,
+    //     hidden: true,
+    //     redirect: 'noredirect',
+    //     children: [
+    //         {
+    //             path: 'profile',
+    //             component: () => import('@/views/system/user/profile/index'),
+    //             name: 'Profile',
+    //             meta: { title: '个人中心', icon: 'user' }
+    //         }
+    //     ]
+    // }
 ]
 export default constantRoutes

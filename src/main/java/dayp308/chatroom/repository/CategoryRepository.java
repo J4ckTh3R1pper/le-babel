@@ -17,6 +17,6 @@ import java.util.function.Function;
 @Repository
 public interface CategoryRepository extends JpaRepository<PostCategory, Integer>, JpaSpecificationExecutor<PostCategory> {
     List<PostCategory> findByNameContainsIgnoreCase(String searchKey);
-    <T> Slice<T> findAll(Pageable pageable, Class<T> clazz);
+    <T> List<T> findBy(Pageable pageable, Class<T> clazz);
     <T> T findById(Integer id, Class<T> clazz);
 }

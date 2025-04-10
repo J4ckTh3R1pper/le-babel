@@ -14,5 +14,8 @@ import {constantRoutes} from "@/router/index.js";
   <router-view/>
 </template>
 
-<style scoped>
+<style>
+body {
+  font-family: 'Roboto';
+}
 </style>

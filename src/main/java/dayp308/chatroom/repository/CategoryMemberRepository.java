@@ -17,5 +17,5 @@ public interface CategoryMemberRepository extends JpaRepository<CategoryMember, 
     List<CategoryMemberDTO> findAllByCategoryId(Integer categoryId);
 
     Optional<CategoryMember> findByUser(User user);
-    <T> Optional<T> findById(CategoryMemberId categoryMemberId, Class<T> clazz);
+    <T> T findById(CategoryMemberId categoryMemberId, Class<T> clazz);
 }

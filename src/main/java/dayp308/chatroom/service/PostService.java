@@ -11,6 +11,8 @@ import dayp308.chatroom.entity.member.CategoryMember;
 import dayp308.chatroom.entity.post.PostDTO;
 import dayp308.chatroom.entity.enums.PostOrderType;
 import dayp308.chatroom.entity.id.CategoryMemberId;
+import dayp308.chatroom.entity.id.CommentLikeId;
+import dayp308.chatroom.entity.id.PostLikeId;
 import dayp308.chatroom.entity.post.Post;
 import dayp308.chatroom.entity.post.PostIdOnly;
 import dayp308.chatroom.entity.user.User;
@@ -91,11 +93,11 @@ public class PostService {
 
     @Transactional
     public boolean likePost(Post post, User user) {
-        PostLike like = new PostLike(post, user);
-        if (!postLikeRepository.exists(Example.of(like)))
-            postLikeRepository.saveAndFlush(like);
+        PostLikeId id = new PostLikeId(user.getId(), post.getId());
+        if (!postLikeRepository.existsById(id))
+            postLikeRepository.saveAndFlush(new PostLike(post, user));
         else {
-            postLikeRepository.delete(like);
+            postLikeRepository.deleteById(id);
             return false;
         }
         return true;
@@ -103,11 +105,11 @@ public class PostService {
 
     @Transactional
     public boolean likeComment(PostComment comment, User user) {
-        CommentLike like = new CommentLike(comment, user);
-        if (!commentLikeRepository.exists(Example.of(like)))
-            commentLikeRepository.saveAndFlush(like);
+        CommentLikeId id = new CommentLikeId(user.getId(), comment.getId());
+        if (!commentLikeRepository.existsById(id))
+            commentLikeRepository.saveAndFlush(new CommentLike(comment, user));
         else {
-            commentLikeRepository.delete(like);
+            commentLikeRepository.deleteById(id);
             return false;
         }
         return true;
