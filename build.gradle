@@ -73,12 +73,6 @@ dependencies {
     // IK分词
     implementation 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
 
-    // Mybatis和PageHelper 已经弃用，留着防止依赖出错
-    // https://mvnrepository.com/artifact/org.mybatis/mybatis
-    implementation 'org.mybatis:mybatis:3.5.19'
-    // https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper
-    implementation 'com.github.pagehelper:pagehelper:6.1.0'
-
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion

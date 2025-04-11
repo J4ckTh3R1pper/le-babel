@@ -47,11 +47,3 @@ spring:
 lebabel:
   img-path: ${IMG_PATH}
   vite-host: ${VITE_HOST:http://localhost:5173}
-
-#mybatis:
-#  type-aliases-package: 'dayp308.chatroom.bean'
-#  mapper-locations: 'classpath*:dayp308/chatroom/mapper/*.xml'
-#  configuration:
-#    map-underscore-to-camel-case: true
-#    lazy-loading-enabled: true
-#  type-handlers-package: 'dayp308.chatroom.typehandler'
