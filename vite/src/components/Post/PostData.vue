@@ -1,19 +1,18 @@
 <template>
   <div class="data">
-    <span class="views">
-      <el-icon><View /></el-icon>
-      {{viewCount}}
+    <span class="left">
+      <span class="views">
+        <el-icon><View /></el-icon>{{viewCount}}
+      </span>
+      <span class="comments">
+        <el-icon><ChatDotSquare /></el-icon>{{commentCount}}
+      </span>
+      <span class="like" :class="{'liked': liked}" @click="like">
+        <el-icon><StarFilled v-if="liked"/><Star v-else/></el-icon>{{likeCount}}
+      </span>
     </span>
-    <span class="comments">
-      <el-icon><ChatDotSquare /></el-icon>
-      {{commentCount}}
-    </span>
-    <span class="like" :class="{'liked': liked}" @click="like">
-      <el-icon>
-        <StarFilled v-if="liked"/>
-        <Star v-else/>
-      </el-icon>
-      {{likeCount}}
+    <span class="right">
+
     </span>
   </div>
 </template>
@@ -51,30 +50,41 @@ function like() {
     flex-direction: row;
     align-items: baseline;
     // justify-content: space-around;
-
-
-    .views,.comments,.like {
+    .left{
       display: flex;
-      border-radius: 16px;
-      padding: 8px 16px;
-      margin: 0px 8px;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .comments,.like {
-      cursor: pointer;
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.127);
+      flex-direction: inherit;
+      align-items: inherit;
+      & > * {
+        &:nth-child(n) {
+          display: flex;
+          border-radius: 16px;
+          padding: 8px;
+
+          align-items: center;
+          justify-content: space-between;
+          .el-icon {
+            margin-right: 4px;
+          }
+        }
+        &:nth-child(n+2) {
+          margin-left: 8px;
+        }
+      }
+      .comments,.like {
+        cursor: pointer;
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.127);
+        }
+      }
+      .liked {
+        color: #FFFFFF;
+        border-color: rgb(255, 77, 77);
+        background-color: rgb(255, 77, 77);
+        &:hover {
+          color: black;
+        }
       }
     }
-    .liked {
-      color: #FFFFFF;
-      border-color: rgb(255, 77, 77);
-      background-color: rgb(255, 77, 77);
-      &:hover {
-        color: black;
-        border-color: black;
-      }
-    }
+
 }
 </style>

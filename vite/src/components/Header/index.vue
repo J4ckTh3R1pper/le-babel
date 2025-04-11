@@ -1,8 +1,12 @@
 <script setup>
 import useLoginUserStore from '@/js/module/login_user';
-import { isEmpty } from '@/js/utils/validate';
+import { isEmpty, isNumber } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
+
+defineOptions({
+  name: 'Header'
+})
 
 const route = useRoute()
 const router = useRouter()
@@ -20,20 +24,34 @@ function getUserRoute() {
   else url = "/userInfo/" + id.value
   router.push(url)
 }
+
+function handleCommand(command) {
+
+}
+
 </script>
 
 <template>
-    <div class="header">
-      <span class="left"></span>
-      <span class="placeholder"></span>
-      <span class="right">
-        <span class="user">
-          <el-avatar class="avatar" :src="headImgUrl"/>
-          <el-link @click="getUserRoute"
-          >{{ isEmpty(nickName) ? '未登录' : nickName }}</el-link>
-        </span>
+  <div class="header">
+    <span class="left">
+      <span class="logo">
+        <img src="/icon.png" width="32px" height="32px">
+        <span>Le Babel</span>
       </span>
-    </div>
+    </span>
+    <span class="placeholder"></span>
+    <span class="right">
+      <el-dropdown class="user" @command="handleCommand">
+        <el-avatar class="avatar" :src="headImgUrl"/>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="profile">{{ !isNumber(id) ? '登录' : '个人主页' }}</el-dropdown-item>
+            <el-dropdown-item v-if="isNumber(id)" command="logOut">登出</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </span>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -50,6 +68,17 @@ function getUserRoute() {
     }
     .avatar {
       margin-right: 0.5em;
+      border: 1px rgba(0, 0, 0, 0.32) solid
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-family: 'Montserrat';
+      font-weight: 800;
+      color: #02302c;
+      img {
+        margin-right: 4px;
+      }
     }
     .left {
       display: flex;

@@ -11,7 +11,7 @@ const { timestamp } = defineProps({
 
 const timeString = ref('')
 watchEffect(() => {
-  let date = new Date(timestamp)
+  let date = new Date(timestamp * 1000)
   timeString.value = Date.now() - timestamp < 86400000 ? date.toLocaleTimeString() : date.toLocaleString()
 })
 
@@ -25,5 +25,11 @@ watchEffect(() => {
 </template>
 
 <style scoped lang="scss">
-
+.time {
+  display: flex;
+  align-items: inherit;
+  .el-icon {
+    margin-right: 4px;
+  }
+}
 </style>

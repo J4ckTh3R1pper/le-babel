@@ -4,6 +4,7 @@ import {ChatDotSquare, Clock, Star, StarFilled, View} from "@element-plus/icons-
 import UserBriefView from "@/components/User/UserBriefView.vue";
 import Time from "@/components/Time.vue";
 import Markdown from "@/components/Markdown/index.vue"
+import PostData from "./PostData.vue";
 
 const {
   postId, categoryId, title, userId, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, liked
@@ -25,35 +26,54 @@ const {
   },
 })
 
+
 </script>
 
 <template>
   <div class="post-detailed-view">
-    <user-brief-view
-      :user-id="userId"
-      :category-id="categoryId"
-    />
+    <div class="top">
+      <UserBriefView :user-id="userId" :category-id="categoryId" full/>
+      <el-divider direction="vertical"/>
+      <Time :timestamp="createTime" class="time"/>
+    </div>
+    <div class="title">{{title}}</div>
+    <div class="content"><Markdown :md-text="content"/></div>
+    <div class="bottom">
+      <PostData
+        :post-id="postId"
+        :view-count="viewCount"
+        :comment-count="commentCount"
+        :like-count="likeCount"
+        :liked="liked"
+      />
+    </div>
   </div>
-  <span>{{title}}</span>
-  <Markdown :md-text="content"/>
-  <PostData
-    :post-id="postId"
-    :view-count="viewCount"
-    :comment-count="commentCount"
-    :like-count="likeCount"
-    :liked="liked"
-  />
-  <span class="createTime">
-    <el-icon><Clock /></el-icon>
-    <Time :timestamp="createTime"/>
-  </span>
 </template>
 
 <style scoped lang="scss">
 .post-detailed-view {
-  display: flex;
-  flex-direction: column;
-}
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    .bottom,.top {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    .time,.category-name {
+      font-size: small;
+      color: #646464;
+    }
+    > * {
+      &:nth-child(n+2) {
+        padding-top: 8px;
+        &:not(.data) {
+          padding-left: 8px;
+        }
+      }
+    }
+  }
+
 .data {
   display: flex;
   flex-direction: row;

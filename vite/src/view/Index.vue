@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import PostList from './Post/PostList.vue';
+import PostList from '@/components/Post/PostList.vue';
 
 
 </script>

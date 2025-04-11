@@ -13,7 +13,7 @@
         :infinite-scroll-disabled="disabled"
         class="list"
     >
-        <li v-for="i in list">
+        <li v-for="i in list" :key="i.id">
             <Suspense>
                 <PostBriefView
                     :post-id="i.id"
@@ -29,9 +29,9 @@
                     :comment-count="i.commentCount"
                     :thumbnails="i.thumbnails"
                     :liked="i.liked"
+                    :show-category="showCategory"
                 />
             </Suspense>
-            <el-divider/>
         </li>
         <li>
             <div class="loading" v-loading="loading">
@@ -46,6 +46,7 @@
 import { getPostSlice } from '@/js/api/post';
 import PostBriefView from './PostBriefView.vue';
 import { onMounted, watchEffect } from 'vue';
+import { isNumber } from 'lodash';
 const sortings = [
     {
         label: '最新回复',
@@ -72,6 +73,7 @@ const disabled = ref(false)
 const list = ref([])
 const loading = ref(false)
 const lastPage = ref(false)
+const showCategory = !isNumber(categoryId)
 
 watch(sort, async () => {
     list.value = []

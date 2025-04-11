@@ -1,5 +1,5 @@
 <script setup>
-import { getCategoryDto }from '@/js/api/category.js'
+import { getCategoryInfo }from '@/js/api/category.js'
 import { useRoute, useRouter } from 'vue-router'
 import defaultAvatar from '@/assets/images/default_user_avatar.png'
 import PostList from '../Post/PostList.vue'
@@ -23,7 +23,7 @@ const membership = ref({})
 const userCache = useUserCacheStore()
 const loginUser = useLoginUserStore()
 
-getCategoryDto(categoryId).then(res => {
+getCategoryInfo(categoryId).then(res => {
     let data = res.data
     categoryId.value = data.id
     name.value = data.name

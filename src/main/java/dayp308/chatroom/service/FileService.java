@@ -20,7 +20,7 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class FileService {
 
-    @Value("${dayp308.chatroom.imgPath}")
+    @Value("${lebabel.img-path}")
     private String imgPath;
 
     private String thumbnailDir = "thumbnails/";

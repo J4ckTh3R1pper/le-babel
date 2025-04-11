@@ -6,6 +6,10 @@ import RecentCategory from "@/components/Sidebar/RecentCategory.vue";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
+defineOptions({
+  name: 'Sidebar'
+})
+
 const sortSelected = ref("")
 const descending = ref(false)
 const sortTypes = [

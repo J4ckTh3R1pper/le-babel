@@ -4,14 +4,20 @@ import {ChatDotSquare, Clock, View} from "@element-plus/icons-vue";
 import Time from "@/components/Time.vue";
 import PostData from "./PostData.vue";
 import InlineMarkdown from "../Markdown/InlineMarkdown.vue";
+import useUserCacheStore from "@/js/module/user_cache";
+import useCategoryCacheStore from "@/js/module/category_cache";
+import { storeToRefs } from "pinia";
+import { isEmpty } from "lodash";
+import { useRoute, useRouter } from "vue-router";
 
 const {
-  postId, title, userId, categoryId, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails, liked
+  postId, title, userId, categoryId, showCategory, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails, liked
 } = defineProps({
   postId: Number,
   title: String,
   userId: Number,
   categoryId: Number,
+  showCategory: Boolean,
   content: String,
   createTime: Number,
   lastUpdateTime: Number,
@@ -29,35 +35,54 @@ const {
   },
 })
 
+const router = useRouter()
+const route = useRoute()
+
+const userCacheStore = useUserCacheStore()
+
+const categoryCache = useCategoryCacheStore()
+const {getCategory} = storeToRefs(categoryCache)
+
+function onClicked() {
+  router.push('/postDetail/' + postId)
+}
+
+if (showCategory) {
+  categoryCache.fetchCategory(categoryId)
+}
 
 </script>
 
 <template>
-  <div class="post-brief-view">
-    <UserBriefView
-      :user-id="userId"
-      :category-id="categoryId"
-    />
-    <span>
-    <el-link class="post-link" type="primary" :href="`/postDetail?id=${postId}`">{{title}}</el-link>
-    </span>
+  <div class="post-brief-view" @click="onClicked">
+    <div class="top">
+      <UserBriefView :user-id="userId" :category-id="categoryId"/>
+      <el-divider direction="vertical"/>
+      <Time :timestamp="createTime" class="time"/>
+      <el-divider direction="vertical"/>
+      <!-- https://stackoverflow.com/questions/77397035/pinia-getter-undefined-if-used-with-filter -->
+      <span class="category-name" v-if="!isEmpty(getCategory(categoryId))">{{ getCategory(categoryId)['name'] }}</span>
+    </div>
+    <div>
+      <el-link class="post-link" type="primary" @click.self.prevent>{{title}}</el-link>
+    </div>
     <div class="content">
       <InlineMarkdown :md-text="content"/>
     </div>
     <div v-if="thumbnails.length > 0" class="thumbnails">
       <el-image v-for="url in thumbnails" :src="'/api' + url" />
     </div>
-    <PostData
-      :post-id="postId"
-      :view-count="viewCount"
-      :comment-count="commentCount"
-      :like-count="likeCount"
-      :liked="liked"
-    />
-    <span class="createTime">
-      <Time :timestamp="createTime * 1000"/>
-    </span>
+    <div class="bottom">
+      <PostData
+        :post-id="postId"
+        :view-count="viewCount"
+        :comment-count="commentCount"
+        :like-count="likeCount"
+        :liked="liked"
+      />
+    </div>
   </div>
+  <el-divider/>
 </template>
 
 <style scoped lang="scss">
@@ -66,17 +91,24 @@ const {
     flex-direction: column;
     cursor: pointer;
     border-radius: 8px;
-    // justify-content: start;
-    // align-items: start;
     padding: 1em;
+    .bottom,.top {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    .time,.category-name {
+      font-size: small;
+      color: #646464;
+    }
     > * {
       &:nth-child(n+2) {
-        padding-top: 4px;
+        padding-top: 8px;
+        &:not(.data) {
+          padding-left: 8px;
+        }
       }
     }
-    // &:nth-child(n) {
-    //   border-bottom: #c4c4c4 1px solid;
-    // }
     &:hover {
       background-color: rgba(0, 0, 0, 0.09);
     }

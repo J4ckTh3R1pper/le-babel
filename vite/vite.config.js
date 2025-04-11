@@ -36,6 +36,7 @@ export default defineConfig(({ mode}) => {
         'vue': 'vue/dist/vue.esm-bundler.js',
         '@': path.resolve(__dirname, 'src')
       },
+      extensions: ['.js', '.vue', '.json'],
     },
     plugins: [
         vue(), vueJsxPlugin(),

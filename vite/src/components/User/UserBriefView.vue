@@ -62,6 +62,7 @@ const avatarStyle = computed(() => ({
 <style scoped lang="scss">
   .user-brief-view {
     display: flex;
+    align-items: center;
   }
 
   .avatar {

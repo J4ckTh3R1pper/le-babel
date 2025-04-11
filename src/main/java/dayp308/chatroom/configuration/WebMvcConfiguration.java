@@ -9,10 +9,10 @@ import org.springframework.web.servlet.config.annotation.*;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-	@Value("${dayp308.chatroom.viteAddress}")
+	@Value("${lebabel.vite-host}")
 	private String viteAddress;
 
-	@Value("${dayp308.chatroom.imgPath}")
+	@Value("${lebabel.img-path}")
 	private String imgPath;
 
 	@Override

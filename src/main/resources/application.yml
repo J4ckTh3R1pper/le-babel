@@ -44,6 +44,9 @@ spring:
       write-dates-as-timestamps: true
     deserialization:
       read-unknown-enum-values-using-default-value: true
+lebabel:
+  img-path: ${IMG_PATH}
+  vite-host: ${VITE_HOST:http://localhost:5173}
 
 #mybatis:
 #  type-aliases-package: 'dayp308.chatroom.bean'

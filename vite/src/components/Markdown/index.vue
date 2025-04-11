@@ -5,12 +5,16 @@ import ClipboardJS from "clipboard";
 import {asyncTimeout} from "@/js/utils/utils.js";
 import useMarkdownStore from "@/js/module/markdown.js";
 
-const props = defineProps({
+defineOptions({
+  name: "Markdown"
+})
+
+const { mdText } = defineProps({
   mdText: String
 })
 
 const md = useMarkdownStore();
-
+const instance = md.instance
 
 const result = ref('')
 

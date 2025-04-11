@@ -1,6 +1,6 @@
 import service from '@/js/utils/request.js'
 
-export function getCategoryDto(id) {
+export function getCategoryInfo(id) {
     return service.get('/no_auth/category/get_info', {
         params: {
             id: id

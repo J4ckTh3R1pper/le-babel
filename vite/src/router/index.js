@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout.vue";
-import Login from "@/view/login.vue"
-import Register from "@/view/register.vue";
+import Login from "@/view/Login.vue"
+import Register from "@/view/Register.vue";
 
 export const constantRoutes = [
     {
@@ -19,12 +19,18 @@ export const constantRoutes = [
         path: '',
         component: Layout,
         redirect: '/index',
+        meta: {title: 'Le Babel'},
         children: [
             {
                 path: '',
-                component: () => import('@/components/index.vue'),
+                component: () => import('@/view/Index.vue'),
                 name: 'Index',
                 meta: { title: '首页', icon: 'dashboard', affix: true }
+            },
+            {
+                path: '/postDetail/:id',
+                name: 'post_detail',
+                component: () => import('@/view/PostDetails.vue')
             }
         ]
     },

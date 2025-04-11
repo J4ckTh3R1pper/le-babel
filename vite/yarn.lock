@@ -483,6 +483,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.9.tgz#50dea3616bc8191fb8e112283b49eaff03e78429"
   integrity sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==
 
+"@fontsource/montserrat@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/@fontsource/montserrat/-/montserrat-5.2.5.tgz#1095d286c156a42a864ade432e2b094acfde3b0b"
+  integrity sha512-/OA+bdg1yqUArDUnEeCqDwgTDiIpvED56TxYskje8UKpsvjl/0A9eNod7IcdHz6/Osi70vo7briRO3la8/u+5Q==
+
 "@fontsource/roboto@^5.2.5":
   version "5.2.5"
   resolved "https://registry.yarnpkg.com/@fontsource/roboto/-/roboto-5.2.5.tgz#b2d869075277e2cba31694951a2d355a8965d763"
@@ -903,7 +908,7 @@
   dependencies:
     vue-demi "*"
 
-acorn@^8.14.0:
+acorn@^8.14.0, acorn@^8.14.1:
   version "8.14.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.14.1.tgz#721d5dc10f7d5b5609a891773d47731796935dfb"
   integrity sha512-OvQ/2pUDKmgfCg++xsTX1wGxfTaszcHVcTctW4UJB4hibJx2HXxxO5UmVgyjMa+ZDsiaf5wWLXYpRWMmBI0QHg==
@@ -1157,6 +1162,11 @@ es-errors@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/es-errors/-/es-errors-1.3.0.tgz#05f75a25dab98e4fb1dcd5e1472c0546d5057c8f"
   integrity sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==
+
+es-module-lexer@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/es-module-lexer/-/es-module-lexer-1.6.0.tgz#da49f587fd9e68ee2404fe4e256c0c7d3a81be21"
+  integrity sha512-qqnD1yMU6tk/jnaMosogGySTZP8YtUgAffA9nMN+E/rjxcfRQ6IEk7IiozUjgxKoFHBGjTLnrHB/YC45r/59EQ==
 
 es-object-atoms@^1.0.0, es-object-atoms@^1.1.1:
   version "1.1.1"
@@ -1885,6 +1895,16 @@ unplugin-auto-import@^19.1.1:
     unplugin "^2.2.0"
     unplugin-utils "^0.2.4"
 
+unplugin-element-plus@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/unplugin-element-plus/-/unplugin-element-plus-0.9.1.tgz#6d79ada3188a978fc16c2e71ecdef601381ef9d5"
+  integrity sha512-TtQ7bj82gM1Hw5A+LmG/oFrvYb6L0BqhxVUl7djMiicvk7LjdUiP70QhTKaBY/tiFR9NJCIPYSmw4naCuhK7Hg==
+  dependencies:
+    es-module-lexer "^1.6.0"
+    magic-string "^0.30.17"
+    unplugin "^2.1.2"
+    unplugin-utils "^0.2.3"
+
 unplugin-icons@^22.1.0:
   version "22.1.0"
   resolved "https://registry.yarnpkg.com/unplugin-icons/-/unplugin-icons-22.1.0.tgz#5a6fe3d751e50f1c937e289857b0418e6855d92a"
@@ -1896,7 +1916,7 @@ unplugin-icons@^22.1.0:
     local-pkg "^1.0.0"
     unplugin "^2.2.0"
 
-unplugin-utils@^0.2.4:
+unplugin-utils@^0.2.3, unplugin-utils@^0.2.4:
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/unplugin-utils/-/unplugin-utils-0.2.4.tgz#56e4029a6906645a10644f8befc404b06d5d24d0"
   integrity sha512-8U/MtpkPkkk3Atewj1+RcKIjb5WBimZ/WSLhhR3w6SsIj8XJuKTacSP8g+2JhfSGw0Cb125Y+2zA/IzJZDVbhA==
@@ -1917,6 +1937,15 @@ unplugin-vue-components@^28.4.1:
     tinyglobby "^0.2.12"
     unplugin "^2.2.0"
     unplugin-utils "^0.2.4"
+
+unplugin@^2.1.2:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/unplugin/-/unplugin-2.3.1.tgz#03701083d8cd41335128ecddd8f0cb0367c7b7e6"
+  integrity sha512-l9lOQPGN82rUAnyX7Qw8z0E9oLgQ8tkPxFyAqX3x7DnX/jvgLHUqKX1b8u5RP6u6K0/GKfgvaiaB018j7zr+Nw==
+  dependencies:
+    acorn "^8.14.1"
+    picomatch "^4.0.2"
+    webpack-virtual-modules "^0.6.2"
 
 unplugin@^2.2.0:
   version "2.2.0"

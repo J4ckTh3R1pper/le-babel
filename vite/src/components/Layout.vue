@@ -1,7 +1,7 @@
 <script setup>
 
-import Sidebar from "@/components/Sidebar/index.vue";
-import Header from "@/components/Header/index.vue"
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header"
 import useAppStore from "@/js/module/app";
 import { storeToRefs } from "pinia";
 
@@ -19,7 +19,9 @@ const {sidebar} = storeToRefs(appStore)
       <el-container class="container">
         <Sidebar/>
         <el-main>
-          <router-view/>
+          <keep-alive>
+            <router-view/>
+          </keep-alive>
         </el-main>
       </el-container>
     </el-container>
