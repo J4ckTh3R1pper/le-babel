@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getCategoryInfo } from '@/js/api/category'
+import { getCategoryCache, getCategoryInfo } from '@/js/api/category'
 
 const useCategoryCacheStore = defineStore(
     'category_cache', {
@@ -8,17 +8,22 @@ const useCategoryCacheStore = defineStore(
     }),
     actions: {
         async fetchCategory(categoryId) {
-            if (!this.categoryMap.has(categoryId))
-                await getCategoryInfo(categoryId).then(res => {
-                    let category = {
+            return new Promise((resolve, reject) => {
+                if (this.categoryMap.has(categoryId))
+                    return resolve(this.categoryMap.get(categoryId))
+                else return reject(categoryId)
+            }).catch( async (categoryId) => {
+                let category;
+                await getCategoryCache(categoryId).then(res => {
+                    category = {
                         name: res.name,
-                        createTime: res.createTime * 1000,
                         avatar : res.avatar,
                         info: res.info,
-                        rule: res.rule
                     }
                     this.categoryMap.set(categoryId, category)
                 })
+                return Promise.resolve(category);
+            })
         }
     },
     getters: {

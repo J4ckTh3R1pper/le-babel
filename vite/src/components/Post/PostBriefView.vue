@@ -40,15 +40,16 @@ const route = useRoute()
 
 const userCacheStore = useUserCacheStore()
 
-const categoryCache = useCategoryCacheStore()
-const {getCategory} = storeToRefs(categoryCache)
+const categoryStore = useCategoryCacheStore()
+const {getCategory} = storeToRefs(categoryStore)
 
 function onClicked() {
   router.push('/postDetail/' + postId)
 }
+let categoryName= ''
 
 if (showCategory) {
-  categoryCache.fetchCategory(categoryId)
+  categoryName = (await categoryStore.fetchCategory(categoryId))['name']
 }
 
 </script>
@@ -59,9 +60,11 @@ if (showCategory) {
       <UserBriefView :user-id="userId" :category-id="categoryId"/>
       <el-divider direction="vertical"/>
       <Time :timestamp="createTime" class="time"/>
-      <el-divider direction="vertical"/>
       <!-- https://stackoverflow.com/questions/77397035/pinia-getter-undefined-if-used-with-filter -->
-      <span class="category-name" v-if="!isEmpty(getCategory(categoryId))">{{ getCategory(categoryId)['name'] }}</span>
+      <template v-if="!isEmpty(categoryName)">
+        <el-divider direction="vertical"/>
+        <span class="category-name">{{ categoryName }}</span>
+      </template>
     </div>
     <div>
       <el-link class="post-link" type="primary" @click.self.prevent>{{title}}</el-link>
@@ -104,7 +107,7 @@ if (showCategory) {
     > * {
       &:nth-child(n+2) {
         padding-top: 8px;
-        &:not(.data) {
+        &:not(.bottom) {
           padding-left: 8px;
         }
       }

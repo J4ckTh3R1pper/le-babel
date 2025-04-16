@@ -1,12 +1,5 @@
 <template>
-    <el-container>
-        <el-main>
-            <PostList :size="15"/>
-        </el-main>
-        <el-aside class="info">
-
-        </el-aside>
-    </el-container>
+    <PostList :size="15" show-category/>
 </template>
 
 <script setup>
@@ -16,10 +9,4 @@ import PostList from '@/components/Post/PostList.vue';
 </script>
 
 <style lang="scss" scoped>
-.el-container {
-    height: 100%;
-}
-.el-main {
-    overflow: hidden;
-}
 </style>

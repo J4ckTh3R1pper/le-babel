@@ -5,9 +5,6 @@ import {ref, computed} from 'vue'
 
 <script>
 
-import {createMemoryHistory, createRouter} from "vue-router";
-import {constantRoutes} from "@/router/index.js";
-
 </script>
 
 <template>

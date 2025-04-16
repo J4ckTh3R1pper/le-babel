@@ -24,11 +24,7 @@ const {categoryId, userId, full} = defineProps({
 
 const userCacheStore = useUserCacheStore()
 
-const user = ref({})
-await userCacheStore.fetchUser(userId)
-await userCacheStore.fetchMember(categoryId, userId)
-const {getUserBriefView} = storeToRefs(userCacheStore)
-user.value = getUserBriefView.value(categoryId, userId)
+const user = ref(await userCacheStore.fetchUserBriefView(categoryId, userId))
 
 watchEffect(() => {
   avatar = isEmpty(user.headImgUrl) ? defaultAvatar : '/api' + user.headImgUrl
@@ -63,6 +59,11 @@ const avatarStyle = computed(() => ({
   .user-brief-view {
     display: flex;
     align-items: center;
+
+    .location {
+      font-size: small;
+      color: #646464;
+    }
   }
 
   .avatar {

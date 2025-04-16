@@ -5,16 +5,12 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import '@fontsource/roboto'
 import '@fontsource/montserrat/700.css'
 // import ElementPlus from 'element-plus'
-import {createRouter, createWebHistory} from "vue-router";
-import constantRoutes from "@/router/index.js";
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {createPinia} from "pinia";
+import createRouter from './router/index'
 
 
-const router = createRouter({
-    history: createWebHistory(),
-    routes: constantRoutes
-})
+const router = createRouter
 const app  = createApp(App)
     // .use(ElementPlus)
     .use(createPinia())

@@ -39,7 +39,7 @@ const {
     <div class="title">{{title}}</div>
     <div class="content"><Markdown :md-text="content"/></div>
     <div class="bottom">
-      <PostData
+      <PostData class="data"
         :post-id="postId"
         :view-count="viewCount"
         :comment-count="commentCount"
@@ -60,6 +60,9 @@ const {
       flex-direction: row;
       align-items: center;
     }
+    .title {
+      font-size: large;
+    }
     .time,.category-name {
       font-size: small;
       color: #646464;
@@ -67,7 +70,7 @@ const {
     > * {
       &:nth-child(n+2) {
         padding-top: 8px;
-        &:not(.data) {
+        &:not(.bottom) {
           padding-left: 8px;
         }
       }

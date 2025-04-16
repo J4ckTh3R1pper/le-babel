@@ -26,6 +26,12 @@ public class CategoryMember {
     @EmbeddedId
     private CategoryMemberId id = new CategoryMemberId(); // 不初始化id会造成NPE
 
+    public CategoryMember(PostCategory category, User user, Role role) {
+        this.category = category;
+        this.user = user;
+        this.role = role;
+    }
+
     @MapsId("categoryId")
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

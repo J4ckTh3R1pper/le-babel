@@ -1,4 +1,4 @@
-import {isArray, take, uniqBy} from "lodash";
+import {compact, filter, isArray, isEmpty, isNumber, remove, take, uniq, uniqBy} from "lodash";
 import {defineStore} from "pinia";
 import Cookies from "js-cookie";
 
@@ -11,10 +11,11 @@ const useRecentCategoryStore = defineStore(
         }),
         actions: {
             updateRecent(obj) {
+                // console.log(obj)
                 this.list.unshift(obj)
-                this.list = uniqBy(this.list, 'id')
-                if (this.list.size > 10) {
-                    this.list = take(this.list, 10)
+                this.list = compact(uniq(this.list))
+                if (this.list.size > 8) {
+                    this.list = take(this.list, 8)
                 }
                 writeRecent(this.list)
             }
@@ -23,12 +24,14 @@ const useRecentCategoryStore = defineStore(
 )
 
 function getRecent() {
-    let list = Cookies.get(cookiesKey)
-    return isArray(list) ? list : []
+    let string = Cookies.get(cookiesKey)
+    let obj = JSON.parse(isEmpty(string) ? '[]' : string)
+    let arr = isArray(obj) ? compact(obj) : []
+    return filter(arr, o => isNumber(o))
 }
 
 function writeRecent(list) {
-    Cookies.set(cookiesKey, list)
+    Cookies.set(cookiesKey, JSON.stringify(list))
 }
 
 export default useRecentCategoryStore

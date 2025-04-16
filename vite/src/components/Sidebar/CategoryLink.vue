@@ -1,41 +1,45 @@
 <template>
-  <el-tooltip placement="top">
-    <template #content>{{info}}</template>
-    <el-menu-item router="true" :index="url" >
-      <el-avatar :src="imgUrl"/>
-      <el-text>{{name}}</el-text>
+  <el-tooltip placement="top" :disabled="isEmpty(data.info)">
+    <template #content>{{data.info}}</template>
+    <el-menu-item @click="onClicked" :index="'category_link:${categoryId}'">
+      <el-avatar :src="data.avatar" class="avatar"/>
+      <el-text>{{data.name}}</el-text>
     </el-menu-item>
   </el-tooltip>
 </template>
 
 <script setup>
+import useCategoryCacheStore from "@/js/module/category_cache";
+import { isEmpty } from "lodash";
+import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import {useRoute, useRouter} from "vue-router";
 
-const route = useRoute()
 const router = useRouter()
 
-const {imgUrl, name, categoryId, info} = defineProps({
-  // route object
-  imgUrl: {
-    type: String,
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
+const store = useCategoryCacheStore()
+
+const {categoryId} = defineProps({
   categoryId: {
-    type: Number | String,
+    type: Number,
     required: true
   },
-  info: {
-    type: String,
-    required: true
-  }
 })
 
-const url = computed(() => {
-  return "/c/" + categoryId
+function onClicked() {
+  router.push({
+    name: 'category_index',
+    params: {
+      id: categoryId
+    }
 })
+}
+
+const data = await store.fetchCategory(categoryId)
 </script>
+
+<style scoped lang="scss">
+.avatar {
+  margin-right: 8px;
+}
+</style>

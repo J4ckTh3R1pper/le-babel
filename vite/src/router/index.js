@@ -1,52 +1,15 @@
-import Layout from "@/components/Layout.vue";
-import Login from "@/view/Login.vue"
-import Register from "@/view/Register.vue";
+import { createRouter, createWebHistory } from "vue-router";
+import constantRoutes from "./routes.js";
+import useRouteHistoryStore from "@/js/module/route_history.js";
 
-export const constantRoutes = [
-    {
-        path: '/login',
-        component: Login,
-        hidden: false,
-        meta: { title: '登录'}
-    },
-    {
-        path: '/register',
-        component: Register,
-        hidden: false,
-        meta: { title: '注册'}
-    },
-    {
-        path: '',
-        component: Layout,
-        redirect: '/index',
-        meta: {title: 'Le Babel'},
-        children: [
-            {
-                path: '',
-                component: () => import('@/view/Index.vue'),
-                name: 'Index',
-                meta: { title: '首页', icon: 'dashboard', affix: true }
-            },
-            {
-                path: '/postDetail/:id',
-                name: 'post_detail',
-                component: () => import('@/view/PostDetails.vue')
-            }
-        ]
-    },
-    // {
-    //     path: '/user',
-    //     component: Layout,
-    //     hidden: true,
-    //     redirect: 'noredirect',
-    //     children: [
-    //         {
-    //             path: 'profile',
-    //             component: () => import('@/views/system/user/profile/index'),
-    //             name: 'Profile',
-    //             meta: { title: '个人中心', icon: 'user' }
-    //         }
-    //     ]
-    // }
-]
-export default constantRoutes
+const router = createRouter({
+    history: createWebHistory(),
+    routes: constantRoutes
+})
+
+router.afterEach((to, from) => {
+    let historyStore = useRouteHistoryStore()
+    historyStore.update(to)
+})
+
+export default router

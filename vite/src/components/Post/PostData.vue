@@ -7,7 +7,7 @@
       <span class="comments">
         <el-icon><ChatDotSquare /></el-icon>{{commentCount}}
       </span>
-      <span class="like" :class="{'liked': liked}" @click="like">
+      <span class="like" :class="{'liked': liked}" @click.stop="like">
         <el-icon><StarFilled v-if="liked"/><Star v-else/></el-icon>{{likeCount}}
       </span>
     </span>
@@ -59,11 +59,11 @@ function like() {
           display: flex;
           border-radius: 16px;
           padding: 8px;
-
+          background-color: rgba(0, 0, 0, 0.048);
           align-items: center;
           justify-content: space-between;
           .el-icon {
-            margin-right: 4px;
+            margin-right: 8px;
           }
         }
         &:nth-child(n+2) {
@@ -81,7 +81,7 @@ function like() {
         border-color: rgb(255, 77, 77);
         background-color: rgb(255, 77, 77);
         &:hover {
-          color: black;
+          color: rgb(255, 77, 77);
         }
       }
     }

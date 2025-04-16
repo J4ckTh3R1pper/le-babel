@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {getUserCache,getMemberCache} from "@/js/api/user.js";
+import { isEmpty } from "lodash";
 
 const useUserCacheStore = defineStore(
     'user_cache',
@@ -9,47 +10,69 @@ const useUserCacheStore = defineStore(
             userMap: new Map()
         }),
         actions: {
-            async fetchUser(userId) {
-                let user;
-                if (!this.userMap.has(userId)) {
+            async fetchUser(userId, renew) {
+                return new Promise((resolve, reject) => {
+                    if (renew) return reject()
+                    if (this.userMap.has(userId)) {
+                        return resolve(this.userMap.get(userId))
+                    } else return reject(userId)
+                }).catch(async (userId) => {
+                    let user;
                     await getUserCache(userId).then(res => {
+                        if (isEmpty(res)) throw new Error()
                         user = res
                     }).catch(r => {
                         user = ghostUser
+                    }).finally(() => {
+                        this.userMap.set(userId, user)
                     })
-                    this.userMap.set(userId, user)
-                }
+                    return Promise.resolve(user)
+                })
             },
-            async fetchMember(categoryId, userId) {
-                let member;
-                if (!this.memberMap.has(categoryId))
-                    this.memberMap.set(categoryId, new Map());
-                if (!this.memberMap.get(categoryId).has(userId)) {
+            async fetchMember(categoryId, userId, renew) {
+                return new Promise((resolve, reject) => {
+                    if (renew) return reject()
+                    if (!this.memberMap.has(categoryId)) {
+                        this.memberMap.set(categoryId, new Map());
+                        return reject()
+                    }
+                    if (this.memberMap.get(categoryId).has(userId))
+                        return resolve(this.memberMap.get(categoryId).get(userId))
+                    return reject()
+                }).catch(async () => {
+                    let member;
                     await getMemberCache(categoryId, userId).then(res => {
-                        if (res == null)
-                            reject()
+                        if (isEmpty(res))
+                            throw new Error()
                         member = res
-                    }).catch(r => {
+                    }).catch(() => {
                         member = defaultMember
+                        // console.log(member)
                     }).finally(() => {
                         this.memberMap.get(categoryId).set(userId, member)
                     })
-                }
+                    return Promise.resolve(member)
+                })
             },
-        },
-        getters: {
-            getUserBriefView(state) {
-                return (categoryId, userId) => {
-                    const user = state.userMap.get(userId)
-                    const member = state.memberMap.get(categoryId, userId)
-                    return {
+            async fetchUserBriefView(categoryId, userId, renew) {
+                return this.fetchUser(userId, renew).then(async (user) => {
+                    let member = await this.fetchMember(categoryId, userId, renew)
+                    return Promise.resolve({
                         nickName: user.nickName,
                         headImgUrl: user.headImgUrl,
                         location: user.location,
                         role: member.role,
                         level: member.experience / 100,
                         title: member.title
-                    }
+                    })
+                })
+            }
+        },
+        getters: {
+            getUserBriefView(state) {
+                return (categoryId, userId) => {
+                    const user = state.userMap.get(userId)
+                    const member = state.memberMap.get(categoryId, userId)
                 }
             }
         }

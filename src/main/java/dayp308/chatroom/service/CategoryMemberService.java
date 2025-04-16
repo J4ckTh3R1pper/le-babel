@@ -19,6 +19,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class CategoryMemberService {
@@ -48,16 +49,20 @@ public class CategoryMemberService {
 
     public CategoryMemberId addMember(PostCategory category, User user, @Nullable Role role) {
         checkAvailability(category);
-        if (categoryMemberRepository.findById(
+        Optional<CategoryMember> member = categoryMemberRepository.findById(
                 new CategoryMemberId(category.getId(), user.getId())
-        ).isPresent()) throw new EntityExistsException("User has already joined");
+        );
+        if (member.isPresent()) {
+            if (member.get().getRole() == Role.GUEST)
+                member.get().setRole(role);
+            else if (member.get().getRole() == Role.SUBSCRIBER)
+                member.get().setRole(Role.GUEST);
+            return categoryMemberRepository.saveAndFlush(member.get()).getId();
+        } else {
+            CategoryMember newMember = new CategoryMember(category, user, role);
+            return categoryMemberRepository.saveAndFlush(newMember).getId();
+        }
 
-        CategoryMember member = new CategoryMember();
-        member.setCategory(category);
-        member.setUser(user);
-        if (role != null) member.setRole(role);
-
-        return categoryMemberRepository.saveAndFlush(member).getId();
     }
 
     public void setUserRole(PostCategory category, User user, Role role) {

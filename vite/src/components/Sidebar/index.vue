@@ -47,6 +47,7 @@ const width = computed(() => {
           active-text-color="#C79457"
           :collapse="!sidebar.opened"
           :collapse-transition="true"
+          :default-openeds="['recent_category']"
           mode="vertical"
         >
           <RecentCategory />
@@ -93,6 +94,7 @@ const width = computed(() => {
   .open-button {
     position: absolute;
     transition: all var(--el-transition-duration) var(--el-transition-function-ease-in-out-bezier);
+    // transition: inherit;
     top: 80px;
     z-index: 99;
     color:black;

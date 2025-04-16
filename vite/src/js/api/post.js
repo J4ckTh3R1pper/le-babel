@@ -1,11 +1,13 @@
 import service from "@/js/utils/request.js"
 
-export function getPostDetails(id) {
+export async function getPostDetails(id) {
     return service.get(
         "/no_auth/post/thread", {
             params: {
                 id: id
             }
+        }).then(res => {
+            return Promise.resolve(res)
         })
 }
 

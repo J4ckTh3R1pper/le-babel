@@ -9,7 +9,7 @@ const useLoginUserStore = defineStore(
     {
         state: () => ({
             token: getToken(),
-            id: null,
+            userId: null,
             nickName: null,
             headImgUrl: defaultAvatar,
             location: null,
@@ -40,7 +40,7 @@ const useLoginUserStore = defineStore(
                         if (!isHttp(avatar)) {
                             avatar = (isEmpty(avatar)) ? defaultAvatar : '/api' + avatar
                         }
-                        this.id = user.id
+                        this.userId = user.id
                         this.nickName = user.nickName
                         this.headImgUrl = avatar
                         this.location = user.location

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dayp308.chatroom.entity.category.CategoryDTO;
 import dayp308.chatroom.entity.category.CategoryMinimal;
+import dayp308.chatroom.entity.category.PostCategory;
 import dayp308.chatroom.entity.category.PostCategory_;
 import dayp308.chatroom.entity.enums.Role;
 import dayp308.chatroom.entity.id.CategoryMemberId;
@@ -27,6 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,6 +82,12 @@ public class CategoryController {
 
     }
 
+    @GetMapping("/api/no_auth/category/get_cache")
+    public CategoryMinimal getMinimal(@RequestParam("id") int id) {
+        return categoryRepository.findById(id, CategoryMinimal.class);
+    }
+    
+
     @PostMapping("/api/category/create_request")
     public ResponseEntity<Integer> createCategoryRequest(
             @RequestParam CategoryCreationForm form,
@@ -89,13 +97,13 @@ public class CategoryController {
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @PostMapping("/api/category/join_category")
-    public ResponseEntity<Integer> joinCategory(Authentication auth,
-                                               int categoryId) {
+    @PutMapping("/api/category/join_category")
+    public ResponseEntity<CategoryMemberId> joinCategory(Authentication auth,
+                                               @RequestParam("id") PostCategory category) {
         User user = (User) auth.getPrincipal();
         CategoryMemberId id = categoryMemberService.addMember(
-                categoryRepository.getReferenceById(categoryId), user, Role.SUBSCRIBER);
-        return new ResponseEntity<>(id.getCategoryId(), HttpStatus.OK);
+                category, user, Role.SUBSCRIBER);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     @GetMapping("/api/category/get_joined_category")

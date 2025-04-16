@@ -12,17 +12,21 @@ const route = useRoute()
 const router = useRouter()
 
 const loginUserStore = useLoginUserStore()
-const {token, id, nickName, headImgUrl, location, roles} = storeToRefs(loginUserStore)
+const {token, userId, nickName, headImgUrl, location, roles} = storeToRefs(loginUserStore)
 
 if (!isEmpty(token))
   loginUserStore.getInfo()
 
 function getUserRoute() {
   let url;
-  if (id.value == null || id.value == undefined)
+  if (isNumber(userId.value))
     url = "/login"
-  else url = "/userInfo/" + id.value
+  else url = "/userInfo/" + userId.value
   router.push(url)
+}
+
+function logoClicked() {
+  router.push({name: 'index'})
 }
 
 function handleCommand(command) {
@@ -34,7 +38,7 @@ function handleCommand(command) {
 <template>
   <div class="header">
     <span class="left">
-      <span class="logo">
+      <span class="logo" @click="logoClicked">
         <img src="/icon.png" width="32px" height="32px">
         <span>Le Babel</span>
       </span>
@@ -45,8 +49,8 @@ function handleCommand(command) {
         <el-avatar class="avatar" :src="headImgUrl"/>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="profile">{{ !isNumber(id) ? '登录' : '个人主页' }}</el-dropdown-item>
-            <el-dropdown-item v-if="isNumber(id)" command="logOut">登出</el-dropdown-item>
+            <el-dropdown-item command="profile">{{ !isNumber(userId) ? '登录' : '个人主页' }}</el-dropdown-item>
+            <el-dropdown-item v-if="isNumber(userId)" command="logOut">登出</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -72,6 +76,7 @@ function handleCommand(command) {
     }
     .logo {
       display: flex;
+      cursor: pointer;
       align-items: center;
       font-family: 'Montserrat';
       font-weight: 800;

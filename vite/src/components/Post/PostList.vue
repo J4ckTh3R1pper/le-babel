@@ -1,12 +1,12 @@
 <template>
-<el-select v-model="sort">
-    <el-option v-for="i in sortings"
-        :value="i.value"
-        :label="i.label"
-        :key="i.label"
-    ></el-option>
-</el-select>
 <div class="post-list">
+    <el-select v-model="sort" class="sort">
+        <el-option v-for="i in sortings"
+            :value="i.value"
+            :label="i.label"
+            :key="i.label"
+        />
+    </el-select>
     <ul v-infinite-scroll="load" 
         :infinite-scroll-delay="500"
         :infinite-scroll-immediate="false"
@@ -14,8 +14,7 @@
         class="list"
     >
         <li v-for="i in list" :key="i.id">
-            <Suspense>
-                <PostBriefView
+            <PostBriefView
                     :post-id="i.id"
                     :title="i.title"
                     :user-id="i.userId"
@@ -30,14 +29,14 @@
                     :thumbnails="i.thumbnails"
                     :liked="i.liked"
                     :show-category="showCategory"
-                />
-            </Suspense>
+            />
         </li>
         <li>
             <div class="loading" v-loading="loading">
                 <span class="empty">已经到底了</span>
             </div>
         </li>
+        <el-divider/>
     </ul>
 </div>
 </template>
@@ -65,31 +64,36 @@ const sortings = [
 ]
 const sort = ref(sortings[0].value)
 const page = ref(1)
-const {categoryId, size} = defineProps({
+const {categoryId, size, showCategory} = defineProps({
     categoryId: Number,
     size: Number,
+    showCategory: Boolean
 })
 const disabled = ref(false)
 const list = ref([])
 const loading = ref(false)
 const lastPage = ref(false)
-const showCategory = !isNumber(categoryId)
 
 watch(sort, async () => {
     list.value = []
     page.value = 1
     load()
-}, { immediate: true })
+}, {} )
 
+watch(() => categoryId, async() => {
+    list.value = []
+    page.value = 1
+    load()
+}, { immediate: true, deep: true})
 
 function load() {
     loading.value = true
     getPostSlice(categoryId, page.value, size, sort.value+',desc').then(res => {
-        let slice = res
-        if (!slice["empty"]) {
-            list.value = list.value.concat(slice.content)
+        if (!res["empty"]) {
+            list.value = list.value.concat(res.content)
             page.value += 1
             lastPage.value = false
+            // console.log(res)
         } else lastPage.value = true
     }).catch(() => {
         disabled.value = true
@@ -102,6 +106,10 @@ function load() {
 </script>
 
 <style scoped lang="scss">
+.sort {
+    margin-bottom: 1em;
+}
+
 .post-list {
     height: 100%;
     overflow: hidden;
@@ -111,6 +119,7 @@ function load() {
     overflow-y: scroll;
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .loading {
