@@ -21,8 +21,10 @@ import BackButton from '@/components/Category/BackButton.vue';
 import PostDetailedView from '@/components/Post/PostDetailedView.vue';
 import { getPostDetails } from '@/js/api/post';
 import useRecentCategoryStore from '@/js/module/recent_category';
+import useRecentPostStore from '@/js/module/recent_post';
 import useRouteHistoryStore from '@/js/module/route_history';
 import { find, initial, isEmpty, isUndefined } from 'lodash';
+import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -31,24 +33,29 @@ const route = useRoute()
 
 const recentCategory = useRecentCategoryStore()
 const routeHistory = useRouteHistoryStore()
+const recentPost = useRecentPostStore()
 
-const {updateRecent} = recentCategory
-const {historyList} = routeHistory
+const {historyList} = storeToRefs(routeHistory)
 
 const id = ref(Number(route.params['id']))
 const data = ref(await getPostDetails(id.value))
-updateRecent(data.value.categoryId)
+recentCategory.updateRecent(data.value.categoryId)
+recentPost.updateRecent(id.value)
 
-const isFirstTime = () => isUndefined( find( historyList.value, o =>
-        o.name == 'post_detail' && o.params['id'] != route.params['id']
-))
+const isFirstTime = computed(() => isUndefined( find( historyList.value, o =>
+        o.name == 'post_detail' && o.params['id'] == id.value
+)))
 
-watch(route, async () => {
-    if ( route.name == 'post_detail' )
-        id.value = Number(route.params['id'])
-    if (isFirstTime()) {
-        data.value = await getPostDetails(id.value)
-        updateRecent(data.value.categoryId)
+watch(route, async (newRoute) => {
+    if ( newRoute.name == 'post_detail' ) {
+        console.log(isFirstTime.value)
+        id.value = Number(newRoute.params['id'])
+        if (isFirstTime.value) {
+            console.log(isFirstTime.value)
+            data.value = await getPostDetails(id.value)
+            recentCategory.updateRecent(data.value.categoryId)
+            recentPost.updateRecent(id.value)
+        }
     }
 })
 

@@ -1,5 +1,9 @@
 <template>
-<div class="post-list">
+<div class="post-list"
+               v-infinite-scroll="load"
+               :infinite-scroll-delay="500"
+               :infinite-scroll-immediate="false"
+>
     <el-select v-model="sort" class="sort">
         <el-option v-for="i in sortings"
             :value="i.value"
@@ -7,13 +11,9 @@
             :key="i.label"
         />
     </el-select>
-    <ul v-infinite-scroll="load" 
-        :infinite-scroll-delay="500"
-        :infinite-scroll-immediate="false"
-        :infinite-scroll-disabled="disabled"
-        class="list"
+    <ul class="list"
     >
-        <li v-for="i in list" :key="i.id">
+        <li v-for="i in list" :key="i.id" @load-list="load">
             <PostBriefView
                     :post-id="i.id"
                     :title="i.title"
@@ -112,11 +112,11 @@ function load() {
 
 .post-list {
     height: 100%;
-    overflow: hidden;
+    overflow: scroll;
+    padding-bottom: 0;
 }
 .list {
-    height: 100%;
-    overflow-y: scroll;
+    overflow-y: visible;
     list-style: none;
     padding: 0;
     margin: 0;

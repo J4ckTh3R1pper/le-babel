@@ -22,13 +22,13 @@ public class MarkdownUtil {
         return renderer.render(document);
     }
 
-    public static List<String> getThumbnails(String markdown) {
+    public static List<String> getThumbnails(String markdown, int count) {
         List<String> urls = new ArrayList<>();
         Parser parser = Parser.builder().build();
         Visitor visitor = new ImageVisitor(urls);
         Node document = parser.parse(markdown);
         document.accept(visitor);
-        List<String> subList = urls.isEmpty() ? urls : urls.subList(0, Math.min(urls.size() - 1, 2));
+        List<String> subList = urls.isEmpty() ? urls : urls.subList(0, Math.min(urls.size(), count));
         return subList.stream().map(s ->
                 FilenameUtils.getPath(s) + "thumbnails/" +
                 FilenameUtils.getBaseName(s) +

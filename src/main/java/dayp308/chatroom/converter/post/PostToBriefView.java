@@ -40,12 +40,12 @@ public class PostToBriefView implements Converter<PostProjection, PostBriefView>
             throw new RuntimeException(e);
         }
         target.setContent(cropContent(source.content()));
-        target.setThumbnails(getThumbnails(source.content()));
+        target.setThumbnails(getThumbnails(source.content(), 3));
         return target;
     }
 
     public static String cropContent(String content) {
-        String[] splitted = MarkdownUtil.stripMarkdown(content).split("(\\r?\\n|<br/>)",2);
+        String[] splitted = MarkdownUtil.stripMarkdown(content).split("(\\r?\\n|<br/>|</p>)",2);
         return splitted[0].trim();
     }
 

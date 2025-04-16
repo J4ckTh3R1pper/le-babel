@@ -9,7 +9,7 @@ const router = createRouter({
 
 router.afterEach((to, from) => {
     let historyStore = useRouteHistoryStore()
-    historyStore.update(to)
+    historyStore.update(from)
 })
 
 export default router

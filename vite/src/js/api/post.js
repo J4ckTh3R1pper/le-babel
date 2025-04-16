@@ -24,6 +24,17 @@ export function getPostSlice(categoryId, pageNum, pageSize, sort) {
     )
 }
 
+export async function getPostMinimalList(ids) {
+    return service.get("/no_auth/post/get_minimal_list", {
+        params: {
+            ids: ids
+        },
+        paramsSerializer: {
+            indexes: null
+        }
+    })
+}
+
 export function likePost(postId) {
     return service.put("/post/like?id=" + postId)
 }

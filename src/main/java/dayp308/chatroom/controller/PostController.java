@@ -22,6 +22,9 @@ import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -33,6 +36,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import dayp308.chatroom.entity.view.post.*;
 
 @RestController
 public class PostController {
@@ -155,4 +161,11 @@ public class PostController {
         if (user != null) view.setViewCount(postService.increaseViewCount(id, 1));
         return new ResponseEntity<>(view, HttpStatus.OK);
     }
+    @GetMapping("/api/no_auth/post/get_minimal_list")
+    public List<PostMinimalView> getMinimalList(@RequestParam("ids") List<Long> ids) {
+        System.out.println(ids);
+        return postService.getPostMinimalViewList(ids);
+    }
+    
+
 }

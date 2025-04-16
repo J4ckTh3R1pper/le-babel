@@ -14,6 +14,8 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder.Case;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -86,7 +88,36 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
     }
 
     @Override
-    public Slice<PostProjection> findAllProjById(
+    public List<PostProjection> findAllProjByIds(List<Long> ids) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<PostProjection> cq = cb.createQuery(PostProjection.class);
+        Root<Post> root = cq.from(Post.class);
+        Selection<Long> likeCount = cb.countDistinct(
+                root.join(Post_.USERS_LIKED, JoinType.LEFT)
+        ).alias("likeCount");
+        Selection<Long> commentCount = cb.countDistinct(
+                root.join(Post_.COMMENTS, JoinType.LEFT)
+        ).alias("commentCount");
+        buildQuery(root, cq, cb, null, likeCount, commentCount);
+
+
+        // ids.forEach(i -> orders.add(cb.asc(cb.selectCase().when(cb.equal(root.get(Post_.ID), i), i).otherwise(ids.size()))));
+        if (ids != null && !ids.isEmpty()) {
+            Case selectCase = cb.selectCase();
+            for (int i=0; i<ids.size();++i ) {
+                selectCase.when(cb.equal(root.get(Post_.ID), ids.get(i)), i);
+            }
+            Order order = cb.asc(selectCase);
+            selectCase.otherwise(ids.size());
+            cq.orderBy(order);
+        }
+        cq.where(root.get(Post_.ID).in(ids));
+        cq.groupBy(root.get(Post_.ID));
+        return em.createQuery(cq).getResultList();
+    }
+
+    @Override
+    public Slice<PostProjection> findAllProj(
             @Nullable Integer categoryId,
             @Nullable User user,
             boolean visibleOnly,

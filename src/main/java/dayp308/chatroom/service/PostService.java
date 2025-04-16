@@ -19,6 +19,7 @@ import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.view.comment.CommentUtil;
 import dayp308.chatroom.entity.view.post.PostBriefView;
 import dayp308.chatroom.entity.view.post.PostDetailedView;
+import dayp308.chatroom.entity.view.post.PostMinimalView;
 import dayp308.chatroom.entity.view.comment.CommentBriefView;
 import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.exception.CategoryDeletedException;
@@ -126,6 +127,24 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public PostMinimalView getPostMinimalView(long id) {
+        PostProjection post = postRepository.findProjById(id, null);
+        PostMinimalView view = conversionService.convert(post, PostMinimalView.class);
+        return view;
+    }
+
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public List<PostMinimalView> getPostMinimalViewList(List<Long> ids) {
+        List<PostProjection> posts = postRepository.findAllProjByIds(ids);
+        Object views = conversionService.convert(posts,
+            TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostProjection.class)),
+            TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostMinimalView.class))
+        );
+        return (List<PostMinimalView>) views;
+    }
+    
+    @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
     public Slice<PostBriefView> getPostSlice(
             @Nullable Integer categoryId,
@@ -133,7 +152,7 @@ public class PostService {
             Pageable pageable,
             boolean visibleOnly
     ) {
-        Slice<PostProjection> slice = postRepository.findAllProjById(categoryId, user, visibleOnly, pageable);
+        Slice<PostProjection> slice = postRepository.findAllProj(categoryId, user, visibleOnly, pageable);
         Object views = conversionService.convert(slice.getContent(),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostProjection.class)),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostBriefView.class))

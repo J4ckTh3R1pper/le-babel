@@ -5,6 +5,7 @@ import Header from "@/components/Header"
 import useAppStore from "@/js/module/app";
 import { storeToRefs } from "pinia";
 import "element-plus/theme-chalk/display.css"
+import RecentPost from "@/components/Post/RecentPost.vue";
 
 const appStore = useAppStore()
 const {sidebar} = storeToRefs(appStore)
@@ -18,48 +19,51 @@ const {sidebar} = storeToRefs(appStore)
     </el-header>
     <el-container class="container">
       <Sidebar/>
-      <el-main>
+      <el-main class="main-wrapper">
         <suspense>
           <router-view v-slot="{ Component }">
-            <keep-alive :include="['Index', 'PostDetails', 'CategoryIndex']">
+            <keep-alive :include="['Index', 'PostDetail', 'CategoryIndex']">
               <component :is="Component"></component>
             </keep-alive>
           </router-view>
         </suspense>
       </el-main>
-      <el-aside class="hidden-sm-and-down">
+      <el-aside class="side-card hidden-sm-and-down" width="400px">
         <!-- TODO: 放置侧边卡片 -->
+         <component :is="RecentPost"></component>
       </el-aside>
     </el-container>
   </el-container>
 </template>
 
 <style scoped lang="scss">
-@import "@/assets/styles/mixin.scss";
-@import "@/assets/styles/variables.module.scss";
 
 .app-wrapper {
-  @include clearfix;
   position: relative;
   height: 100%;
   width: 100%;
-  overflow-y: hidden;
+  overflow-y: visible;
 
   &.mobile.openSidebar {
     position: fixed;
     top: 0;
   }
+  // @include clearfix;
 }
 
 .container {
-  height: 100%;
-}
-
-.el-main {
+  height: calc(100% - 50px);
   padding-bottom: 0;
-  overflow: hidden;
 }
 
+.main-wrapper {
+  padding-bottom: 0;
+  overflow-y: visible;
+}
+.side-card {
+  padding: 20px 0px;
+  padding-right: 20px;
+}
 .header-wrapper {
   display: flex;
   flex-direction: row;
@@ -67,4 +71,6 @@ const {sidebar} = storeToRefs(appStore)
   align-items: stretch;
   padding: 0;
 }
+// @import "@/assets/styles/mixin.scss";
+// @import "@/assets/styles/variables.module.scss";
 </style>

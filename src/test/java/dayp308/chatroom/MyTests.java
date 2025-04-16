@@ -187,7 +187,7 @@ class MyTests {
     @Test
     void testPostBriefSlice() {
         User user = userRepository.getReferenceById(135L);
-        Slice<PostProjection> slice = postRepository.findAllProjById(2, user,true, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, Post_.LAST_UPDATE_TIME)));
+        Slice<PostProjection> slice = postRepository.findAllProj(2, user,true, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, Post_.LAST_UPDATE_TIME)));
         System.out.println(slice.getContent());
     }
 }

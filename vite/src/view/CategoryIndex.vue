@@ -70,6 +70,7 @@ async function subscribe() {
 </script>
 
 <template>
+    <div class="category-index">
     <div class="header">
         <span class="left">
             <el-avatar class="avatar" :src="avatar"/>
@@ -86,9 +87,14 @@ async function subscribe() {
         :category-id="categoryId"
         :size="15"
     />
+    </div>
 </template>
 
 <style lang="scss" scoped>
+.category-index {
+    height: calc(100% - 50px);
+    overflow-y: hidden;
+}
 .header {
     display: flex;
     flex-direction: row;

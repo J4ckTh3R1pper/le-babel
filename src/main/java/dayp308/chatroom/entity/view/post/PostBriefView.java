@@ -3,7 +3,6 @@ package dayp308.chatroom.entity.view.post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
