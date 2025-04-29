@@ -56,7 +56,7 @@ public class SecurityConfiguration {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> {
-            web.ignoring().requestMatchers("/api/images/**");
+            web.ignoring().requestMatchers("/api/images/**", "/error", "/upload/**");
         };
     }
 
@@ -76,9 +76,9 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling( e -> {
-                    // e.disable();
-                    e.accessDeniedPage(null)
-                            .authenticationEntryPoint(authenticationEntryPoint());
+                    e.disable();
+                    // e.accessDeniedPage(null)
+                    //         .authenticationEntryPoint(authenticationEntryPoint());
                 })
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

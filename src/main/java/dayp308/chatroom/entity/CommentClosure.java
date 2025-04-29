@@ -1,5 +1,7 @@
 package dayp308.chatroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import dayp308.chatroom.entity.comment.PostComment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -12,13 +14,15 @@ import lombok.Setter;
 @Table(name = "comment_closure")
 public class CommentClosure {
     @EmbeddedId
-    private CommentClosureId id;
+    private CommentClosureId id = new CommentClosureId();
 
+    @JsonIgnore
     @MapsId("ancestor")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ancestor", nullable = false)
     private PostComment ancestor;
 
+    @JsonIgnore
     @MapsId("descendant")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "descendant", nullable = false)
@@ -26,6 +30,6 @@ public class CommentClosure {
 
     @NotNull
     @Column(name = "depth", nullable = false)
-    private Byte depth;
+    private Long depth;
 
 }

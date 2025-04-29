@@ -108,10 +108,4 @@ public class UserService {
         return user.getId();
     }
 
-    public UserDTO updateUser(User user) {
-        userRepository.saveAndFlush(user);
-        return userRepository.findById(user.getId(), UserDTO.class);
-    }
-
-
 }

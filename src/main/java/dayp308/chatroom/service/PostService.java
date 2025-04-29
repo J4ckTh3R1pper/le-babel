@@ -17,23 +17,27 @@ import dayp308.chatroom.entity.post.Post;
 import dayp308.chatroom.entity.post.PostIdOnly;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.view.comment.CommentUtil;
+import dayp308.chatroom.entity.view.comment.CommentView;
 import dayp308.chatroom.entity.view.post.PostBriefView;
 import dayp308.chatroom.entity.view.post.PostDetailedView;
 import dayp308.chatroom.entity.view.post.PostMinimalView;
-import dayp308.chatroom.entity.view.comment.CommentBriefView;
-import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.exception.CategoryDeletedException;
 import dayp308.chatroom.exception.CategoryMutedException;
 import dayp308.chatroom.exception.CategoryPendingException;
 import dayp308.chatroom.exception.UserMutedException;
 import dayp308.chatroom.repository.*;
+import dayp308.chatroom.repository.listener.CommentCreateEvent;
 import dayp308.chatroom.repository.projection.CommentProjection;
 import dayp308.chatroom.repository.projection.PostProjection;
 import dayp308.chatroom.repository.specification.CommentSpecs;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityExistsException;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.*;
@@ -46,6 +50,8 @@ import java.util.*;
 @Service
 public class PostService {
 
+    private final CommentClosureRepository commentClosureRepository;
+
     private final PostRepository postRepository;
     private final CategoryService categoryService;
     private final UserService userService;
@@ -57,9 +63,10 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentUtil commentUtil;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public PostService(PostRepository postRepository, CategoryService categoryService, UserService userService, ConversionService conversionService, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository, CategoryMemberRepository categoryMemberRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, CommentUtil commentUtil) {
+    public PostService(PostRepository postRepository, CategoryService categoryService, UserService userService, ConversionService conversionService, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository, CategoryMemberRepository categoryMemberRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, CommentUtil commentUtil, CommentClosureRepository commentClosureRepository, ApplicationEventPublisher eventPublisher) {
         this.postRepository = postRepository;
         this.categoryService = categoryService;
         this.userService = userService;
@@ -71,6 +78,8 @@ public class PostService {
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
         this.commentUtil = commentUtil;
+        this.commentClosureRepository = commentClosureRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -174,15 +183,9 @@ public class PostService {
      * @return 返回给前端的View对象
      */
     @Transactional(readOnly = true)
-    public CommentDetailedView getCommentDetailedView(long commentId, @Nullable User user) {
+    public CommentView getCommentDetailedView(long commentId, @Nullable User user) {
         CommentProjection projection = commentRepository.findProjectionById(commentId, user == null ? null : user.getId());
-        CommentDetailedView view = commentUtil.getCommentDetailedView(projection, user);
-        return view;
-    }
-
-    @Transactional(readOnly = true)
-    public CommentBriefView getCommentBriefView(CommentProjection comment, @Nullable User user) {
-        CommentBriefView view = commentUtil.getCommentBriefView(comment, user);
+        CommentView view = commentUtil.getCommentDetailedView(projection, user);
         return view;
     }
 
@@ -194,17 +197,17 @@ public class PostService {
      * @return 分页视图对象
      */
     @Transactional(readOnly = true)
-    public Slice<CommentBriefView> getBriefCommentSliceByPost(
+    public Slice<CommentView> getBriefCommentSliceByPost(
             Post post, @Nullable User user, Pageable pageable) {
-        Slice<CommentProjection> projections = commentRepository.findProjectionsByPostId(
-                post.getId(), user == null ? null : user.getId(), pageable);
-        List<CommentBriefView> views = projections.getContent().stream().map(
+        Slice<CommentProjection> projections = commentRepository.findAllProjByPostId(post.getId(), user, pageable, true);
+        List<CommentView> views = projections.getContent().stream().map(
                 c -> commentUtil.getCommentBriefView(c, user)
         ).toList();
         return new SliceImpl<>(views, pageable, projections.hasNext());
     }
 
     @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
     public List<CommentDTO> getCommentsByPostId(long id) {
         Post post = postRepository.getReferenceById(id);
         PageRequest pageRequest = PageRequest.of(0, 25);
@@ -240,20 +243,23 @@ public class PostService {
     @Transactional
     public CommentDTO addComment(@NotNull CommentCreationForm form, User user) {
         PostComment comment = conversionService.convert(form, PostComment.class);
-        Post post = postRepository.getReferenceById(form.getPostId());
+        Post post = comment.getPost();
         PostCategory category = post.getCategory();
         checkAvailability(category);
         CategoryMember membership = categoryMemberRepository.findById(new CategoryMemberId(category.getId(), user.getId())).orElse(null);
         membership = checkAndCreateMembership(user, post, membership);
         checkMute(category, membership);
         comment.setUser(user);
-        commentRepository.saveAndFlush(comment);
+        commentRepository.save(comment);
+        eventPublisher.publishEvent(new CommentCreateEvent(comment));
         if ( membership.getRole().ordinal() > 0 ) {
             membership.setExperience(membership.getExperience() + 3);
             categoryMemberRepository.saveAndFlush( membership );
         }
         post.setLastUpdateTime(Instant.now());
         postRepository.saveAndFlush(post);
+        commentRepository.flush();
+        commentClosureRepository.flush();
         return commentRepository.findById(comment.getId(), CommentDTO.class).orElseThrow();
     }
 
@@ -287,4 +293,5 @@ public class PostService {
         }
         return membership;
     }
+
 }

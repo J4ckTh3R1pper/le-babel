@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dayp308.chatroom.entity.category.CategoryDTO;
 import dayp308.chatroom.entity.category.CategoryMinimal;
+import dayp308.chatroom.entity.category.CategoryProjection;
 import dayp308.chatroom.entity.category.PostCategory;
 import dayp308.chatroom.entity.category.PostCategory_;
 import dayp308.chatroom.entity.enums.Role;
@@ -65,11 +66,8 @@ public class CategoryController {
     }
 
     @GetMapping("/api/no_auth/category/get_info")
-    public ResponseEntity<CategoryDTO> getCategoryInfo(@RequestParam("id") int id) {
-        return new ResponseEntity<>(
-            categoryRepository.findById(id, CategoryDTO.class),
-            HttpStatus.OK
-        );
+    public CategoryProjection getCategoryInfo(@RequestParam("id") int id) {
+        return categoryRepository.findProjectionById(id);
     }
 
     @GetMapping("/api/no_auth/category/get_member")

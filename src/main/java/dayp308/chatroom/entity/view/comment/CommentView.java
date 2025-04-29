@@ -1,25 +1,36 @@
 package dayp308.chatroom.entity.view.comment;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
 @Component
-public class CommentView {
+public class CommentView implements Serializable {
     protected Long id;
     protected Long postId;
     protected Long userId;
+    protected Integer categoryId;
     protected String commentBody;
     protected Instant createTime;
     protected Long likeCount;
     protected Boolean liked;
+    protected Long parentCommentId;
+    @Setter(AccessLevel.NONE)
+    protected Long childCount;
+    protected List<CommentView> children = new ArrayList<>();
 
     protected CommentView(){}
 
@@ -29,21 +40,19 @@ public class CommentView {
         return Objects.equals(id, that.id);
     }
 
+    public void setChildCount(Long childCount) {
+        this.childCount = Math.max(childCount - 1, 0);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
     }
 
-    public CommentBriefView getBriefView() {
-        CommentBriefView target = new CommentBriefView();
-        BeanUtils.copyProperties(this, target);
-        return target;
+    public void dfs(Consumer<CommentView> function) {
+        this.children.forEach(child -> {
+            function.accept(child);
+            child.dfs(function);
+        });
     }
-
-    public CommentDetailedView getDetailedView() {
-        CommentDetailedView target = new CommentDetailedView();
-        BeanUtils.copyProperties(this, target);
-        return target;
-    }
-
 }

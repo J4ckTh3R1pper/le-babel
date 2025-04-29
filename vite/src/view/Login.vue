@@ -49,7 +49,7 @@ function handleLogin() {
         if (valid) {
           loading.value = true;
 
-          userStore.login(loginForm.value).then(() => {
+          userStore.login(loginForm.value).then(async () => {
             const query = route.query;
             const otherQueryParams = Object.keys(query).reduce((acc, cur) => {
               if (cur !== "redirect") {

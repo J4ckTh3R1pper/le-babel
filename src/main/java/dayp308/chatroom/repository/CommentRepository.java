@@ -28,6 +28,7 @@ public interface CommentRepository extends JpaRepository<PostComment, Long>, Cus
             c.id as id,
             c.post.id as postId,
             c.user.id as userId,
+            c.post.category.id as categoryId,
             c.commentBody as commentBody,
             c.createTime as createTime,
             c.isDeleted as isDeleted,

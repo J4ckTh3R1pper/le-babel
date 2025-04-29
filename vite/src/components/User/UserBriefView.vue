@@ -27,7 +27,7 @@ const userCacheStore = useUserCacheStore()
 const user = ref(await userCacheStore.fetchUserBriefView(categoryId, userId))
 
 watchEffect(() => {
-  avatar = isEmpty(user.headImgUrl) ? defaultAvatar : '/api' + user.headImgUrl
+  avatar = isEmpty(user.value.headImgUrl) ? defaultAvatar : '/api' + user.value.headImgUrl
 })
 
 const avatarStyle = computed(() => ({
@@ -42,10 +42,13 @@ const avatarStyle = computed(() => ({
     <el-avatar class="avatar" :src="avatar" :size=" full ? 50 : 25" :style="avatarStyle"/>
     <span class="data">
       <span class="top">
-        <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == '3' ? '版主' : user.role == '2' ? '管理员' : '' }}</span>
+        <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == 3 ? '版主' : user.role == 2 ? '管理员' : '' }}</span>
         <el-link class="nickname" :href="`/userInfo?id=${userId}`">{{user.nickName}}</el-link>
-        <span v-if="user.role > 0" class="level">{{'Lv.' + user.level}}</span>
-        <span v-if="isEmpty(user.title)" class="title">{{user.title}}</span>
+        <span v-if="user.role > 0" >
+          <el-divider direction="vertical" border-style="dashed"/>
+          <el-text class="level">{{'Lv.' + user.level}}</el-text>
+        </span>
+        <el-text v-if="isEmpty(user.title)" class="title">{{user.title}}</el-text>
       </span>
       <span v-if="full" class="bottom">
         <span class="location">{{user.location}}</span>
@@ -82,4 +85,5 @@ const avatarStyle = computed(() => ({
     background-color: #1E90FF;
     color: #FFFFFF;
   }
+  
 </style>

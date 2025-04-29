@@ -15,8 +15,6 @@ import dayp308.chatroom.entity.post.Post_;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.entity.user.UserDetailedProj;
-import dayp308.chatroom.entity.view.comment.CommentBriefView;
-import dayp308.chatroom.entity.view.comment.CommentDetailedView;
 import dayp308.chatroom.repository.*;
 import dayp308.chatroom.repository.projection.PostProjection;
 import dayp308.chatroom.service.CategoryMemberService;
@@ -147,12 +145,6 @@ class MyTests {
                 ***
                 """;
         System.out.println(PostToBriefView.cropContent(md));
-    }
-
-    @Test
-    void testCommentTree() {
-        CommentDetailedView view = postService.getCommentDetailedView(32, null);
-        System.out.println(view.toString());
     }
 
     @Test

@@ -5,16 +5,16 @@ const cookiesKey = 'recentPost'
 
 const useRecentPostStore = defineStore('recent_post', {
     state: () => ({
-        list: getRecent()
+        postList: getRecent()
     }),
     actions: {
         updateRecent(obj) {
-            this.list.unshift(obj)
-            this.list = compact(uniq(this.list))
-            if (this.list.size > 10) {
-                this.list = take(this.list, 10)
+            this.postList.unshift(obj)
+            this.postList = compact(uniq(this.postList))
+            if (this.postList.size > 10) {
+                this.postList = take(this.postList, 10)
             }
-            writeRecent(this.list)
+            writeRecent(this.postList)
         }
     }
 })

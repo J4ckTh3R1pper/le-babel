@@ -22,6 +22,14 @@ public class CommentClosureId implements java.io.Serializable {
     @Column(name = "descendant", nullable = false)
     private Long descendant;
 
+    public CommentClosureId() {
+    }
+
+    public CommentClosureId(long ancestor, long descendant) {
+        this.ancestor = ancestor;
+        this.descendant = descendant;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -4,17 +4,17 @@ import java.time.Instant;
 
 public interface PostDTO {
     Long getId();
-    PublishUser getPublishUser();
+    User getUser();
     String getTitle();
     String getContent();
     Category getCategory();
     Byte getStatus();
-    Long getViews();
+    Long getViewCount();
     Instant getLastUpdateTime();
     Instant getCreateTime();
     String getTags();
 
-    interface PublishUser {
+    interface User {
         Long getId();
     }
 

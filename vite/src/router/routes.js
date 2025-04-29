@@ -5,12 +5,14 @@ import Register from "@/view/Register.vue";
 export const constantRoutes = [
     {
         path: '/login',
+        name: 'login',
         component: Login,
         hidden: false,
         meta: { title: '登录'}
     },
     {
         path: '/register',
+        name: 'register',
         component: Register,
         hidden: false,
         meta: { title: '注册'}
@@ -36,6 +38,11 @@ export const constantRoutes = [
                 path: '/category/:id',
                 name: 'category_index',
                 component: () => import('@/view/CategoryIndex.vue')
+            },
+            {
+                path: '/createPost/:id',
+                name: 'create_post',
+                component: () => import('@/view/CreatePost.vue')
             }
         ]
     },

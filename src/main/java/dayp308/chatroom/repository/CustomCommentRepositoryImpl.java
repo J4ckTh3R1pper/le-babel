@@ -1,5 +1,9 @@
 package dayp308.chatroom.repository;
 
+import dayp308.chatroom.entity.CommentClosure;
+import dayp308.chatroom.entity.CommentClosure_;
+import dayp308.chatroom.entity.category.PostCategory;
+import dayp308.chatroom.entity.category.PostCategory_;
 import dayp308.chatroom.entity.comment.PostComment;
 import dayp308.chatroom.entity.comment.PostComment_;
 import dayp308.chatroom.entity.enums.CommentOrderType;
@@ -17,24 +21,24 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.query.QueryUtils;
-import org.springframework.data.jpa.support.PageableUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     @PersistenceContext
     EntityManager em;
 
     private static void buildQuery(
-            Root<PostComment> root, CriteriaBuilder cb, CriteriaQuery<CommentProjection> cq, User user,
+            From<?, PostComment> root, CriteriaBuilder cb, CriteriaQuery<CommentProjection> cq, User user,
+            boolean filterDeleted,
             Selection<?>... additionalSelect
     ) {
         Join<PostComment, User> userJoin = root.join(PostComment_.USER, JoinType.LEFT);
         Join<PostComment, Post> postJoin = root.join(PostComment_.POST, JoinType.LEFT);
+        Join<Post, PostCategory> categoryJoin = postJoin.join(Post_.CATEGORY, JoinType.LEFT);
         Join<PostComment, PostComment> parentJoin = root.join(PostComment_.PARENT_COMMENT, JoinType.LEFT);
+        Join<PostComment, PostComment> descendants = root.join(PostComment_.DESCENDANTS, JoinType.INNER);
 
         Join<PostComment, User> currentUserLikeJoin = null;
         if (user != null) {
@@ -47,15 +51,23 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                         : cb.isNotNull(currentUserLikeJoin.get(User_.ID)), Boolean.TRUE
         ).otherwise(Boolean.FALSE);
 
+        Expression<Object> commentBody = cb.selectCase().when(
+                filterDeleted ? cb.isTrue(root.get(PostComment_.IS_DELETED)) : cb.disjunction()
+                , "[deleted]").otherwise(root.get(PostComment_.COMMENT_BODY));
+        
+        Expression<Long> childCount = cb.countDistinct(descendants);
+
         Selection<?>[] selections = new Selection[] {
                 root.get(PostComment_.ID).alias("id"),
                 postJoin.get(Post_.ID).alias("postId"),
                 userJoin.get(User_.ID).alias("userId"),
-                root.get(PostComment_.COMMENT_BODY).alias("commentBody"),
+                categoryJoin.get(PostCategory_.ID).alias("categoryId"),
+                commentBody.alias("commentBody"),
                 root.get(PostComment_.CREATE_TIME).alias("createTime"),
                 root.get(PostComment_.IS_DELETED).alias("isDeleted"),
                 parentJoin.get(PostComment_.ID).alias("parentCommentId"),
-                liked.alias("liked")
+                childCount.alias("childCount"),
+                liked.alias("liked"),
 
         };
         List<Selection<?>> selectionList = new ArrayList<>(Arrays.asList(selections));
@@ -65,13 +77,13 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     }
 
     @Override
-    public CommentProjection findProjById(long id, User user) {
+    public CommentProjection findProjById(long id, User user, boolean filterDeleted) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<CommentProjection> cq = cb.createQuery(CommentProjection.class);
         Root<PostComment> root = cq.from(PostComment.class);
         Join<PostComment, User> likeJoin = root.join(PostComment_.USERS_LIKED, JoinType.LEFT);
         Expression<Long> likeCount = cb.countDistinct(likeJoin);
-        buildQuery(root, cb, cq, user,
+        buildQuery(root, cb, cq, user, filterDeleted,
                 likeCount.alias("likeCount")
         );
         cq.where(cb.equal(root.get(PostComment_.ID), id)).groupBy(root.get(PostComment_.ID));
@@ -79,7 +91,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
     }
 
     @Override
-    public Slice<CommentProjection> findAllProjByPostId(long postId, User user, Pageable pageable) {
+    public Slice<CommentProjection> findAllProjByPostId(long postId, User user, Pageable pageable, boolean filterDeleted) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<CommentProjection> cq = cb.createQuery(CommentProjection.class);
         Root<PostComment> root = cq.from(PostComment.class);
@@ -87,13 +99,13 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         Join<PostComment, User> likeJoin = root.join(PostComment_.USERS_LIKED, JoinType.LEFT);
         Expression<Long> likeCount = cb.countDistinct(likeJoin);
 
-        buildQuery(root, cb, cq, user,
+        buildQuery(root, cb, cq, user, filterDeleted,
                 likeCount.alias("likeCount")
         );
         cq.where(
                 cb.and(
                         cb.equal(root.join(PostComment_.POST).get(Post_.ID), postId),
-                        cb.isNull(root.join(PostComment_.PARENT_COMMENT))
+                        cb.isNull(root.join(PostComment_.PARENT_COMMENT, JoinType.LEFT))
                 )
         ).groupBy(root.get(PostComment_.ID));
 
@@ -109,27 +121,51 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
             query.setMaxResults(pageable.getPageSize() + 1);
             query.setFirstResult((int) pageable.getOffset());
         }
-        List<CommentProjection> resultList = query.getResultList().subList(0, pageSize);
+        List<CommentProjection> resultList = query.getResultList();
         boolean hasNext = pageable.isPaged() && resultList.size() > pageSize;
-        return new SliceImpl<>(resultList, pageable, hasNext);
+        return new SliceImpl<>(hasNext ? resultList.subList(0, pageSize) : resultList, pageable, hasNext);
     }
 
     @Override
-    public List<CommentProjection> findAllProjByCommentId(long commentId, User user, int limit) {
+    public List<CommentProjection> findAllProjByCommentId(long commentId, User user, int limit, boolean filterDeleted) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<CommentProjection> cq = cb.createQuery(CommentProjection.class);
         Root<PostComment> root = cq.from(PostComment.class);
         Join<PostComment, User> likeJoin = root.join(PostComment_.USERS_LIKED, JoinType.LEFT);
         Expression<Long> likeCount = cb.countDistinct(likeJoin);
 
-        buildQuery(root, cb, cq, user,
+        buildQuery(root, cb, cq, user, filterDeleted,
                 likeCount.alias("likeCount")
         );
-        cq.where(cb.equal(root.join(PostComment_.PARENT_COMMENT).get(PostComment_.ID), commentId))
+        cq.where(cb.equal(root.join(PostComment_.PARENT_COMMENT, JoinType.LEFT).get(PostComment_.ID), commentId))
                 .groupBy(root.get(PostComment_.ID)).orderBy(cb.desc(root.get(PostComment_.ID)));
         TypedQuery<CommentProjection> query = em.createQuery(cq);
         if (limit > 0)
             query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<CommentProjection> findClosureListByCommentId(long commentId, User user, int limit, boolean filterDeleted) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<CommentProjection> cq = cb.createQuery(CommentProjection.class);
+        Root<CommentClosure> root = cq.from(CommentClosure.class);
+        Join<CommentClosure, PostComment> ancestor = root.join(CommentClosure_.ANCESTOR, JoinType.INNER);
+        Join<CommentClosure, PostComment> descendant = root.join(CommentClosure_.DESCENDANT, JoinType.INNER);
+
+        Join<PostComment, User> likeJoin = descendant.join(PostComment_.USERS_LIKED, JoinType.LEFT);
+        Expression<Long> likeCount = cb.countDistinct(likeJoin);
+        buildQuery(descendant, cb, cq, user, filterDeleted,
+                likeCount.alias("likeCount")
+        );
+        cq.where(cb.and(
+                cb.equal(ancestor.get(PostComment_.ID), commentId),
+                cb.notEqual(root.get(CommentClosure_.DEPTH),0)
+        )).groupBy(descendant.get(PostComment_.ID)).orderBy(
+                cb.asc(descendant.get(PostComment_.ID))
+        );
+        TypedQuery<CommentProjection> query = em.createQuery(cq);
+        if (limit > 0) query.setMaxResults(limit);
         return query.getResultList();
     }
 }

@@ -3,6 +3,8 @@ package dayp308.chatroom.entity.view.comment;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.repository.CommentRepository;
 import dayp308.chatroom.repository.projection.CommentProjection;
+import jakarta.validation.constraints.Null;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
@@ -23,39 +25,44 @@ public class CommentUtil {
         this.conversionService = conversionService;
     }
 
-    public CommentBriefView getCommentBriefView(CommentProjection source, @Nullable User user) {
-        CommentBriefView result = conversionService.convert(source, CommentBriefView.class);
-        Objects.requireNonNull(result).setChildren(getBriefChildren(result, user));
+    public CommentView getCommentBriefView(CommentProjection source, @Nullable User user) {
+        CommentView result = Objects.requireNonNull(conversionService.convert(source, CommentView.class));
+        setBriefChildren(result, user);
         return result;
     }
 
-    public CommentDetailedView getCommentDetailedView(CommentProjection source, @Nullable User user) {
-        CommentDetailedView result = conversionService.convert(source, CommentDetailedView.class);
-        result.setChildren(getDetailedChildren(result, user));
+    public CommentView getCommentDetailedView(CommentProjection source, @Nullable User user) {
+        CommentView result = conversionService.convert(source, CommentView.class);
+        setDetailedChildren(result, user);
         return result;
+    }
+
+    private void buildChildrenTree(CommentView source, List<CommentView> closureList) {
+        var directChildren = closureList.stream().filter(c -> c.getParentCommentId() == source.getId()).toList();
+        closureList.removeAll(directChildren);
+        directChildren.forEach(c -> {
+            buildChildrenTree(c, closureList);
+        });
+        source.setChildren(directChildren);
     }
 
     @SuppressWarnings("unchecked")
-    private List<CommentView> getBriefChildren(CommentView source, @Nullable User user) {
-        List<CommentProjection> list = commentRepository.findAllProjByCommentId(source.getId(), user, 5);
-        Object result = conversionService.convert(list,
+    private void setBriefChildren(CommentView source, @Nullable User user) {
+        List<CommentProjection> list = commentRepository.findClosureListByCommentId(source.getId(), user, 5, true);
+        List<CommentView> result = (List<CommentView>) conversionService.convert(list,
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentProjection.class)),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentView.class))
         );
-        return (List<CommentView>) result;
+        buildChildrenTree(source, result);
     }
 
     @SuppressWarnings("unchecked")
-    private List<CommentDetailedView> getDetailedChildren(CommentView source, @Nullable User user) {
-        List<CommentProjection> list = commentRepository.findAllProjByCommentId(source.getId(), user, 0);
-        List<CommentDetailedView> result = (List<CommentDetailedView>) conversionService.convert(list,
+    private void setDetailedChildren(CommentView source, @Nullable User user) {
+        List<CommentProjection> list = commentRepository.findClosureListByCommentId(source.getId(), user, 0, true);
+        List<CommentView> result = (List<CommentView>) conversionService.convert(list,
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentProjection.class)),
-                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentDetailedView.class))
+                TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentView.class))
         );
-        if (result != null && !result.isEmpty())
-            result.forEach(c -> {
-                c.setChildren(getDetailedChildren(c, user));
-            });
-        return result;
+        buildChildrenTree(source, result);
     }
 }

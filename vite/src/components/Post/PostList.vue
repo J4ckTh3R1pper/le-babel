@@ -13,7 +13,7 @@
     </el-select>
     <ul class="list"
     >
-        <li v-for="i in list" :key="i.id" @load-list="load">
+        <li v-for="i in list" :key="i.id">
             <PostBriefView
                     :post-id="i.id"
                     :title="i.title"
@@ -73,6 +73,7 @@ const disabled = ref(false)
 const list = ref([])
 const loading = ref(false)
 const lastPage = ref(false)
+const emit = defineEmits(['finish-load'])
 
 watch(sort, async () => {
     list.value = []
@@ -85,6 +86,10 @@ watch(() => categoryId, async() => {
     page.value = 1
     load()
 }, { immediate: true, deep: true})
+
+watch(loading, () => {
+    if (!loading.value) emit('finish-load')
+})
 
 function load() {
     loading.value = true

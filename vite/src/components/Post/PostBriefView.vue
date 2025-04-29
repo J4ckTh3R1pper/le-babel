@@ -73,7 +73,7 @@ if (showCategory) {
       <InlineMarkdown :md-text="content"/>
     </div>
     <div v-if="thumbnails.length > 0" class="thumbnails">
-      <el-image v-for="url in thumbnails" :src="'/api' + url" />
+      <el-image v-for="url in thumbnails" :src="url" />
     </div>
     <div class="bottom">
       <PostData

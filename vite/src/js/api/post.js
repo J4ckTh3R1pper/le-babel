@@ -35,11 +35,10 @@ export async function getPostMinimalList(ids) {
     })
 }
 
-export function likePost(postId) {
+export async function likePost(postId) {
     return service.put("/post/like?id=" + postId)
 }
 
-
-export function likeComment(commentId) {
-    return service.put("/comment/like?id=" + commentId)
+export async function createPost(form) {
+    return service.post("/post/create", form, {})
 }

@@ -10,14 +10,14 @@ import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
 import dayp308.chatroom.entity.business.LikeResponse;
 import dayp308.chatroom.entity.business.PostForm;
-import dayp308.chatroom.entity.view.comment.CommentDetailedView;
+import dayp308.chatroom.entity.view.comment.CommentView;
 import dayp308.chatroom.entity.view.post.PostBriefView;
 import dayp308.chatroom.entity.view.post.PostDetailedView;
-import dayp308.chatroom.entity.view.comment.CommentBriefView;
 import dayp308.chatroom.repository.CommentLikeRepository;
 import dayp308.chatroom.repository.PostLikeRepository;
 import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.repository.UserRepository;
+import dayp308.chatroom.service.FileService;
 import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,10 +38,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 import dayp308.chatroom.entity.view.post.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 public class PostController {
+
+    private final FileService fileService;
 
     private final PostService postService;
     private final UserService userService;
@@ -52,7 +59,7 @@ public class PostController {
     private final CommentLikeRepository commentLikeRepository;
 
     @Autowired
-    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository) {
+    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, FileService fileService) {
         this.postService = postService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -60,18 +67,25 @@ public class PostController {
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
+        this.fileService = fileService;
     }
 
     @PostMapping("/api/post/create")
-    public ResponseEntity<Long> createPost(@Valid PostForm postForm, Authentication auth) throws EntityNotFoundException {
+    public ResponseEntity<Long> createPost(@Valid @RequestBody PostForm postForm, Authentication auth) throws EntityNotFoundException {
         long id = postService.addPost(postForm, ( (User) auth.getPrincipal() )).getId();
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @PostMapping("/api/comment/create")
-    public ResponseEntity<Long> createComment(@Valid CommentCreationForm commentCreationForm, Authentication auth) throws EntityNotFoundException {
+    public ResponseEntity<Long> createComment(@Valid @RequestBody CommentCreationForm commentCreationForm, Authentication auth) throws EntityNotFoundException {
         long id = postService.addComment(commentCreationForm, ((User) auth.getPrincipal()) ).getId();
         return new ResponseEntity<>(id, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/api/upload_image")
+    public String uploadImage(@RequestPart("image") MultipartFile image) {
+        String storeName = fileService.uploadImage(image);
+        return "/api/images/" + storeName;
     }
 
     @PreAuthorize(
@@ -110,7 +124,7 @@ public class PostController {
 
     @GetMapping("/api/no_auth/post/get_posts")
     public Slice<PostBriefView> getPostSlice(
-            @RequestParam(value = "categoryId", required = false)Integer categoryId,
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
             @PageableDefault(
                     sort = {Post_.LAST_UPDATE_TIME},
                     direction = Sort.Direction.DESC)
@@ -125,7 +139,7 @@ public class PostController {
     }
 
     @GetMapping("/api/no_auth/post/get_comments")
-    public Slice<CommentBriefView> getCommentSlice(
+    public Slice<CommentView> getCommentSlice(
             @RequestParam("id") Post post,
             Pageable pageable,
             Authentication auth
@@ -137,8 +151,14 @@ public class PostController {
         return postService.getBriefCommentSliceByPost(post, user, pageable);
     }
 
+    @GetMapping("/api/no_auth/comment/get_category_id")
+    public Integer getCategoryId(@RequestParam("id") PostComment comment) {
+        return comment.getPost().getCategory().getId();
+    }
+    
+
     @GetMapping("/api/no_auth/comment/get_detail")
-    public ResponseEntity<CommentDetailedView> getCommentDetail(
+    public CommentView getCommentDetail(
             @RequestParam("id") int id,
             Authentication auth
     ) {
@@ -146,8 +166,8 @@ public class PostController {
         if ( auth != null && auth.isAuthenticated() )
             user = (User) auth.getPrincipal();
 
-        CommentDetailedView view = postService.getCommentDetailedView(id, user);
-        return new ResponseEntity<>(view, HttpStatus.OK);
+        CommentView view = postService.getCommentDetailedView(id, user);
+        return view;
     }
 
     @GetMapping("/api/no_auth/post/thread")

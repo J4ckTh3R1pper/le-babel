@@ -26,4 +26,16 @@ public class FileUtil {
             }
         }
 	}
+
+    public static ByteArrayInputStream inputStream2ByteArrayInputStream(InputStream is) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte [] buf = new byte[1024];
+        int len;
+        while ( (len=is.read(buf)) > -1 ) {
+            output.write(buf, 0, len);
+        }
+        output.flush();
+        is.close();
+        return new ByteArrayInputStream(output.toByteArray());
+    }
 }

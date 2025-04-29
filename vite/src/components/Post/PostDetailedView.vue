@@ -5,6 +5,8 @@ import UserBriefView from "@/components/User/UserBriefView.vue";
 import Time from "@/components/Time.vue";
 import Markdown from "@/components/Markdown/index.vue"
 import PostData from "./PostData.vue";
+import { MdPreview } from "md-editor-v3";
+import 'md-editor-v3/lib/preview.css';
 
 const {
   postId, categoryId, title, userId, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, liked
@@ -37,7 +39,8 @@ const {
       <Time :timestamp="createTime" class="time"/>
     </div>
     <div class="title">{{title}}</div>
-    <div class="content"><Markdown :md-text="content"/></div>
+    <!-- <div class="content"><Markdown :md-text="content"/></div> -->
+    <MdPreview :model-value="content"/>
     <div class="bottom">
       <PostData class="data"
         :post-id="postId"
@@ -54,7 +57,7 @@ const {
 .post-detailed-view {
     display: flex;
     flex-direction: column;
-    padding: 1em;
+    padding: 1em 0;
     .bottom,.top {
       display: flex;
       flex-direction: row;

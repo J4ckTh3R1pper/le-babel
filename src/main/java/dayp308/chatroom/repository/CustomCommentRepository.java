@@ -10,7 +10,9 @@ import org.springframework.lang.Nullable;
 import java.util.List;
 
 public interface CustomCommentRepository {
-    CommentProjection findProjById(long id, @Nullable User user);
-    Slice<CommentProjection> findAllProjByPostId(long postId, @Nullable User user, Pageable pageable);
-    List<CommentProjection> findAllProjByCommentId(long commentId, @Nullable User user, int limit);
+    CommentProjection findProjById(long id, @Nullable User user, boolean filterDeleted);
+    Slice<CommentProjection> findAllProjByPostId(long postId, @Nullable User user, Pageable pageable, boolean filterDeleted);
+    List<CommentProjection> findAllProjByCommentId(long commentId, @Nullable User user, int limit, boolean filterDeleted);
+
+    List<CommentProjection> findClosureListByCommentId(long commentId, User user, int limit, boolean filterDeleted);
 }

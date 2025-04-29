@@ -78,6 +78,12 @@ public class UserController {
         return user;
     }
 
+    @GetMapping("/api/user/authorize")
+    public UserDetailedProj attemptLogin(Authentication auth) {
+        return userService.findUserDetailedProjById(((User) auth.getPrincipal()).getId());
+    }
+    
+
     @GetMapping(value = "/api/no_auth/user/get_minimal")
     public UserMinimal getMinimal(
             @RequestParam(value = "id", required = false) Long userId,
@@ -94,14 +100,16 @@ public class UserController {
     }
 
     @PostMapping(value = "/api/user/update_avatar")
-    public ResponseEntity<String> updateAvatar(
+    public String updateAvatar(
             @RequestPart("image") MultipartFile imageFile,
             Authentication auth
     ) throws FileUploadException {
 
         User user = ((User) auth.getPrincipal());
-        user.setHeadImgUrl(fileService.uploadImage(imageFile));
-        return new ResponseEntity<>(userService.updateUser(user).headImgUrl(), HttpStatus.OK);
+        String storeName = fileService.uploadImage(imageFile);
+        user.setHeadImgUrl("/api/images/" + storeName);
+        userRepository.saveAndFlush(user);
+        return user.getHeadImgUrl();
     }
 
     @PostMapping(value = "/api/user/update", produces = "application/json;charset=UTF-8")
@@ -110,7 +118,7 @@ public class UserController {
         user.setNickName(form.getNickName());
         user.setIntroduce(form.getIntroduce());
         user.setGender(form.getGender());
-        userService.updateUser(user);
+        userRepository.saveAndFlush(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

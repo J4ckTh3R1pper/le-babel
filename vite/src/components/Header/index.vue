@@ -14,15 +14,25 @@ const router = useRouter()
 const loginUserStore = useLoginUserStore()
 const {token, userId, nickName, headImgUrl, location, roles} = storeToRefs(loginUserStore)
 
-if (!isEmpty(token))
-  loginUserStore.getInfo()
+watch (route, () => {
+  if (!isEmpty(token.value))
+    loginUserStore.getInfo()
+}, {immediate: true})
+
 
 function getUserRoute() {
-  let url;
-  if (isNumber(userId.value))
-    url = "/login"
-  else url = "/userInfo/" + userId.value
-  router.push(url)
+  let route = {};
+  if (!isNumber(userId.value))
+    route = {name: 'login'}
+  else {
+    route = {
+      name: 'user_info',
+      params: {
+        id: userId.value
+      }
+    }
+  }
+  router.push(route)
 }
 
 function logoClicked() {
@@ -45,11 +55,12 @@ function handleCommand(command) {
     </span>
     <span class="placeholder"></span>
     <span class="right">
+      <div id="translate"></div>
       <el-dropdown class="user" @command="handleCommand">
         <el-avatar class="avatar" :src="headImgUrl"/>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="profile">{{ !isNumber(userId) ? '登录' : '个人主页' }}</el-dropdown-item>
+            <el-dropdown-item command="profile" @click="getUserRoute">{{ !isNumber(userId) ? '登录' : '个人主页' }}</el-dropdown-item>
             <el-dropdown-item v-if="isNumber(userId)" command="logOut">登出</el-dropdown-item>
           </el-dropdown-menu>
         </template>

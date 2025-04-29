@@ -1,5 +1,5 @@
 <template>
-    <el-button @click="onClicked" round icon="ArrowLeft"><el-avatar :src="data.avatar" size="small"/>{{ data.name }}</el-button>
+    <el-button class="back-button" @click="onClicked" round icon="ArrowLeft"><el-avatar :src="data.avatar" size="small"/>{{ data.name }}</el-button>
 </template>
 
 <script setup>
@@ -31,7 +31,11 @@ function onClicked() {
 </script>
 
 <style lang="scss" scoped>
-.el-avatar {
-    margin-right: 6px;
+.back-button {
+    margin: 8px;
+    .el-avatar {
+        margin-right: 6px;
+    }
+
 }
 </style>

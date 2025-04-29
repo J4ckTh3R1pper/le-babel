@@ -6,9 +6,29 @@ import useAppStore from "@/js/module/app";
 import { storeToRefs } from "pinia";
 import "element-plus/theme-chalk/display.css"
 import RecentPost from "@/components/Post/RecentPost.vue";
+import { useRoute } from "vue-router";
+import CategoryInfo from "@/components/Category/CategoryInfo.vue";
+import { computed } from "vue";
 
 const appStore = useAppStore()
 const {sidebar} = storeToRefs(appStore)
+const route = useRoute()
+
+watch(route, () => {
+  loading.value = true
+})
+
+const sideCardComponent = computed(() => {
+  if (route.name == 'category_index' || route.name == 'post_detail') {
+    return CategoryInfo
+  }
+
+  if (route.name == 'index') {
+    return RecentPost
+  }
+})
+
+const loading = ref(true)
 
 </script>
 
@@ -19,19 +39,24 @@ const {sidebar} = storeToRefs(appStore)
     </el-header>
     <el-container class="container">
       <Sidebar/>
-      <el-main class="main-wrapper">
-        <suspense>
+      <suspense>
+        <el-main class="main-wrapper" v-loading="loading">
           <router-view v-slot="{ Component }">
-            <keep-alive :include="['Index', 'PostDetail', 'CategoryIndex']">
-              <component :is="Component"></component>
-            </keep-alive>
+            <transition name="fade">
+              <keep-alive :include="['Index', 'PostDetail', 'CategoryIndex']">
+                <component :is="Component" @finish-load="loading = false" :key="route.path"></component>
+              </keep-alive>
+            </transition>
           </router-view>
-        </suspense>
-      </el-main>
-      <el-aside class="side-card hidden-sm-and-down" width="400px">
-        <!-- TODO: 放置侧边卡片 -->
-         <component :is="RecentPost"></component>
-      </el-aside>
+        </el-main>
+      </suspense>
+      <suspense>
+        <el-aside class="side-card hidden-sm-and-down" width="400px">
+          <keep-alive :include="['RecentPost']">
+            <component :is="sideCardComponent"></component>
+          </keep-alive>
+        </el-aside>
+      </suspense>
     </el-container>
   </el-container>
 </template>

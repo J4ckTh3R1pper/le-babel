@@ -47,7 +47,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <span v-html="result"></span>
+  <div v-html="result"></div>
 </template>
 
 <style lang="scss" scoped>

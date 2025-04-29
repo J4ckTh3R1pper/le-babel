@@ -14,7 +14,7 @@ public class PostForm {
     @NotNull
     private Integer categoryId;
     @NotBlank
-    @Size(max = 64)
+    @Size(max = 192)
     private String title;
     @NotBlank
     private String content;

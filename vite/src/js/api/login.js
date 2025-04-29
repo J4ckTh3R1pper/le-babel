@@ -1,4 +1,5 @@
 import request from "@/js/utils/request.js";
+import useLoginUserStore from "../module/login_user";
 
 export function loginRequest(loginName, password, captcha, uuid, rememberMe) {
     const data = {
@@ -24,19 +25,16 @@ export function registerRequest(data) {
 }
 
 // 获取用户详细信息
-export function getInfoRequest() {
+export async function getInfoRequest() {
     return request({
-        url: '/no_auth/user/get_full_info',
+        url: '/user/authorize',
         method: 'get'
     })
 }
 
 // 退出方法
 export function logoutRequest() {
-    return request({
-        url: '/logout',
-        method: 'post'
-    })
+    return Promise.resolve()
 }
 
 // 获取验证码

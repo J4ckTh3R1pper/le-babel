@@ -25,7 +25,7 @@ public class PostDtoToPostConverter implements Converter<PostDTO, Post> {
 
     @Override
     public Post convert(PostDTO source) {
-        User user = userRepository.findById(source.getPublishUser().getId()).orElseThrow();
+        User user = userRepository.findById(source.getUser().getId()).orElseThrow();
         PostCategory postCategory = categoryRepository.findById(source.getCategory().getId()).orElseThrow();
         Post target = new Post();
         BeanUtils.copyProperties(source, target);

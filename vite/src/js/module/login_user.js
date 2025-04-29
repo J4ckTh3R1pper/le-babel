@@ -37,22 +37,21 @@ const useLoginUserStore = defineStore(
                     getInfoRequest().then(res => {
                         const user = res
                         let avatar = user.headImgUrl || ""
-                        if (!isHttp(avatar)) {
-                            avatar = (isEmpty(avatar)) ? defaultAvatar : '/api' + avatar
-                        }
+                        avatar = (isEmpty(avatar)) ? defaultAvatar : '/api' + avatar
                         this.userId = user.id
                         this.nickName = user.nickName
                         this.headImgUrl = avatar
                         this.location = user.location
                         resolve()
-                    }).catch(error => { reject(error)})
+                    }).catch(error => this.logOut())
                 })
             },
             // 退出系统
             logOut() {
                 return new Promise((resolve, reject) => {
                     logoutRequest(this.token).then(() => {
-                        this.token = ''
+                        this.userId = null
+                        this.token = null
                         this.roles = []
                         this.permissions = []
                         removeToken()

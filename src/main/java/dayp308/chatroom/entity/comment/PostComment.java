@@ -63,9 +63,23 @@ public class PostComment {
     @JoinColumn(name = "parent_comment_id")
     private PostComment parentComment;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "parentComment")
-    private Set<PostComment> subComments = new LinkedHashSet<>();
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "comment_closure",
+        joinColumns = @JoinColumn(name = "descendant"),
+        inverseJoinColumns = @JoinColumn(name = "ancestor")
+    )
+    private Set<PostComment> ancestors = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "ancestors")
+    private Set<PostComment> descendants = new LinkedHashSet<>();
+    
+
+    // @JsonManagedReference
+    // @OneToMany(mappedBy = "parentComment")
+    // private Set<PostComment> subComments = new LinkedHashSet<>();
 
 
 }

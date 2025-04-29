@@ -34,7 +34,7 @@ public class Post {
     @JoinColumn(name = "publish_user_id", nullable = false)
     private User user;
 
-    @Column(name = "post_title", nullable = false, length = 64)
+    @Column(name = "post_title", nullable = false, length = 192)
     @GenericField(name = "title", projectable = Projectable.YES)
     private String title;
 
