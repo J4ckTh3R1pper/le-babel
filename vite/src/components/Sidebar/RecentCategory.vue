@@ -11,7 +11,7 @@ const {list} = storeToRefs(recentStore)
 
 <template>
   <Suspense>
-  <el-sub-menu index="recent_category">
+  <el-sub-menu index="recent-category">
     <!--          最近访问-->
     <template #title>
       <el-icon><Clock /></el-icon>

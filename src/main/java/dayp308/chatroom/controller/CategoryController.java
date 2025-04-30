@@ -104,15 +104,6 @@ public class CategoryController {
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
-    @GetMapping("/api/category/get_joined_category")
-    public Slice<CategoryMinimal> getJoinedCategory(
-            Authentication auth,
-            Pageable pageable
-    ) {
-        User user = (User) auth.getPrincipal();
-        return categoryService.getMinimalSlice(user, pageable);
-    }
-
     @GetMapping("/api/no_auth/category/get_category_list")
     public List<CategoryMinimal> getCategoryList(
             @PageableDefault(

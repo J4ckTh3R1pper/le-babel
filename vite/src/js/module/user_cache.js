@@ -62,7 +62,7 @@ const useUserCacheStore = defineStore(
                         headImgUrl: user.headImgUrl,
                         location: user.location,
                         role: member.role,
-                        level: member.experience / 100,
+                        level: Math.round(member.experience / 100),
                         title: member.title
                     })
                 })

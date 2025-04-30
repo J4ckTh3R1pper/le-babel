@@ -183,7 +183,6 @@ public class PostController {
     }
     @GetMapping("/api/no_auth/post/get_minimal_list")
     public List<PostMinimalView> getMinimalList(@RequestParam("ids") List<Long> ids) {
-        System.out.println(ids);
         return postService.getPostMinimalViewList(ids);
     }
     

@@ -2,7 +2,8 @@
     <div class="post-minimal-view">
         <div class="left">
             <div class="category-info">
-                <el-avatar :src="categoryData.avatar" size="small"/><el-link class="name">{{ categoryData.name }}</el-link><br/>
+                <el-avatar :src="categoryData.avatar" size="small"/>
+                <el-link @click="toCategory" class="name">{{ categoryData.name }}</el-link><br/>
             </div>
             <div class="title">
                 <el-link class="name">{{ title }}</el-link><br/>
@@ -21,6 +22,7 @@
 <script setup>
 import useCategoryCacheStore from '@/js/module/category_cache';
 import { isEmpty } from 'lodash';
+import { useRouter } from 'vue-router';
 
 const {postId, categoryId, title, likeCount, commentCount, thumbnail} = defineProps({
     postId: {
@@ -42,6 +44,15 @@ const {postId, categoryId, title, likeCount, commentCount, thumbnail} = definePr
 
 const categoryCache = useCategoryCacheStore()
 const categoryData = await categoryCache.fetchCategory(categoryId)
+const router = useRouter()
+function toCategory() {
+    router.push({
+        name: 'category_index',
+        params: {
+            id: categoryId
+        }
+    })
+}
 
 </script>
 

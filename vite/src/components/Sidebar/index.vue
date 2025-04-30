@@ -5,6 +5,10 @@ import CategoryLink from "@/components/Sidebar/CategoryLink.vue";
 import RecentCategory from "@/components/Sidebar/RecentCategory.vue";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import useLoginUserStore from "@/js/module/login_user";
+import JoinedCategory from "./JoinedCategory.vue";
+import { isNumber } from "lodash";
+import { useRouter } from "vue-router";
 
 defineOptions({
   name: 'Sidebar'
@@ -28,9 +32,12 @@ const sortTypes = [
 ]
 
 const appStore = useAppStore()
+const loginUserStore = useLoginUserStore()
 const {sidebar} = storeToRefs(appStore)
+const router = useRouter()
 
 const {toggleSidebar} = appStore
+const {userId} = storeToRefs(loginUserStore)
 const width = computed(() => {
   return sidebar.value.opened ? '224' : '65'
 })
@@ -50,7 +57,13 @@ const width = computed(() => {
           :default-openeds="['recent_category']"
           mode="vertical"
         >
+          <el-menu-item
+          @click="router.push({name: 'index'})"
+          >
+            <el-icon><House /></el-icon>首页
+          </el-menu-item>
           <RecentCategory />
+          <JoinedCategory :user-id="userId" v-if="isNumber(userId)"/>
         </el-menu>
       </el-scrollbar>
     </div>

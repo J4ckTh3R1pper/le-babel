@@ -14,6 +14,7 @@ import dayp308.chatroom.entity.user.UserMinimal;
 import dayp308.chatroom.entity.user.UserMinimalImpl;
 import dayp308.chatroom.exception.FileUploadException;
 import dayp308.chatroom.exception.InvalidFormException;
+import dayp308.chatroom.repository.CategoryMemberRepository;
 import dayp308.chatroom.repository.RedisCaptchaRepository;
 import dayp308.chatroom.repository.UserRepository;
 import dayp308.chatroom.service.FileService;
@@ -21,6 +22,9 @@ import dayp308.chatroom.service.UserService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.NoResultException;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -33,18 +37,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class UserController {
+
+    private final CategoryMemberRepository categoryMemberRepository;
     private final UserService userService;
     private final FileService fileService;
     private final UserRepository userRepository;
     private final ObjectMapper jacksonObjectMapper;
     private final RedisCaptchaRepository redisCaptchaRepository;
 
-    public UserController(UserService service, FileService fileService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, RedisCaptchaRepository redisCaptchaRepository) {
+    public UserController(UserService service, FileService fileService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, RedisCaptchaRepository redisCaptchaRepository, CategoryMemberRepository categoryMemberRepository) {
         this.userService = service;
         this.fileService = fileService;
         this.userRepository = userRepository;
         this.jacksonObjectMapper = jacksonObjectMapper;
         this.redisCaptchaRepository = redisCaptchaRepository;
+        this.categoryMemberRepository = categoryMemberRepository;
     }
 
     @PostMapping(value = "/api/no_auth/register")
@@ -127,4 +134,12 @@ public class UserController {
         int exp = userService.getOverallExp(userRepository.getReferenceById(userId));
         return new ResponseEntity<>(exp, HttpStatus.OK);
     }
+
+    @GetMapping("/api/no_auth/user/get_joined_category")
+    public List<Integer> getJoinedCategory(
+        @RequestParam("id") User user
+    ) {
+        return categoryMemberRepository.findCategoryIdsByJoinUserId(user.getId());
+    }
+
 }

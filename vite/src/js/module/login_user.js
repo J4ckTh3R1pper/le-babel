@@ -35,13 +35,12 @@ const useLoginUserStore = defineStore(
             getInfo() {
                 return new Promise((resolve, reject) => {
                     getInfoRequest().then(res => {
-                        const user = res
-                        let avatar = user.headImgUrl || ""
+                        let avatar = res.headImgUrl || ""
                         avatar = (isEmpty(avatar)) ? defaultAvatar : '/api' + avatar
-                        this.userId = user.id
-                        this.nickName = user.nickName
+                        this.userId = res.id
+                        this.nickName = res.nickName
                         this.headImgUrl = avatar
-                        this.location = user.location
+                        this.location = res.location
                         resolve()
                     }).catch(error => this.logOut())
                 })
@@ -50,10 +49,7 @@ const useLoginUserStore = defineStore(
             logOut() {
                 return new Promise((resolve, reject) => {
                     logoutRequest(this.token).then(() => {
-                        this.userId = null
-                        this.token = null
-                        this.roles = []
-                        this.permissions = []
+                        this.$reset()
                         removeToken()
                         resolve()
                     }).catch(error => {
