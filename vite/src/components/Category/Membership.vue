@@ -1,23 +1,22 @@
 <template>
   <div class="user-membership">
-    <el-avatar class="avatar" :src="avatar"/>
+    <el-avatar class="avatar" :src="user.headImgUrl"/>
     <span class="data">
-      <span class="top">
         <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == 3 ? '版主' : user.role == 2 ? '管理员' : '' }}</span>
         <el-link class="nickname" :href="`/userInfo?id=${userId}`">{{user.nickName}}</el-link>
-        <el-divider/>
-        <el-text v-if="isEmpty(user.title)" class="title">{{user.title}}</el-text>
-        <div v-if="user.role > 0" >
+        <el-text v-if="isEmpty(user.title)" class="title">{{user.title}}</el-text><br>
+        <span class="exp" v-if="user.role > 0" >
           <el-text class="level">{{'等级' + user.level}}</el-text>
-          <el-progress :percentage="user.level % 100"/>
-        </div>
+          <el-progress :percentage="user.experience % 100" :format="format"/>
+        </span>
       </span>
-    </span>
   </div>
 </template>
 
 <script setup>
 import useUserCacheStore from '@/js/module/user_cache'
+import { isEmpty, isNumber } from 'lodash'
+import defaultAvatar from '@/assets/images/default_user_avatar.png'
 
 const {userId, categoryId} = defineProps({
     userId: {
@@ -30,13 +29,13 @@ const {userId, categoryId} = defineProps({
     }
 })
 const userCacheStore = useUserCacheStore()
-
 const user = ref(await userCacheStore.fetchUserBriefView(categoryId, userId))
-const avatar = ref('')
 
-watchEffect(() => {
-  avatar = isEmpty(user.value.headImgUrl) ? defaultAvatar : '/api' + user.value.headImgUrl
+watch(() => categoryId, async () => {
+  user.value = await userCacheStore.fetchUserBriefView(categoryId, userId)
 })
+
+const format = (percentage) => percentage + '/100' 
 
 </script>
 
@@ -52,7 +51,20 @@ watchEffect(() => {
 
 .data {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
+  .nickname {
+    flex-grow: 0;
+    align-self: flex-start;
+  }
+  .exp {
+    display: flex;
+    flex-grow: 1;
+    .el-progress {
+        margin-left: 5px;
+        flex-grow: 1;
+    }
+  }
 }
 .role_3 {
   background-color: #FF4500;

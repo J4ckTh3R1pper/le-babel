@@ -3,6 +3,7 @@ import {getToken, setToken, removeToken} from "@/js/utils/auth.js";
 import {defineStore} from "pinia";
 import defaultAvatar from '@/assets/images/default_user_avatar.png'
 import {isEmpty, isHttp} from '@/js/utils/validate.js'
+import { isNumber } from "lodash";
 
 const useLoginUserStore = defineStore(
     'user',
@@ -23,26 +24,17 @@ const useLoginUserStore = defineStore(
                 const captcha = userInfo.captcha
                 const uuid = userInfo.uuid
                 const rememberMe = userInfo.rememberMe
-                return new Promise((resolve, reject) => {
-                    loginRequest(loginName, password, captcha, uuid, rememberMe).then(res => {
-                        resolve()
-                    }).catch(error => {
-                        reject(error)
-                    })
-                })
+                return loginRequest(loginName, password, captcha, uuid, rememberMe)
             },
             // 获取用户信息
             async getInfo() {
-                return new Promise((resolve, reject) => {
-                    getInfoRequest().then(res => {
-                        let avatar = res.headImgUrl || ""
-                        avatar = (isEmpty(avatar)) ? defaultAvatar : '/api' + avatar
-                        this.userId = res.id
-                        this.nickName = res.nickName
-                        this.headImgUrl = avatar
-                        this.location = res.location
-                        resolve()
-                    }).catch(error => this.logOut())
+                getInfoRequest().then(res => {
+                    let avatar = res.headImgUrl || ""
+                    avatar = (isEmpty(avatar)) ? defaultAvatar : avatar
+                    this.userId = res.id
+                    this.nickName = res.nickName
+                    this.headImgUrl = avatar
+                    this.location = res.location
                 })
             },
             // 退出系统
@@ -57,6 +49,9 @@ const useLoginUserStore = defineStore(
                     })
                 })
             }
+        },
+        getters: {
+            isLoggedIn: (state) => isNumber(state.userId)
         }
     })
 

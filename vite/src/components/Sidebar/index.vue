@@ -45,6 +45,7 @@ const width = computed(() => {
 </script>
 
 <template>
+  <Suspense>
   <el-aside width="collapse">
     <div class="sidebar">
       <el-scrollbar wrap-class="scrollbar-wrapper">
@@ -60,7 +61,8 @@ const width = computed(() => {
           <el-menu-item
           @click="router.push({name: 'index'})"
           >
-            <el-icon><House /></el-icon>首页
+              <el-icon><House /></el-icon>
+              <span>首页</span>
           </el-menu-item>
           <RecentCategory />
           <JoinedCategory :user-id="userId" v-if="isNumber(userId)"/>
@@ -82,6 +84,7 @@ const width = computed(() => {
       />
     </span>
   </el-aside>
+  </Suspense>
 </template>
 
 <style scoped lang="scss">

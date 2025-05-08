@@ -64,7 +64,7 @@ const registerRules = {
 
 
 function handleRegister() {
-  proxy.$refs.registerRef.validate( valid => {
+  proxy.$refs.registerRef.validate( async valid => {
     if (valid) {
       loading.value = true;
       let data = {
@@ -74,19 +74,19 @@ function handleRegister() {
         uuid: registerForm.value.uuid,
         captcha: registerForm.value.captcha
       }
-      registerRequest(data).then(() => {
-        const username = data.loginName;
-        ElMessageBox.alert("<span style='color: red;'>" + "恭喜你，您的账号 " + username + " 注册成功！</span>", "系统提示", {
+      try {
+        await registerRequest(data)
+        let username = data.loginName;
+        await ElMessageBox.alert("<span style='color: red;'>" + "恭喜你，您的账号 " + username + " 注册成功！</span>", "系统提示", {
           dangerouslyUseHTMLString: true,
           type: "success",
-        }).then(() => {
-          router.push("/login");
-        }).catch(() => {});
-
-      }).catch(() => {
+        })
+        loading.value = true
+        router.push({name: 'login'});
+      } catch (err) {
         getCaptcha()
         loading.value = false
-      })
+      }
     }
   })
 }

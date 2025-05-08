@@ -2,11 +2,14 @@ package dayp308.chatroom.service;
 
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.user.UserDetailedProj;
+import dayp308.chatroom.entity.Subscription;
 import dayp308.chatroom.entity.business.UserRegistrationForm;
+import dayp308.chatroom.entity.id.SubscriptionId;
 import dayp308.chatroom.entity.user.UserDTO;
 import dayp308.chatroom.exception.InvalidFormException;
 import dayp308.chatroom.exception.UserExistsException;
 import dayp308.chatroom.repository.CategoryMemberRepository;
+import dayp308.chatroom.repository.SubscriptionRepository;
 import dayp308.chatroom.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static dayp308.chatroom.repository.specification.UserSpecs.userMemberships;
 
@@ -32,13 +36,15 @@ public class UserService {
     private final ConversionService conversionService;
     private final PasswordEncoder passwordEncoder;
     private final CategoryMemberRepository categoryMemberRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, ConversionService conversionService, PasswordEncoder passwordEncoder, CategoryMemberRepository categoryMemberRepository) {
+    public UserService(UserRepository userRepository, ConversionService conversionService, PasswordEncoder passwordEncoder, CategoryMemberRepository categoryMemberRepository, SubscriptionRepository subscriptionRepository) {
         this.userRepository = userRepository;
         this.conversionService = conversionService;
         this.passwordEncoder = passwordEncoder;
         this.categoryMemberRepository = categoryMemberRepository;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -58,11 +64,11 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public int getOverallExp(User user) {
-        final int[] overallExp = {0};
+        final AtomicInteger  overallExp = new AtomicInteger(0);
         categoryMemberRepository.findAll(userMemberships(user)).forEach(m -> {
-            overallExp[0] = overallExp[0] + m.getExperience();
+            overallExp.addAndGet( m.getExperience() );
         });
-        return overallExp[0];
+        return overallExp.get();
     }
 
     /***
@@ -108,4 +114,24 @@ public class UserService {
         return user.getId();
     }
 
+    public Boolean getFollowed(long userId, long subscribedUserId) {
+        SubscriptionId id = new SubscriptionId(userId, subscribedUserId);
+        Subscription sub = subscriptionRepository.findById(id).orElse(null);
+        if (sub != null) return true;
+        return false;
+    }
+
+    public Boolean followUser(User user, User targetUser) {
+        SubscriptionId id = new SubscriptionId(user.getId(), targetUser.getId());
+        if (!subscriptionRepository.existsById(id)) {
+            Subscription sub = new Subscription();
+            sub.setUser(user);
+            sub.setSubscribedUser(targetUser);
+            subscriptionRepository.saveAndFlush(sub);
+            return true;
+        } else {
+            subscriptionRepository.deleteById(id);
+            return false;
+        }
+    }
 }

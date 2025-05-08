@@ -24,3 +24,39 @@ export async function getJoinedCategoryIds(id) {
         }
     })
 }
+
+export async function getFullInfo(id) {
+    return service.get("/no_auth/user/get_full_info", {
+        params: {
+            id: id
+        }
+    })
+}
+
+export async function getFollowed(id) {
+    return service.get("/user/get_followed", {
+        params: {
+            id: id
+        }
+    })
+}
+
+export async function getOverallExp(id) {
+    return service.get("/no_auth/user/get_overall_exp", {
+        params: {
+            id: id
+        }
+    })
+}
+
+export async function followUser(id) {
+    return service.post("/user/follow?id=" + id)
+}
+
+export async function updateUser(nickName, introduce, gender) {
+    return service.postForm("/user/update", {
+        nickName: nickName,
+        introduce: introduce,
+        gender: gender
+    })
+}

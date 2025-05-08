@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -72,22 +75,22 @@ public class UserController {
 
     @GetMapping(value = "/api/no_auth/user/get_full_info")
     public UserDetailedProj getFullInfo(
-        @RequestParam(value = "id", required = false) Long userId,
-        Authentication auth
+        @RequestParam(value = "id") Long userId
     ) {
-        UserDetailedProj user;
-        if ( userId != null )
-            user = userService.findUserDetailedProjById(userId);
-        else if ( auth != null ) {
-            User detail = (User) auth.getPrincipal();
-            user = userService.findUserDetailedProjById(detail.getId());
-        } else throw new NoResultException();
+        UserDetailedProj user = userService.findUserDetailedProjById(userId);
         return user;
     }
 
     @GetMapping("/api/user/authorize")
     public UserDetailedProj attemptLogin(Authentication auth) {
         return userService.findUserDetailedProjById(((User) auth.getPrincipal()).getId());
+    }
+    
+    @GetMapping("/api/user/get_followed")
+    public Boolean getFollowed(@RequestParam("id") long id,
+        Authentication auth
+    ) {
+        return userService.getFollowed(((User) auth.getPrincipal()).getId(), id);
     }
     
 
@@ -130,9 +133,9 @@ public class UserController {
     }
 
     @GetMapping("/api/no_auth/user/get_overall_exp")
-    public ResponseEntity<Integer> getOverallExp(@RequestParam("userId") long userId) {
+    public Integer getOverallExp(@RequestParam("id") long userId) {
         int exp = userService.getOverallExp(userRepository.getReferenceById(userId));
-        return new ResponseEntity<>(exp, HttpStatus.OK);
+        return exp;
     }
 
     @GetMapping("/api/no_auth/user/get_joined_category")
@@ -141,5 +144,11 @@ public class UserController {
     ) {
         return categoryMemberRepository.findCategoryIdsByJoinUserId(user.getId());
     }
+
+    @PostMapping("/api/user/follow")
+    public Boolean followUser(@RequestParam("id") User targetUser, Authentication auth) {
+        return userService.followUser((User) auth.getPrincipal(), targetUser);
+    }
+    
 
 }

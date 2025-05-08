@@ -11,11 +11,12 @@ export async function getPostDetails(id) {
         })
 }
 
-export function getPostSlice(categoryId, pageNum, pageSize, sort) {
+export function getPostSlice(categoryId, userId, pageNum, pageSize, sort) {
     return service.get(
         "/no_auth/post/get_posts", {
             params: {
                 categoryId: categoryId,
+                userId: userId,
                 page: pageNum,
                 size: pageSize,
                 sort: sort

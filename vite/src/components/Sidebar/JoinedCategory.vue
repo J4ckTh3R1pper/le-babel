@@ -1,5 +1,4 @@
 <template>
-  <Suspense>
     <el-sub-menu index="joined-category">
       <!--用户加入的所有板块-->
       <template #title>
@@ -12,7 +11,6 @@
                       :category-id="id"/>
       </el-menu-item-group>
     </el-sub-menu>
-  </Suspense>
 </template>
 
 <script setup>

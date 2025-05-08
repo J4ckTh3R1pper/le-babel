@@ -14,18 +14,8 @@
         <ul class="list">
             <li v-for="i in list">
                 <CommentBriefView class="root-comment"
-                    :category-id="i.categoryId"
-                    :comment-id="i.id"
-                    :comment-body="i.commentBody"
-                    :children="i.children"
-                    :post-id="i.postId"
-                    :create-time="i.createTime"
-                    :like-count="i.likeCount"
-                    :user-id="i.userId"
-                    :liked="i.liked"
-                    :child-count="i.childCount"
+                    :data="i"
                 />
-                <el-link v-if="i.childCount > 5">查看所有回复</el-link>
             </li>
         </ul>
     </div>
@@ -63,7 +53,7 @@ async function load(reload) {
     let data;
     try {
         data = await getCommentByPostId(postId, page.value, size, sort.value)
-        console.log(data)
+        // console.log(data)
         if (!data['empty']) {
             list.value = uniqBy(list.value.concat(data.content), 'id')
     }

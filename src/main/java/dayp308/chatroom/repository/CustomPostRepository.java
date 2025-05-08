@@ -1,5 +1,6 @@
 package dayp308.chatroom.repository;
 
+import dayp308.chatroom.entity.category.PostCategory;
 import dayp308.chatroom.entity.enums.PostOrderType;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.repository.projection.PostProjection;
@@ -14,8 +15,9 @@ public interface CustomPostRepository {
     PostProjection findProjById(long id, @Nullable User user);
 
     Slice<PostProjection> findAllProj(
-            @Nullable Integer categoryId,
+            @Nullable PostCategory category,
             @Nullable User user,
+            @Nullable User targetUser,
             boolean visibleOnly,
             Pageable pageable
     );

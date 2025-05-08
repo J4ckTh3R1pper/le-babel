@@ -156,12 +156,13 @@ public class PostService {
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
     public Slice<PostBriefView> getPostSlice(
-            @Nullable Integer categoryId,
+            @Nullable PostCategory category,
             @Nullable User user,
+            @Nullable User targetUser,
             Pageable pageable,
             boolean visibleOnly
     ) {
-        Slice<PostProjection> slice = postRepository.findAllProj(categoryId, user, visibleOnly, pageable);
+        Slice<PostProjection> slice = postRepository.findAllProj(category, user, targetUser, visibleOnly, pageable);
         Object views = conversionService.convert(slice.getContent(),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostProjection.class)),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostBriefView.class))
@@ -184,8 +185,15 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public CommentView getCommentDetailedView(long commentId, @Nullable User user) {
-        CommentProjection projection = commentRepository.findProjectionById(commentId, user == null ? null : user.getId());
+        CommentProjection projection = commentRepository.findProjById(commentId, user, true);
         CommentView view = commentUtil.getCommentDetailedView(projection, user);
+        return view;
+    }
+
+    @Transactional(readOnly = true)
+    public CommentView getCommentBriefView(long commentId, @Nullable User user) {
+        CommentProjection projection = commentRepository.findProjById(commentId, user, true);
+        CommentView view = commentUtil.getCommentBriefView(projection, user);
         return view;
     }
 
@@ -199,28 +207,11 @@ public class PostService {
     @Transactional(readOnly = true)
     public Slice<CommentView> getBriefCommentSliceByPost(
             Post post, @Nullable User user, Pageable pageable) {
-        Slice<CommentProjection> projections = commentRepository.findAllProjByPostId(post.getId(), user, pageable, true);
+        Slice<CommentProjection> projections = commentRepository.findAllProjByPostId(post.getId(), user, pageable, false);
         List<CommentView> views = projections.getContent().stream().map(
                 c -> commentUtil.getCommentBriefView(c, user)
         ).toList();
         return new SliceImpl<>(views, pageable, projections.hasNext());
-    }
-
-    @Transactional(readOnly = true)
-    @SuppressWarnings("unchecked")
-    public List<CommentDTO> getCommentsByPostId(long id) {
-        Post post = postRepository.getReferenceById(id);
-        PageRequest pageRequest = PageRequest.of(0, 25);
-        Slice<PostComment> slice = commentRepository.findAll(
-                CommentSpecs.allCommentByPost(post, false),
-                pageRequest);
-
-        // https://stackoverflow.com/questions/7738305/spring-conversion-service-from-lista-to-listb
-        return (List<CommentDTO>) conversionService.convert(
-                        slice.getContent(),
-                        TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostComment.class)),
-                        TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(CommentDTO.class))
-        );
     }
 
     @Transactional
@@ -256,10 +247,7 @@ public class PostService {
             membership.setExperience(membership.getExperience() + 3);
             categoryMemberRepository.saveAndFlush( membership );
         }
-        post.setLastUpdateTime(Instant.now());
-        postRepository.saveAndFlush(post);
         commentRepository.flush();
-        commentClosureRepository.flush();
         return commentRepository.findById(comment.getId(), CommentDTO.class).orElseThrow();
     }
 

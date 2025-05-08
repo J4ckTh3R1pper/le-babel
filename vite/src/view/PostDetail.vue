@@ -49,7 +49,7 @@ const {historyList} = storeToRefs(routeHistory)
 const id = ref(null)
 const data = ref(null)
 
-const emit = defineEmits(['finish-load'])
+const emit = defineEmits(['finish-load', 'category-change'])
 
 const isFirstTime = computed(() => isUndefined( find( historyList.value, o =>
         o.name == 'post_detail' && o.params['id'] == id.value
@@ -77,6 +77,10 @@ watch(id, async () => {
         emit('finish-load')
     }
 }, {immediate: true})
+
+watch (data, newData => {
+    emit('category-change', newData['categoryId'])
+})
 
 </script>
 

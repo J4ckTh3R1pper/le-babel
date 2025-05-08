@@ -35,6 +35,11 @@ export const constantRoutes = [
                 component: () => import('@/view/PostDetail.vue')
             },
             {
+                path: '/commentDetail/:id',
+                name: 'comment_detail',
+                component: () => import('@/view/CommentDetail.vue')
+            },
+            {
                 path: '/category/:id',
                 name: 'category_index',
                 component: () => import('@/view/CategoryIndex.vue')
@@ -43,22 +48,18 @@ export const constantRoutes = [
                 path: '/createPost/:id',
                 name: 'create_post',
                 component: () => import('@/view/CreatePost.vue')
+            },
+            {
+                path: '/userProfile/:id',
+                name: 'user_profile',
+                component: () => import('@/view/UserProfile.vue')
+            },
+            {
+                path: '/userEdit',
+                name: 'user_edit',
+                component: () => import('@/view/UserEdit.vue')
             }
         ]
     },
-    // {
-    //     path: '/user',
-    //     component: Layout,
-    //     hidden: true,
-    //     redirect: 'noredirect',
-    //     children: [
-    //         {
-    //             path: 'profile',
-    //             component: () => import('@/views/system/user/profile/index'),
-    //             name: 'Profile',
-    //             meta: { title: '个人中心', icon: 'user' }
-    //         }
-    //     ]
-    // }
 ]
 export default constantRoutes

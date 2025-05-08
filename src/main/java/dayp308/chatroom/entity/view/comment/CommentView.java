@@ -28,7 +28,6 @@ public class CommentView implements Serializable {
     protected Long likeCount;
     protected Boolean liked;
     protected Long parentCommentId;
-    @Setter(AccessLevel.NONE)
     protected Long childCount;
     protected List<CommentView> children = new ArrayList<>();
 
@@ -38,10 +37,6 @@ public class CommentView implements Serializable {
     public boolean equals(Object o) {
         if (!(o instanceof CommentView that)) return false;
         return Objects.equals(id, that.id);
-    }
-
-    public void setChildCount(Long childCount) {
-        this.childCount = Math.max(childCount - 1, 0);
     }
 
     @Override

@@ -2,27 +2,31 @@
     <div class="comment-brief-view">
         <UserBriefView :category-id="categoryId" :user-id="userId"/>
         <Markdown :md-text="commentBody" class="comment-body"/>
-        <CommentData @toggle-reply-input="toggleReplyInput" :comment-id="commentId" :comment-count="childCount" :liked="liked" :like-count="likeCount"/>
+        <CommentData 
+            @toggle-reply-input="toggleReplyInput"
+            ref="dataRef"
+            :comment-id="commentId"
+            :comment-count="childCount"
+            :liked="liked"
+            :like-count="likeCount"
+        />
         <span v-show="showReplyInput">
             <el-input v-model="replyText" placeholder="输入回复内容"/><el-button type="primary" @click="replyComment">回复</el-button>
         </span>
-        <details class="child-comment" v-if="!isEmpty(children)" open>
+        <details class="child-comment" v-if="!isEmpty(data.children)" open>
             <summary>展开评论</summary>
             <CommentBriefView ref="childrenRef"
                 @toggle-reply-input="closeAllReplyInput"
+                @comment-created="refreshData"
                 v-for="i in children"
-                :category-id="i.categoryId"
-                :children="i.children"
-                :comment-id="i.id"
-                :comment-body="i.commentBody"
-                :post-id="i.postId"
-                :create-time="i.createTime"
-                :child-count="i.childCount"
-                :like-count="i.likeCount"
-                :user-id="i.userId"
-                :liked="i.liked"
+                :key="i.id"
+                :data="i"
             />
         </details>
+        <el-link
+            v-if="!detailed && childCount > 5 && !isNumber(parentCommentId)"
+            @click="goToDetails"
+        >查看所有回复</el-link>
     </div>
 </template>
 
@@ -30,42 +34,66 @@
 import UserBriefView from '../User/UserBriefView.vue';
 import Markdown from '@/components/Markdown/index.vue'
 import CommentData from './CommentData.vue';
-import { isEmpty } from 'lodash';
-import { postComment } from '@/js/api/comment';
-import { useTemplateRef } from 'vue';
+import { isEmpty, isNumber } from 'lodash';
+import { getSingleComment, postComment } from '@/js/api/comment';
+import { nextTick, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 
-const {commentId, postId, userId, categoryId, commentBody, createTime, likeCount, liked, children = [], childCount = 0} = defineProps({
-    commentId: {
-        type: Number,
-        required: true
-    },
-    postId: Number,
-    userId: Number,
-    categoryId: Number,
-    commentBody: String,
-    createTime: Number,
-    likeCount: Number,
-    liked: Boolean,
-    children: Array,
-    childCount: Number,
+const {data, detailed} = defineProps({
+    data: Object,
+    detailed: Boolean
 })
+const router = useRouter()
+
+const commentId = data.id
+const postId = data.postId
+const userId = data.userId
+const categoryId = data.categoryId
+const commentBody = ref(data.commentBody)
+const createTime = data.createTime
+const likeCount = data.likeCount
+const liked = data.liked
+const parentCommentId = data.parentCommentId
+const childCount = data.childCount
+const children = ref(data.children)
 
 const replyText = ref(null)
 const emit = defineEmits(['comment-created', 'toggle-reply-input'])
 const showReplyInput = ref(false)
 
 const childrenRef = useTemplateRef('childrenRef')
+const dataRef = useTemplateRef('dataRef')
+
+async function refreshData() {
+    await dataRef.value.refresh()
+}
+
+function goToDetails() {
+    router.push({name: 'comment_detail', params: {id: commentId}})
+}
+
+async function refresh() {
+    let newData = await getSingleComment(data.id)
+    children.value = []
+    newData.children.forEach(i => {
+        children.value.push(i)
+    })
+    console.log(newData.children)
+    console.log(children.value)
+}
 
 async function replyComment() {
     if (isEmpty(replyText.value)) return
     let form = {
-        postId: postId,
+        postId: data.postId,
         commentBody: replyText.value,
-        parentCommentId: commentId
+        parentCommentId: data.id
     }
     try {
         let newCommentId = await postComment(form);
         emit('comment-created')
+        refresh()
+        refreshData()
         replyText.value = null
     } catch (err) {
         console.log(err)

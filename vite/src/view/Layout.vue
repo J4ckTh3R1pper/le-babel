@@ -8,27 +8,49 @@ import "element-plus/theme-chalk/display.css"
 import RecentPost from "@/components/Post/RecentPost.vue";
 import { useRoute } from "vue-router";
 import CategoryInfo from "@/components/Category/CategoryInfo.vue";
-import { computed } from "vue";
+import { computed, onBeforeMount, onMounted } from "vue";
+import UserInfo from "@/components/Sidebar/UserInfo.vue";
 
 const appStore = useAppStore()
 const {sidebar} = storeToRefs(appStore)
 const route = useRoute()
 
+const categoryId = ref(null)
+const userId = ref(null)
+const loading = ref(true)
+const emit = defineEmits(['initialized'])
+
+onBeforeMount(() => {
+  initParam()
+})
+
+onMounted(() => {
+  emit('initialized')
+})
+
+function initParam() {
+  if ( route.name == 'category_index' ) {
+    categoryId.value = Number(route.params['id'])
+  }
+  if ( route.name == 'user_profile') {
+    userId.value = Number(route.params['id'])
+  }
+}
+
 watch(route, () => {
   loading.value = true
-})
+  initParam()
+}, {immediate: true})
 
 const sideCardComponent = computed(() => {
-  if (route.name == 'category_index' || route.name == 'post_detail') {
-    return CategoryInfo
-  }
-
-  if (route.name == 'index') {
-    return RecentPost
+  switch(route.name) {
+    case 'category_index':
+    case 'post_detail':
+    case 'comment_detail': return CategoryInfo
+    case 'index': return RecentPost
+    case 'user_profile': return UserInfo
   }
 })
-
-const loading = ref(true)
 
 </script>
 
@@ -44,7 +66,12 @@ const loading = ref(true)
           <router-view v-slot="{ Component }">
             <transition name="fade">
               <keep-alive :include="['Index', 'PostDetail', 'CategoryIndex']">
-                <component :is="Component" @finish-load="loading = false" :key="route.path"></component>
+                <component
+                  :is="Component"
+                  @finish-load="loading = false"
+                  @category-change="v => categoryId = v"
+                  :key="route.path">
+                </component>
               </keep-alive>
             </transition>
           </router-view>
@@ -53,7 +80,7 @@ const loading = ref(true)
       <suspense>
         <el-aside class="side-card hidden-sm-and-down" width="400px">
           <keep-alive :include="['RecentPost']">
-            <component :is="sideCardComponent"></component>
+            <component :is="sideCardComponent" :user-id="userId" :category-id="categoryId"></component>
           </keep-alive>
         </el-aside>
       </suspense>

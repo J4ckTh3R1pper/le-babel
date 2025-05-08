@@ -11,6 +11,30 @@ export async function getCommentByPostId(postId, page, size, sort) {
     })
 }
 
+export async function getSingleComment(commentId) {
+    return service.get("/no_auth/comment/get_single", {
+        params: {
+            id: commentId
+        }
+    })
+}
+
+export async function getCommentDetail(commentId) {
+    return service.get("/no_auth/comment/get_detail", {
+        params: {
+            id: commentId
+        }
+    })
+}
+
+export async function getCommentData(commentId) {
+    return service.get("/no_auth/comment/get_data", {
+        params: {
+            id: commentId
+        }
+    })
+}
+
 export async function likeComment(commentId) {
     return service.put("/comment/like?id=" + commentId)
 }

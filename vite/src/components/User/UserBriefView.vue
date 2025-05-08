@@ -4,8 +4,10 @@ import defaultAvatar from '@/assets/images/default_user_avatar.png'
 import useUserCacheStore from "@/js/module/user_cache";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const avatar = ref('');
+const router = useRouter()
 
 const {categoryId, userId, full} = defineProps({
   categoryId: {
@@ -27,7 +29,7 @@ const userCacheStore = useUserCacheStore()
 const user = ref(await userCacheStore.fetchUserBriefView(categoryId, userId))
 
 watchEffect(() => {
-  avatar = isEmpty(user.value.headImgUrl) ? defaultAvatar : '/api' + user.value.headImgUrl
+  avatar.value = isEmpty(user.value.headImgUrl) ? defaultAvatar : user.value.headImgUrl
 })
 
 const avatarStyle = computed(() => ({
@@ -37,13 +39,12 @@ const avatarStyle = computed(() => ({
 </script>
 
 <template>
-  <Suspense>
   <div class="user-brief-view">
     <el-avatar class="avatar" :src="avatar" :size=" full ? 50 : 25" :style="avatarStyle"/>
     <span class="data">
       <span class="top">
         <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == 3 ? '版主' : user.role == 2 ? '管理员' : '' }}</span>
-        <el-link class="nickname" :href="`/userInfo?id=${userId}`">{{user.nickName}}</el-link>
+        <el-link class="nickname" @click.self.prevent="router.push({name: 'user_profile', params:{id: userId}})">{{user.nickName}}</el-link>
         <span v-if="user.role > 0" >
           <el-divider direction="vertical" border-style="dashed"/>
           <el-text class="level">{{'Lv.' + user.level}}</el-text>
@@ -55,7 +56,6 @@ const avatarStyle = computed(() => ({
       </span>
     </span>
   </div>
-  </Suspense>
 </template>
 
 <style scoped lang="scss">

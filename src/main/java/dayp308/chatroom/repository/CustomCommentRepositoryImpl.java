@@ -11,6 +11,7 @@ import dayp308.chatroom.entity.post.Post;
 import dayp308.chatroom.entity.post.Post_;
 import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.user.User_;
+import dayp308.chatroom.repository.projection.CommentData;
 import dayp308.chatroom.repository.projection.CommentProjection;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -38,7 +39,10 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         Join<PostComment, Post> postJoin = root.join(PostComment_.POST, JoinType.LEFT);
         Join<Post, PostCategory> categoryJoin = postJoin.join(Post_.CATEGORY, JoinType.LEFT);
         Join<PostComment, PostComment> parentJoin = root.join(PostComment_.PARENT_COMMENT, JoinType.LEFT);
-        Join<PostComment, PostComment> descendants = root.join(PostComment_.DESCENDANTS, JoinType.INNER);
+        Join<PostComment, PostComment> descendants = root.join(PostComment_.DESCENDANTS, JoinType.LEFT);
+        descendants.on(
+                cb.notEqual(descendants.get(PostComment_.ID), root.get(PostComment_.ID))
+        );
 
         Join<PostComment, User> currentUserLikeJoin = null;
         if (user != null) {
@@ -105,7 +109,7 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         cq.where(
                 cb.and(
                         cb.equal(root.join(PostComment_.POST).get(Post_.ID), postId),
-                        cb.isNull(root.join(PostComment_.PARENT_COMMENT, JoinType.LEFT))
+                        cb.isNull(root.join(PostComment_.PARENT_COMMENT, JoinType.LEFT).get(PostComment_.ID))
                 )
         ).groupBy(root.get(PostComment_.ID));
 
@@ -167,5 +171,42 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
         TypedQuery<CommentProjection> query = em.createQuery(cq);
         if (limit > 0) query.setMaxResults(limit);
         return query.getResultList();
+    }
+    @Override
+    public CommentData getCommentDataById(long commentId, User user) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<CommentData> cq = cb.createQuery(CommentData.class);
+        Root<PostComment> root = cq.from(PostComment.class);
+        Join<PostComment, PostComment> descendants = root.join(PostComment_.DESCENDANTS, JoinType.LEFT);
+        descendants.on(
+                cb.notEqual(descendants.get(PostComment_.ID), commentId)
+        );
+        Join<PostComment, User> likeJoin = root.join(PostComment_.USERS_LIKED, JoinType.LEFT);
+
+        Join<PostComment, User> currentUserLikeJoin = null;
+        if (user != null) {
+            currentUserLikeJoin = root.join(PostComment_.USERS_LIKED, JoinType.LEFT);
+            currentUserLikeJoin.on(cb.equal(currentUserLikeJoin.get(User_.ID), user.getId()));
+        }
+
+        Expression<Object> liked = cb.selectCase().when(
+                currentUserLikeJoin == null ? cb.disjunction()
+                        : cb.isNotNull(currentUserLikeJoin.get(User_.ID)), Boolean.TRUE
+        ).otherwise(Boolean.FALSE);
+        Expression<Long> childCount = cb.countDistinct(descendants);
+        Expression<Long> likeCount = cb.countDistinct(likeJoin);
+
+        cq.select(cb.construct(CommentData.class,
+                childCount.alias("childCount"),
+                liked.alias("liked"),
+                likeCount.alias("likedCount")
+        ));
+
+        cq.where(
+                cb.equal(
+                        root.get(PostComment_.ID), commentId
+                ));
+        TypedQuery<CommentData> query = em.createQuery(cq);
+        return query.getSingleResult();
     }
 }

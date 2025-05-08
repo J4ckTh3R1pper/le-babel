@@ -32,7 +32,7 @@ const recentCategory = useRecentCategoryStore()
 
 const {userId} = storeToRefs(userStore)
 const {historyList} = storeToRefs(history)
-const emit = defineEmits(['finish-load'])
+const emit = defineEmits(['finish-load', 'category-change'])
 
 const isFirstTime = computed( () => isUndefined( find( historyList.value, o =>
         o.name == 'category_index' && o.params['id'] == route.params['id']
@@ -47,12 +47,13 @@ watch(route, async () => {
     if (!isFirstTime.value) emit('finish-load')
 }, {immediate: true})
 
-watch(categoryId, async() => {
-    if (isNumber (categoryId.value)) {
-        let data = (await categoryCache.fetchCategory(categoryId.value))
+watch(categoryId, async (newId) => {
+    if (isNumber (newId)) {
+        let data = (await categoryCache.fetchCategory(newId))
         name.value = data.name
         avatar.value = data.avatar
         if (isFirstTime.value) load()
+        emit('category-change', newId)
     }
 }, {immediate: true})
 

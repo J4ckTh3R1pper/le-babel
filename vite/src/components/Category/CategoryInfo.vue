@@ -5,10 +5,14 @@
         </template>
         <el-text>{{ info }}</el-text>
         <el-divider/>
-        <Membership v-if="isNumber(categoryId) && isNumber(userId)" :category-id="categoryId" :user-id="userId"/>
-        <el-divider/>
-        <el-text v-if="isEmpty(rule)">{{ '版规: ' + rule }}</el-text>
-        <el-divider/>
+        <template v-if="isNumber(categoryId) && isNumber(userId)">
+            <Membership  :category-id="categoryId" :user-id="userId"/>
+            <el-divider/>
+        </template>
+        <template v-if="isEmpty(rule)">
+            <el-text >{{ '规则: ' + rule }}</el-text>
+            <el-divider/>
+        </template>
         <el-text>{{ '创建时间: ' + createDate }}</el-text>
         <el-divider/>
         <el-text>{{ '关注: ' + subscriberCount }}</el-text>
@@ -31,7 +35,13 @@ const loginUserStore = useLoginUserStore()
 const {historyList} = storeToRefs(historyStore)
 const {list} = storeToRefs(recentCategory)
 const {userId} = storeToRefs(loginUserStore)
-const categoryId = ref(null)
+
+const {categoryId} = defineProps({
+    categoryId: {
+        type: Number,
+        required: true
+    }
+})
 const isFirstTime = computed(() => isUndefined( find( historyList.value, o =>
         o.name == 'category_index' && o.params['id'] == route.params['id']
 )))
@@ -41,7 +51,6 @@ const createTime = ref(0)
 const avatar = ref('')
 const info = ref('')
 const rule = ref('')
-const userStore = useUserCacheStore()
 const subscriberCount = ref(0)
 
 const createDate = computed(() => {
@@ -49,22 +58,13 @@ const createDate = computed(() => {
     return date.toISOString().split('T')[0]
 })
 
-watch(route, () => {
-    if ( route.name == 'category_index' ) {
-        categoryId.value = Number(route.params['id'])
-    }
+watch(() => categoryId, () => {
+    load()
 }, {immediate: true})
-
-watch(categoryId, () => {
-    if (categoryId.value && isFirstTime.value) load()
-}, {immediate: true})
-
-watch(list, () => {
-    categoryId.value = list.value[0]
-})
 
 async function load() {
-    let data = await getCategoryInfo(categoryId.value)
+    if (!isNumber(categoryId)) return
+    let data = await getCategoryInfo(categoryId)
     name.value = data.name
     createTime.value = data.createTime
     avatar.value = data.avatar

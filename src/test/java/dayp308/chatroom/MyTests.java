@@ -176,10 +176,4 @@ class MyTests {
         System.out.println(projection);
         System.out.println(projection2);
     }
-    @Test
-    void testPostBriefSlice() {
-        User user = userRepository.getReferenceById(135L);
-        Slice<PostProjection> slice = postRepository.findAllProj(2, user,true, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, Post_.LAST_UPDATE_TIME)));
-        System.out.println(slice.getContent());
-    }
 }

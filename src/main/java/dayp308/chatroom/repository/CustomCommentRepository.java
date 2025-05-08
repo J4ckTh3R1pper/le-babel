@@ -2,6 +2,7 @@ package dayp308.chatroom.repository;
 
 import dayp308.chatroom.entity.enums.CommentOrderType;
 import dayp308.chatroom.entity.user.User;
+import dayp308.chatroom.repository.projection.CommentData;
 import dayp308.chatroom.repository.projection.CommentProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -15,4 +16,5 @@ public interface CustomCommentRepository {
     List<CommentProjection> findAllProjByCommentId(long commentId, @Nullable User user, int limit, boolean filterDeleted);
 
     List<CommentProjection> findClosureListByCommentId(long commentId, User user, int limit, boolean filterDeleted);
+    CommentData getCommentDataById(long commentId, User user);
 }

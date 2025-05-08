@@ -29,6 +29,7 @@
                     :thumbnails="i.thumbnails"
                     :liked="i.liked"
                     :show-category="showCategory"
+                    :show-user="!isNumber(userId)"
             />
         </li>
         <li>
@@ -64,8 +65,9 @@ const sortings = [
 ]
 const sort = ref(sortings[0].value)
 const page = ref(1)
-const {categoryId, size, showCategory} = defineProps({
+const {categoryId = null, userId = null, size = 15, showCategory} = defineProps({
     categoryId: Number,
+    userId: Number,
     size: Number,
     showCategory: Boolean
 })
@@ -76,15 +78,17 @@ const lastPage = ref(false)
 const emit = defineEmits(['finish-load'])
 
 watch(sort, async () => {
-    list.value = []
-    page.value = 1
-    load()
+    reload()
 }, {} )
 
-watch(() => categoryId, async() => {
+function reload() {
     list.value = []
     page.value = 1
     load()
+}
+
+watch(() => categoryId, async () => {
+    reload()
 }, { immediate: true, deep: true})
 
 watch(loading, () => {
@@ -93,7 +97,7 @@ watch(loading, () => {
 
 function load() {
     loading.value = true
-    getPostSlice(categoryId, page.value, size, sort.value+',desc').then(res => {
+    getPostSlice(categoryId, userId, page.value, size, sort.value+',desc').then(res => {
         if (!res["empty"]) {
             list.value = list.value.concat(res.content)
             page.value += 1

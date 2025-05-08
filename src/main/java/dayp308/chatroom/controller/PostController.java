@@ -10,13 +10,12 @@ import dayp308.chatroom.entity.user.User;
 import dayp308.chatroom.entity.business.CommentCreationForm;
 import dayp308.chatroom.entity.business.LikeResponse;
 import dayp308.chatroom.entity.business.PostForm;
+import dayp308.chatroom.entity.category.PostCategory;
 import dayp308.chatroom.entity.view.comment.CommentView;
 import dayp308.chatroom.entity.view.post.PostBriefView;
 import dayp308.chatroom.entity.view.post.PostDetailedView;
-import dayp308.chatroom.repository.CommentLikeRepository;
-import dayp308.chatroom.repository.PostLikeRepository;
-import dayp308.chatroom.repository.PostRepository;
-import dayp308.chatroom.repository.UserRepository;
+import dayp308.chatroom.repository.*;
+import dayp308.chatroom.repository.projection.CommentData;
 import dayp308.chatroom.service.FileService;
 import dayp308.chatroom.service.PostService;
 import dayp308.chatroom.service.UserService;
@@ -48,6 +47,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 public class PostController {
 
+    private final CommentRepository commentRepository;
+
     private final FileService fileService;
 
     private final PostService postService;
@@ -59,7 +60,7 @@ public class PostController {
     private final CommentLikeRepository commentLikeRepository;
 
     @Autowired
-    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, FileService fileService) {
+    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, FileService fileService, CommentRepository commentRepository) {
         this.postService = postService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -68,6 +69,7 @@ public class PostController {
         this.postLikeRepository = postLikeRepository;
         this.commentLikeRepository = commentLikeRepository;
         this.fileService = fileService;
+        this.commentRepository = commentRepository;
     }
 
     @PostMapping("/api/post/create")
@@ -124,7 +126,8 @@ public class PostController {
 
     @GetMapping("/api/no_auth/post/get_posts")
     public Slice<PostBriefView> getPostSlice(
-            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "categoryId", required = false) PostCategory category,
+            @RequestParam(value = "userId", required = false) User targetUser,
             @PageableDefault(
                     sort = {Post_.LAST_UPDATE_TIME},
                     direction = Sort.Direction.DESC)
@@ -135,7 +138,7 @@ public class PostController {
         if ( auth != null && auth.isAuthenticated() )
             user = (User) auth.getPrincipal();
 
-        return postService.getPostSlice(categoryId, user, pageable, true);
+        return postService.getPostSlice(category, user, targetUser, pageable, true);
     }
 
     @GetMapping("/api/no_auth/post/get_comments")
@@ -170,6 +173,28 @@ public class PostController {
         return view;
     }
 
+    @GetMapping("/api/no_auth/comment/get_single")
+    public CommentView getSingleComment(
+            @RequestParam("id") int id,
+            Authentication auth
+    ) {
+        User user = null;
+        if ( auth != null && auth.isAuthenticated() )
+            user = (User) auth.getPrincipal();
+
+        CommentView view = postService.getCommentBriefView(id, user);
+        return view;
+    }
+
+    @GetMapping("/api/no_auth/comment/get_data")
+    public CommentData getCommentData(@RequestParam("id") long id, Authentication auth) {
+        User user = null;
+        if ( auth != null && auth.isAuthenticated() )
+            user = (User) auth.getPrincipal();
+        return commentRepository.getCommentDataById(id, user);
+    }
+    
+
     @GetMapping("/api/no_auth/post/thread")
     public ResponseEntity<PostDetailedView> getThread(
             @RequestParam("id") long id, Authentication auth) throws JsonProcessingException {
@@ -178,7 +203,7 @@ public class PostController {
             user = (User) auth.getPrincipal();
 
         PostDetailedView view = postService.getPostDetailedView(id, user);
-        if (user != null) view.setViewCount(postService.increaseViewCount(id, 1));
+        // if (user != null) view.setViewCount(postService.increaseViewCount(id, 2));
         return new ResponseEntity<>(view, HttpStatus.OK);
     }
     @GetMapping("/api/no_auth/post/get_minimal_list")

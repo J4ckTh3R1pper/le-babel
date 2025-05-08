@@ -12,7 +12,7 @@ const useUserCacheStore = defineStore(
         actions: {
             async fetchUser(userId, renew) {
                 return new Promise((resolve, reject) => {
-                    if (renew) return reject()
+                    if (renew) return reject(userId)
                     if (this.userMap.has(userId)) {
                         return resolve(this.userMap.get(userId))
                     } else return reject(userId)
@@ -62,6 +62,7 @@ const useUserCacheStore = defineStore(
                         headImgUrl: user.headImgUrl,
                         location: user.location,
                         role: member.role,
+                        experience: member.experience,
                         level: Math.round(member.experience / 100),
                         title: member.title
                     })

@@ -118,8 +118,9 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
 
     @Override
     public Slice<PostProjection> findAllProj(
-            @Nullable Integer categoryId,
+            @Nullable PostCategory category,
             @Nullable User user,
+            @Nullable User targetUser,
             boolean visibleOnly,
             Pageable pageable
             ) {
@@ -140,8 +141,10 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
 
         // 拼接WHERE条件
         Predicate p = cb.conjunction();
-        if ( categoryId != null )
-            p = cb.and(p, categoryIdEquals(root, cb, categoryId));
+        if ( category != null )
+            p = cb.and(p, categoryIdEquals(root, cb, category.getId()));
+        if ( targetUser != null )
+            p = cb.and(p, cb.equal(root.join(Post_.USER).get(User_.ID), targetUser.getId()));
         if ( visibleOnly )
             p = cb.and(p, isVisible(root, cb));
 

@@ -57,8 +57,8 @@ function handleLogin() {
               }
               return acc;
             }, {});
-            await userStore.getInfo()
-            router.push({ path: redirect.value || "/", query: otherQueryParams });
+            // router.push({ path: redirect.value || "/", query: otherQueryParams });
+            window.location.replace(window.location.protocol + "//" + window.location.host)
           } catch (err) {
             loading.value = false;
             console.log(err)

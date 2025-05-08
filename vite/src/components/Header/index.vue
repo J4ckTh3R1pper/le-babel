@@ -26,13 +26,18 @@ function getUserRoute() {
     route = {name: 'login'}
   else {
     route = {
-      name: 'user_info',
+      name: 'user_profile',
       params: {
         id: userId.value
       }
     }
   }
   router.push(route)
+}
+
+async function logOut() {
+  await loginUserStore.logOut()
+  window.location.reload()
 }
 
 function logoClicked() {
@@ -61,7 +66,7 @@ function handleCommand(command) {
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item command="profile" @click="getUserRoute">{{ !isNumber(userId) ? '登录' : '个人主页' }}</el-dropdown-item>
-            <el-dropdown-item v-if="isNumber(userId)" command="logOut">登出</el-dropdown-item>
+            <el-dropdown-item v-if="isNumber(userId)" @click="logOut">登出</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

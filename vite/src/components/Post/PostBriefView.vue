@@ -11,13 +11,14 @@ import { isEmpty } from "lodash";
 import { useRoute, useRouter } from "vue-router";
 
 const {
-  postId, title, userId, categoryId, showCategory, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails, liked
+  postId, title, userId, categoryId, showCategory = true, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails, liked, showUser = true
 } = defineProps({
   postId: Number,
   title: String,
   userId: Number,
   categoryId: Number,
   showCategory: Boolean,
+  showUser: Boolean,
   content: String,
   createTime: Number,
   lastUpdateTime: Number,
@@ -57,8 +58,10 @@ if (showCategory) {
 <template>
   <div class="post-brief-view" @click="onClicked">
     <div class="top">
-      <UserBriefView :user-id="userId" :category-id="categoryId"/>
-      <el-divider direction="vertical"/>
+      <template v-if="showUser">
+        <UserBriefView :user-id="userId" :category-id="categoryId"/>
+        <el-divider direction="vertical"/>
+      </template>
       <Time :timestamp="createTime" class="time"/>
       <!-- https://stackoverflow.com/questions/77397035/pinia-getter-undefined-if-used-with-filter -->
       <template v-if="!isEmpty(categoryName)">

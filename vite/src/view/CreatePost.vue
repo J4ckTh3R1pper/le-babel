@@ -44,13 +44,17 @@ const form = ref({
 const route = useRoute()
 const router = useRouter()
 const id = ref(Number(route.params['id']))
-const emit = defineEmits(['finish-load'])
+const emit = defineEmits(['finish-load', 'category-change'])
 const loading = ref(false)
 
 watch(route, async (newRoute) => {
     if ( newRoute.name == 'create_post' ) {
         id.value = Number(newRoute.params['id'])
     }
+})
+
+watch(id, newValue => {
+    emit('category-change', newValue)
 })
 
 emit('finish-load')

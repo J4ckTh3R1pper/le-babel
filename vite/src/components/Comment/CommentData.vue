@@ -12,7 +12,8 @@
 </template>
 
 <script setup>
-import { likeComment } from '@/js/api/comment';
+import { getCommentData, likeComment } from '@/js/api/comment';
+import { nextTick } from 'vue';
 
 const props = defineProps({
     commentId: {
@@ -30,16 +31,26 @@ const commentId = ref(props['commentId'])
 const commentCount = ref(props['commentCount'])
 const likeCount = ref(props['likeCount'])
 
-function like() {
-    likeComment(commentId.value).then(data => {
-        liked.value = data.liked
-        likeCount.value = data.count
-    })
+async function like() {
+  await likeComment(commentId.value)
+  await refresh()
 }
 
 function toggleReplyInput() {
   emit('toggle-reply-input')
 }
+
+async function refresh() {
+  let data = await getCommentData(commentId.value)
+  liked.value = data.liked
+  commentCount.value = data.childCount
+  likeCount.value = data.likeCount
+  await nextTick()
+}
+
+defineExpose({
+  refresh
+})
 
 </script>
 

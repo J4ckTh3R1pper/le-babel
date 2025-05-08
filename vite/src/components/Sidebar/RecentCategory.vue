@@ -10,7 +10,6 @@ const {list} = storeToRefs(recentStore)
 </script>
 
 <template>
-  <Suspense>
   <el-sub-menu index="recent-category">
     <!--          最近访问-->
     <template #title>
@@ -23,7 +22,6 @@ const {list} = storeToRefs(recentStore)
                     :category-id="id"/>
     </el-menu-item-group>
   </el-sub-menu>
-  </Suspense>
 </template>
 
 <style scoped lang="scss">

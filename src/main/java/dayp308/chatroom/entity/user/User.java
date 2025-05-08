@@ -56,7 +56,7 @@ public class User implements UserDetails {
     private String location = "";
 
     @ColumnDefault("''")
-    @Column(name = "introduce", nullable = false, length = 32)
+    @Column(name = "introduce", nullable = false, length = 144)
     private String introduce = "";
 
     @ColumnDefault("0")
