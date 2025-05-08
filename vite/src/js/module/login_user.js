@@ -17,7 +17,7 @@ const useLoginUserStore = defineStore(
         }),
         actions: {
             // 登录
-            login(userInfo) {
+            async login(userInfo) {
                 const loginName = userInfo.loginName.trim()
                 const password = userInfo.password
                 const captcha = userInfo.captcha
@@ -32,7 +32,7 @@ const useLoginUserStore = defineStore(
                 })
             },
             // 获取用户信息
-            getInfo() {
+            async getInfo() {
                 return new Promise((resolve, reject) => {
                     getInfoRequest().then(res => {
                         let avatar = res.headImgUrl || ""
@@ -46,11 +46,11 @@ const useLoginUserStore = defineStore(
                 })
             },
             // 退出系统
-            logOut() {
+            async logOut() {
                 return new Promise((resolve, reject) => {
                     logoutRequest(this.token).then(() => {
-                        this.$reset()
                         removeToken()
+                        this.$reset()
                         resolve()
                     }).catch(error => {
                         reject(error)

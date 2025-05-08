@@ -5,7 +5,9 @@
         </template>
         <el-text>{{ info }}</el-text>
         <el-divider/>
-        <el-text>{{ '版规: ' + rule }}</el-text>
+        <Membership v-if="isNumber(categoryId) && isNumber(userId)" :category-id="categoryId" :user-id="userId"/>
+        <el-divider/>
+        <el-text v-if="isEmpty(rule)">{{ '版规: ' + rule }}</el-text>
         <el-divider/>
         <el-text>{{ '创建时间: ' + createDate }}</el-text>
         <el-divider/>
@@ -16,31 +18,30 @@
 <script setup>
 import { getCategoryInfo } from '@/js/api/category';
 import useRouteHistoryStore from '@/js/module/route_history';
-import { find, isUndefined } from 'lodash';
+import { find, isEmpty, isNumber, isUndefined } from 'lodash';
 import { storeToRefs } from 'pinia';
-import { reactive } from 'vue';
-import { routeLocationKey } from 'vue-router';
-import Time from '../Time.vue';
-import useRecentPostStore from '@/js/module/recent_post';
-import mitt from 'mitt';
 import useRecentCategoryStore from '@/js/module/recent_category';
+import useUserCacheStore from '@/js/module/user_cache';
+import useLoginUserStore from '@/js/module/login_user';
+import Membership from './Membership.vue';
 const route = useRoute()
 const historyStore = useRouteHistoryStore()
-const recentPost = useRecentPostStore()
 const recentCategory = useRecentCategoryStore()
+const loginUserStore = useLoginUserStore()
 const {historyList} = storeToRefs(historyStore)
 const {list} = storeToRefs(recentCategory)
+const {userId} = storeToRefs(loginUserStore)
 const categoryId = ref(null)
 const isFirstTime = computed(() => isUndefined( find( historyList.value, o =>
         o.name == 'category_index' && o.params['id'] == route.params['id']
 )))
 
 const name = ref('')
-const emitter = mitt()
 const createTime = ref(0)
 const avatar = ref('')
 const info = ref('')
 const rule = ref('')
+const userStore = useUserCacheStore()
 const subscriberCount = ref(0)
 
 const createDate = computed(() => {

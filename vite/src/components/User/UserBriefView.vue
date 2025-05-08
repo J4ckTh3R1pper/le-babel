@@ -5,7 +5,7 @@ import useUserCacheStore from "@/js/module/user_cache";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
-let avatar = ref('');
+const avatar = ref('');
 
 const {categoryId, userId, full} = defineProps({
   categoryId: {

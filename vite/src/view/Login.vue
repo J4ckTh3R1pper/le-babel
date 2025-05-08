@@ -45,24 +45,26 @@ onMounted(() => {
 })
 
 function handleLogin() {
-    proxy.$refs.loginRef.validate( valid => {
+    proxy.$refs.loginRef.validate( async valid => {
         if (valid) {
           loading.value = true;
-
-          userStore.login(loginForm.value).then(async () => {
-            const query = route.query;
-            const otherQueryParams = Object.keys(query).reduce((acc, cur) => {
+          try {
+            await userStore.login(loginForm.value)
+            let query = route.query;
+            let otherQueryParams = Object.keys(query).reduce((acc, cur) => {
               if (cur !== "redirect") {
                 acc[cur] = query[cur];
               }
               return acc;
             }, {});
+            await userStore.getInfo()
             router.push({ path: redirect.value || "/", query: otherQueryParams });
-          }).catch(() => {
+          } catch (err) {
             loading.value = false;
+            console.log(err)
             // 重新获取验证码
             getCaptcha();
-          });
+          }
         }
     })
 }
