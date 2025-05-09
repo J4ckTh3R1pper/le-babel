@@ -53,6 +53,7 @@ if (showCategory) {
   categoryName = (await categoryStore.fetchCategory(categoryId))['name']
 }
 
+window.translate.execute();
 </script>
 
 <template>

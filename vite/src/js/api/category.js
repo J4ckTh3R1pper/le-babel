@@ -19,3 +19,11 @@ export async function getCategoryCache(id) {
 export async function joinCategory(id) {
     return service.put('/category/join_category?id=' + id)
 }
+
+export async function createCategory(name, avatar, info) {
+    return service.postForm("/category/create", {
+        name: name,
+        avatar: avatar,
+        info: info,
+    })
+}

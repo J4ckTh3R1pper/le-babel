@@ -19,6 +19,8 @@ import dayp308.chatroom.repository.PostRepository;
 import dayp308.chatroom.service.CategoryMemberService;
 import dayp308.chatroom.service.CategoryService;
 import jakarta.persistence.NoResultException;
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -30,6 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,9 +89,9 @@ public class CategoryController {
     }
     
 
-    @PostMapping("/api/category/create_request")
+    @PostMapping("/api/category/create")
     public ResponseEntity<Integer> createCategoryRequest(
-            @RequestParam CategoryCreationForm form,
+            @Valid CategoryCreationForm form,
             Authentication auth
     ) {
         int id = categoryService.createCategory(form, (User) auth.getPrincipal());

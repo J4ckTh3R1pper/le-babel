@@ -7,6 +7,12 @@ import Markdown from "@/components/Markdown/index.vue"
 import PostData from "./PostData.vue";
 import { MdPreview } from "md-editor-v3";
 import 'md-editor-v3/lib/preview.css';
+import useLoginUserStore from "@/js/module/login_user";
+import { storeToRefs } from "pinia";
+import useUserCacheStore, { defaultMember } from "@/js/module/user_cache";
+import { useRouter } from "vue-router";
+import { deletePost } from "@/js/api/post";
+import { computed } from "vue";
 
 const {
   postId, categoryId, title, userId, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, liked
@@ -28,6 +34,25 @@ const {
   },
 })
 
+const loginUserStore = useLoginUserStore()
+const {isLoggedIn} = storeToRefs(loginUserStore)
+const userCacheStore = useUserCacheStore()
+const router = useRouter()
+const membership = async () => isLoggedIn.value ? await userCacheStore.fetchMember(categoryId, loginUserStore.userId, true) : defaultMember
+
+const hasDeletePermission = computed( () => {
+  if (!isLoggedIn.value) return false;
+  return loginUserStore.userId === userId || membership.role > 1
+})
+
+async function onConfirmDelete() {
+  try {
+    await deletePost(postId)
+    router.push({name: 'category_index', params: {id: categoryId}})
+  } catch(err) {
+    ElMessage({message: err, type: 'error'})
+  }
+}
 
 </script>
 
@@ -49,7 +74,15 @@ const {
         :like-count="likeCount"
         :liked="liked"
       />
-    </div>
+      <el-popconfirm v-if="hasDeletePermission" title="你确定要删除此帖子吗？" @confirm="onConfirmDelete">
+        <template #reference>
+          <el-button type="danger">
+            <el-icon><Delete /></el-icon>
+            删除
+          </el-button>
+        </template>
+      </el-popconfirm>
+      </div>
   </div>
 </template>
 
@@ -77,6 +110,10 @@ const {
           padding-left: 8px;
         }
       }
+    }
+    .bottom {
+      display: flex;
+      justify-content: space-between;
     }
   }
 

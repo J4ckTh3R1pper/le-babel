@@ -77,6 +77,13 @@ const avatarStyle = computed(() => ({
     display: flex;
     flex-direction: column;
   }
+
+  .role_3, .role_2 {
+    border-radius: 4px;
+    padding: 4px 3px;
+    font-size: 12px;
+    margin-right: 4px;
+  }
   .role_3 {
     background-color: #FF4500;
     color: #FFFFFF;

@@ -59,13 +59,20 @@ const width = computed(() => {
           mode="vertical"
         >
           <el-menu-item
-          @click="router.push({name: 'index'})"
+            @click="router.push({name: 'index'})"
           >
-              <el-icon><House /></el-icon>
-              <span>首页</span>
+            <el-icon><House /></el-icon>
+            <span>首页</span>
           </el-menu-item>
           <RecentCategory />
           <JoinedCategory :user-id="userId" v-if="isNumber(userId)"/>
+          <el-menu-item
+            @click="router.push({name: 'create_category'})"
+            v-if="isNumber(userId)"
+          >
+            <el-icon><Plus /></el-icon>
+            <span>创建新板块</span>
+          </el-menu-item>
         </el-menu>
       </el-scrollbar>
     </div>

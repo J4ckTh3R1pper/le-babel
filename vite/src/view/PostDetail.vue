@@ -19,7 +19,8 @@
         <h1><el-text>评论</el-text></h1>
         <CommentList :post-id="data.id" ref="commentList"/>
         <el-divider/>
-        <CreateComment :post-id="data.id" @comment-created="onCommentCreated"/>
+        <CreateComment v-if="isLoggedIn" :post-id="data.id" @comment-created="onCommentCreated"/>
+        <div class="login" v-else><el-text>请先</el-text><el-link @click="router.push({name: 'login'})" type="primary">登录</el-link></div>
     </div>
 </template>
 
@@ -29,6 +30,7 @@ import CommentList from '@/components/Comment/CommentList.vue';
 import CreateComment from '@/components/Comment/CreateComment.vue';
 import PostDetailedView from '@/components/Post/PostDetailedView.vue';
 import { getPostDetails } from '@/js/api/post';
+import useLoginUserStore from '@/js/module/login_user';
 import useRecentCategoryStore from '@/js/module/recent_category';
 import useRecentPostStore from '@/js/module/recent_post';
 import useRouteHistoryStore from '@/js/module/route_history';
@@ -43,8 +45,10 @@ const route = useRoute()
 const recentCategory = useRecentCategoryStore()
 const routeHistory = useRouteHistoryStore()
 const recentPost = useRecentPostStore()
+const loginUserStore = useLoginUserStore()
 
 const {historyList} = storeToRefs(routeHistory)
+const {isLoggedIn} = storeToRefs(loginUserStore)
 
 const id = ref(null)
 const data = ref(null)
@@ -87,5 +91,9 @@ watch (data, newData => {
 <style lang="scss" scoped>
 .post-detail {
     margin-bottom: 4em;
+    .login {
+        display: flex;
+        justify-content: center;
+    }
 }
 </style>

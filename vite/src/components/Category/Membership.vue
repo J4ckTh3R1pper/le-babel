@@ -2,8 +2,10 @@
   <div class="user-membership">
     <el-avatar class="avatar" :src="user.headImgUrl"/>
     <span class="data">
-        <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == 3 ? '版主' : user.role == 2 ? '管理员' : '' }}</span>
-        <el-link class="nickname" :href="`/userInfo?id=${userId}`">{{user.nickName}}</el-link>
+        <span>
+          <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == 3 ? '版主' : user.role == 2 ? '管理员' : '' }}</span>
+          <el-link class="nickname" :href="`/userInfo?id=${userId}`">{{user.nickName}}</el-link>
+        </span>
         <el-text v-if="isEmpty(user.title)" class="title">{{user.title}}</el-text><br>
         <span class="exp" v-if="user.role > 0" >
           <el-text class="level">{{'等级' + user.level}}</el-text>
@@ -53,6 +55,9 @@ const format = (percentage) => percentage + '/100'
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+  & > * {
+    padding-bottom: 4px;
+  }
   .nickname {
     flex-grow: 0;
     align-self: flex-start;
@@ -66,6 +71,12 @@ const format = (percentage) => percentage + '/100'
     }
   }
 }
+  .role_3, .role_2 {
+    border-radius: 4px;
+    padding: 4px 3px;
+    font-size: 12px;
+    margin-right: 4px;
+  }
 .role_3 {
   background-color: #FF4500;
   color: #FFFFFF;

@@ -58,6 +58,11 @@ export const constantRoutes = [
                 path: '/userEdit',
                 name: 'user_edit',
                 component: () => import('@/view/UserEdit.vue')
+            },
+            {
+                path: 'createCategory',
+                name: 'create_category',
+                component: () => import('@/view/CreateCategory.vue')
             }
         ]
     },

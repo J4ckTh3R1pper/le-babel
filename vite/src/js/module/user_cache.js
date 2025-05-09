@@ -80,13 +80,13 @@ const useUserCacheStore = defineStore(
             
 })
 
-const ghostUser = {
+export const ghostUser = {
     nickName: "ghost",
     headImgUrl: "/assets/images/default_user_avatar.png",
     location: ""
 }
 
-const defaultMember = {
+export const defaultMember = {
     role: 0,
     experience: 0,
     title: null

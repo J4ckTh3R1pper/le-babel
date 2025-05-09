@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CategoryCreationForm {
     @NotBlank
-    private String categoryName;
+    private String name;
     private String avatar;
     @NotBlank
-    private String categoryInfo;
+    private String info;
 }

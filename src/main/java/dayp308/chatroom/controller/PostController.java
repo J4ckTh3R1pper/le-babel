@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -91,15 +92,15 @@ public class PostController {
     }
 
     @PreAuthorize(
-            "@authz.isOwner(#post) or @authz.hasAuthorityGe(#post, 'MODERATOR')")
-    @PostMapping("/api/post/delete")
-    public ResponseEntity<String> deletePost(@RequestParam("id") Post post) {
+            "@authz.isPostOwner(#post) or @authz.hasAuthorityGe(#post, 'MODERATOR')")
+    @PutMapping("/api/post/delete")
+    public ResponseEntity<String> deletePost(@RequestParam("id") @P("post") Post post) {
         postService.deletePost(post);
         return new ResponseEntity<>("deleted thread: " + post.getId(), HttpStatus.OK);
     }
 
     @PreAuthorize(
-            "@authz.isOwner(#comment) or @authz.hasAuthorityGe(#comment, 'MODERATOR')")
+            "@authz.isCommentOwner(#comment) or @authz.hasAuthorityGe(#comment, 'MODERATOR')")
     @PostMapping("/api/comment/delete")
     public ResponseEntity<String> deleteComment(@RequestParam("id") PostComment comment) {
         postService.deleteComment(comment);

@@ -49,14 +49,14 @@ public class CustomSpEL {
         return hasAuthorityGe(comment.getPost(), role);
     }
 
-    public boolean isOwner(Post post) {
+    public boolean isPostOwner(Post post) {
         long authenticatedUserId = (
                 (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
         ).getId();
         return post.getUser().getId() == authenticatedUserId;
     }
 
-    public boolean isOwner(PostComment comment) {
+    public boolean isCommentOwner(PostComment comment) {
         long authenticatedUserId = (
                 (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()
         ).getId();

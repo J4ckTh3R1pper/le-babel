@@ -43,3 +43,7 @@ export async function likePost(postId) {
 export async function createPost(form) {
     return service.post("/post/create", form, {})
 }
+
+export async function deletePost(id) {
+    return service.put("/post/delete?id=" + id);
+}

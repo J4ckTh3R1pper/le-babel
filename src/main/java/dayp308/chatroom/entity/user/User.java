@@ -47,9 +47,9 @@ public class User implements UserDetails {
     @Column(name = "nick_name", nullable = false, length = 8, unique = true)
     private String nickName;
 
-    @ColumnDefault("'/images/avatar/default.jpg'")
+    @ColumnDefault("")
     @Column(name = "head_img_url", length = 256, nullable = false)
-    private String headImgUrl = "/images/avatar/default.jpg";
+    private String headImgUrl;
 
     @ColumnDefault("''")
     @Column(name = "location", nullable = false, length = 4)
