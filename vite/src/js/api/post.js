@@ -6,18 +6,17 @@ export async function getPostDetails(id) {
             params: {
                 id: id
             }
-        }).then(res => {
-            return Promise.resolve(res)
-        })
+    })
 }
 
-export function getPostSlice(categoryId, userId, pageNum, pageSize, sort) {
+export function getPostSlice(categoryId, userId, keyword, pageNum, pageSize, sort) {
     return service.get(
         "/no_auth/post/get_posts", {
             params: {
                 categoryId: categoryId,
                 userId: userId,
                 page: pageNum,
+                keyword: keyword,
                 size: pageSize,
                 sort: sort
             }
@@ -46,4 +45,21 @@ export async function createPost(form) {
 
 export async function deletePost(id) {
     return service.put("/post/delete?id=" + id);
+}
+
+export async function searchPost(keyword) {
+    return service.get("/no_auth/post/search", {
+        params: {
+            keyword: keyword
+        }
+    })
+}
+
+export async function getSingle(id) {
+    return service.get(
+        "/no_auth/post/get_single", {
+            params: {
+                id: id
+            }
+    })
 }

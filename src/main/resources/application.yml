@@ -37,6 +37,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+        search: 
+          backend:
+            directory.root: ${INDEX_PATH:index/}
         format_sql: true
         jdbc:
           fetch_size: 1048576

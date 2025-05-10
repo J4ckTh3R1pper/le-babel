@@ -60,9 +60,14 @@ export const constantRoutes = [
                 component: () => import('@/view/UserEdit.vue')
             },
             {
-                path: 'createCategory',
+                path: '/createCategory',
                 name: 'create_category',
                 component: () => import('@/view/CreateCategory.vue')
+            },
+            {
+                path: '/searchPost/:keyword',
+                name: 'search_post',
+                component: () => import('@/view/SearchPost.vue')
             }
         ]
     },

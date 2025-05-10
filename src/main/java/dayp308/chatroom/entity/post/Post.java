@@ -13,6 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Entity
+@Indexed
 @Table(name = "tb_post")
 public class Post {
     @Id
@@ -35,13 +37,13 @@ public class Post {
     private User user;
 
     @Column(name = "post_title", nullable = false, length = 192)
-    @GenericField(name = "title", projectable = Projectable.YES)
+    @FullTextField(name = "title", projectable = Projectable.YES)
     private String title;
 
     @Lob
     @Column(name = "post_content", nullable = false)
     @FullTextField(name = "content")
-    @GenericField(projectable = Projectable.YES)
+    // @GenericField(projectable = Projectable.YES)
     private String content;
 
     @JsonBackReference

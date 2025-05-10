@@ -121,6 +121,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
             @Nullable PostCategory category,
             @Nullable User user,
             @Nullable User targetUser,
+            @Nullable String keyword,
             boolean visibleOnly,
             Pageable pageable
             ) {
@@ -141,14 +142,18 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
 
         // 拼接WHERE条件
         Predicate p = cb.conjunction();
+        List<Predicate> criteria = new ArrayList<Predicate>();
+        criteria.add(p);
         if ( category != null )
-            p = cb.and(p, categoryIdEquals(root, cb, category.getId()));
+            criteria.add(categoryIdEquals(root, cb, category.getId()));
         if ( targetUser != null )
-            p = cb.and(p, cb.equal(root.join(Post_.USER).get(User_.ID), targetUser.getId()));
+            criteria.add(cb.equal(root.join(Post_.USER).get(User_.ID), targetUser.getId()));
         if ( visibleOnly )
-            p = cb.and(p, isVisible(root, cb));
+            criteria.add(isVisible(root, cb));
+        if ( keyword != null && !keyword.isBlank() )
+            criteria.add(cb.like(root.get(Post_.TITLE), "%" + keyword + "%"));
 
-        cq.where(p).groupBy(root.get(Post_.ID));
+        cq.where(cb.and(criteria.toArray(new Predicate[0]))).groupBy(root.get(Post_.ID));
 
         // 获取排序
         if (pageable.getSort().isSorted()) {

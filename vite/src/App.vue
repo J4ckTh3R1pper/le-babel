@@ -7,6 +7,9 @@ window.translate = translate; //方便审核元素用控制台调试
 translate.service.use('client.edge'); //翻译通道
 translate.whole.enableAll(); //整体翻译
 translate.language.setLocal('chinese_simplified');
+translate.language.translateLocal = true;
+translate.ignore.class.push('nickname');
+translate.ignore.class.push('nickName');
 // translate.selectLanguageTag.show = false;
 //页面渲染完毕后触发执行 translate.execute(); 
 

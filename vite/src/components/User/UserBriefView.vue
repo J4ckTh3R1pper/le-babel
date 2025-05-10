@@ -44,7 +44,7 @@ const avatarStyle = computed(() => ({
     <span class="data">
       <span class="top">
         <span v-if="user.role > 1" :class="'role_' + user.role">{{ user.role == 3 ? '版主' : user.role == 2 ? '管理员' : '' }}</span>
-        <el-link class="nickname" @click.self.prevent="router.push({name: 'user_profile', params:{id: userId}})">{{user.nickName}}</el-link>
+        <el-link class="nickname" @click.stop="router.push({name: 'user_profile', params:{id: userId}})">{{user.nickName}}</el-link>
         <span v-if="user.role > 0" >
           <el-divider direction="vertical" border-style="dashed"/>
           <el-text class="level">{{'Lv.' + user.level}}</el-text>
@@ -52,7 +52,7 @@ const avatarStyle = computed(() => ({
         <el-text v-if="isEmpty(user.title)" class="title">{{user.title}}</el-text>
       </span>
       <span v-if="full" class="bottom">
-        <span class="location">{{user.location}}</span>
+        <!-- <span class="location">{{user.location}}</span> -->
       </span>
     </span>
   </div>

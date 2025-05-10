@@ -45,8 +45,9 @@
 <script setup>
 import { getPostSlice } from '@/js/api/post';
 import PostBriefView from './PostBriefView.vue';
-import { onMounted, watchEffect } from 'vue';
-import { isNumber } from 'lodash';
+import { onActivated, onMounted, watchEffect } from 'vue';
+import { isEmpty, isNumber } from 'lodash';
+import { asyncTimeout } from '@/js/utils/utils';
 const sortings = [
     {
         label: '最新回复',
@@ -65,9 +66,10 @@ const sortings = [
 ]
 const sort = ref(sortings[0].value)
 const page = ref(1)
-const {categoryId = null, userId = null, size = 15, showCategory} = defineProps({
+const {categoryId = null, userId = null, size = 15, keyword, showCategory} = defineProps({
     categoryId: Number,
     userId: Number,
+    keyword: String,
     size: Number,
     showCategory: Boolean
 })
@@ -78,18 +80,22 @@ const lastPage = ref(false)
 const emit = defineEmits(['finish-load'])
 
 watch(sort, async () => {
-    reload()
+    cleanAndLoad()
 }, {} )
 
-function reload() {
+function cleanAndLoad() {
     list.value = []
     page.value = 1
     load()
 }
 
-watch(() => categoryId, async () => {
-    reload()
+watch(() => categoryId, async id => {
+    cleanAndLoad()
 }, { immediate: true, deep: true})
+
+watch(() => keyword, async word => {
+    if (!isEmpty(word)) cleanAndLoad()
+})
 
 watch(loading, () => {
     if (!loading.value) emit('finish-load')
@@ -97,7 +103,7 @@ watch(loading, () => {
 
 function load() {
     loading.value = true
-    getPostSlice(categoryId, userId, page.value, size, sort.value+',desc').then(res => {
+    getPostSlice(categoryId, userId, keyword, page.value, size, sort.value+',desc').then(res => {
         if (!res["empty"]) {
             list.value = list.value.concat(res.content)
             page.value += 1
@@ -109,8 +115,14 @@ function load() {
     })
     .finally( () => {
         loading.value = false
+        window.translate.execute()
     })
 }
+
+onActivated( async () => {
+    await asyncTimeout(500)
+    window.translate.execute()
+})
 
 </script>
 

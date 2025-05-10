@@ -18,6 +18,7 @@ import dayp308.chatroom.repository.*;
 import dayp308.chatroom.repository.projection.CommentData;
 import dayp308.chatroom.service.FileService;
 import dayp308.chatroom.service.PostService;
+import dayp308.chatroom.service.SearchService;
 import dayp308.chatroom.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -59,9 +60,10 @@ public class PostController {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final SearchService searchService;
 
     @Autowired
-    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, FileService fileService, CommentRepository commentRepository) {
+    public PostController(PostService postService, UserService userService, UserRepository userRepository, ObjectMapper jacksonObjectMapper, PostRepository postRepository, PostLikeRepository postLikeRepository, CommentLikeRepository commentLikeRepository, FileService fileService, CommentRepository commentRepository, SearchService searchService) {
         this.postService = postService;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -71,6 +73,7 @@ public class PostController {
         this.commentLikeRepository = commentLikeRepository;
         this.fileService = fileService;
         this.commentRepository = commentRepository;
+        this.searchService = searchService;
     }
 
     @PostMapping("/api/post/create")
@@ -129,6 +132,7 @@ public class PostController {
     public Slice<PostBriefView> getPostSlice(
             @RequestParam(value = "categoryId", required = false) PostCategory category,
             @RequestParam(value = "userId", required = false) User targetUser,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @PageableDefault(
                     sort = {Post_.LAST_UPDATE_TIME},
                     direction = Sort.Direction.DESC)
@@ -139,7 +143,7 @@ public class PostController {
         if ( auth != null && auth.isAuthenticated() )
             user = (User) auth.getPrincipal();
 
-        return postService.getPostSlice(category, user, targetUser, pageable, true);
+        return postService.getPostSlice(category, user, targetUser, keyword, pageable, true);
     }
 
     @GetMapping("/api/no_auth/post/get_comments")
@@ -197,7 +201,7 @@ public class PostController {
     
 
     @GetMapping("/api/no_auth/post/thread")
-    public ResponseEntity<PostDetailedView> getThread(
+    public PostDetailedView getThread(
             @RequestParam("id") long id, Authentication auth) throws JsonProcessingException {
         User user = null;
         if ( auth != null && auth.isAuthenticated() )
@@ -205,12 +209,29 @@ public class PostController {
 
         PostDetailedView view = postService.getPostDetailedView(id, user);
         // if (user != null) view.setViewCount(postService.increaseViewCount(id, 2));
-        return new ResponseEntity<>(view, HttpStatus.OK);
+        return view;
     }
+
+    @GetMapping("/api/no_auth/post/get_single")
+    public PostBriefView getSingle(@RequestParam("id") long id, Authentication auth) {
+        User user = null;
+        if ( auth != null && auth.isAuthenticated() )
+            user = (User) auth.getPrincipal();
+
+
+        return postService.getPostBriefView(id, user) ;
+    }
+    
+
     @GetMapping("/api/no_auth/post/get_minimal_list")
     public List<PostMinimalView> getMinimalList(@RequestParam("ids") List<Long> ids) {
         return postService.getPostMinimalViewList(ids);
     }
-    
+
+    @GetMapping("/api/no_auth/post/search")
+    public List<Long> searchPost(@RequestParam("keyword") String keyword) {
+        List<Long> ids = searchService.searchPost(keyword).stream().map(p -> p.getId()).toList();
+        return ids;
+    }
 
 }

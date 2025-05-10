@@ -35,6 +35,8 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -136,6 +138,16 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public PostBriefView getPostBriefView(long id, @Nullable User user) {
+        PostProjection post = postRepository.findProjById(id, user);
+        PostBriefView view = conversionService.convert(
+                post,
+                PostBriefView.class
+        );
+        return view;
+    }
+
+    @Transactional(readOnly = true)
     public PostMinimalView getPostMinimalView(long id) {
         PostProjection post = postRepository.findProjById(id, null);
         PostMinimalView view = conversionService.convert(post, PostMinimalView.class);
@@ -159,10 +171,11 @@ public class PostService {
             @Nullable PostCategory category,
             @Nullable User user,
             @Nullable User targetUser,
+            @Nullable String keyword,
             Pageable pageable,
             boolean visibleOnly
     ) {
-        Slice<PostProjection> slice = postRepository.findAllProj(category, user, targetUser, visibleOnly, pageable);
+        Slice<PostProjection> slice = postRepository.findAllProj(category, user, targetUser, keyword, visibleOnly, pageable);
         Object views = conversionService.convert(slice.getContent(),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostProjection.class)),
                 TypeDescriptor.collection(List.class, TypeDescriptor.valueOf(PostBriefView.class))
@@ -251,11 +264,13 @@ public class PostService {
         return commentRepository.findById(comment.getId(), CommentDTO.class).orElseThrow();
     }
 
+    @Transactional
     public void deletePost(Post post) {
         post.setStatus((byte) 0);
         postRepository.saveAndFlush(post);
     }
 
+    @Transactional
     public void deleteComment(PostComment dto) {
         PostComment comment = Objects.requireNonNull(conversionService.convert(dto, PostComment.class));
         comment.setIsDeleted(true);

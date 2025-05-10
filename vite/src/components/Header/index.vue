@@ -3,6 +3,7 @@ import useLoginUserStore from '@/js/module/login_user';
 import { isEmpty, isNumber } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
+import SearchBar from './SearchBar.vue';
 
 defineOptions({
   name: 'Header'
@@ -58,7 +59,9 @@ function handleCommand(command) {
         <span>Le Babel</span>
       </span>
     </span>
-    <span class="placeholder"></span>
+    <span class="center">
+      <SearchBar/>
+    </span>
     <span class="right">
       <div id="translate"></div>
       <el-dropdown class="user" @command="handleCommand">
@@ -82,12 +85,13 @@ function handleCommand(command) {
     flex-grow: 1;
     justify-content: space-between;
     background-color: rgb(42, 191, 152);
-    .placeholder {
+    .center {
       display: flex;
+      justify-content: center;
       flex-grow: 2;
     }
     .avatar {
-      margin-right: 0.5em;
+      margin-left: 0.5em;
       border: 1px rgba(0, 0, 0, 0.32) solid
     }
     .logo {

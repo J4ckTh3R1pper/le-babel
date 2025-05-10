@@ -18,6 +18,7 @@ public interface CustomPostRepository {
             @Nullable PostCategory category,
             @Nullable User user,
             @Nullable User targetUser,
+            @Nullable String keyword,
             boolean visibleOnly,
             Pageable pageable
     );
