@@ -3,13 +3,15 @@
         <template #header>
             <el-text>板块详情</el-text>
         </template>
-        <el-text>{{ info }}</el-text>
-        <el-divider/>
+        <template v-if="!isEmpty(info)">
+            <el-text>{{ info }}</el-text>
+            <el-divider/>
+        </template>
         <template v-if="isNumber(categoryId) && isNumber(userId)">
             <Membership  :category-id="categoryId" :user-id="userId"/>
             <el-divider/>
         </template>
-        <template v-if="isEmpty(rule)">
+        <template v-if="!isEmpty(rule)">
             <el-text >{{ '规则: ' + rule }}</el-text>
             <el-divider/>
         </template>
