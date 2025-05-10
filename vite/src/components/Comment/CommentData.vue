@@ -13,6 +13,8 @@
 
 <script setup>
 import { getCommentData, likeComment } from '@/js/api/comment';
+import useLoginUserStore from '@/js/module/login_user';
+import { storeToRefs } from 'pinia';
 import { nextTick } from 'vue';
 
 const props = defineProps({
@@ -30,8 +32,15 @@ const liked = ref(props['liked'])
 const commentId = ref(props['commentId'])
 const commentCount = ref(props['commentCount'])
 const likeCount = ref(props['likeCount'])
+const loginUserStore = useLoginUserStore()
+
+const {isLoggedIn} = storeToRefs(loginUserStore)
 
 async function like() {
+  if (!isLoggedIn.value) {
+    ElMessage({message: '请先登录！', type: 'error'})
+    return
+  }
   await likeComment(commentId.value)
   await refresh()
 }

@@ -38,6 +38,8 @@ import { isEmpty, isNumber } from 'lodash';
 import { getSingleComment, postComment } from '@/js/api/comment';
 import { nextTick, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
+import useLoginUserStore from '@/js/module/login_user';
+import { storeToRefs } from 'pinia';
 
 const {data, detailed} = defineProps({
     data: Object,
@@ -56,6 +58,9 @@ const liked = data.liked
 const parentCommentId = data.parentCommentId
 const childCount = data.childCount
 const children = ref(data.children)
+const loginUserStore = useLoginUserStore()
+
+const {isLoggedIn} = storeToRefs(loginUserStore)
 
 const replyText = ref(null)
 const emit = defineEmits(['comment-created', 'toggle-reply-input'])
@@ -84,6 +89,10 @@ async function refresh() {
 
 async function replyComment() {
     if (isEmpty(replyText.value)) return
+    if (!isLoggedIn.value) {
+        ElMessage({message: '请先登录！', type: 'error'})
+        return
+    }
     let form = {
         postId: data.postId,
         commentBody: replyText.value,

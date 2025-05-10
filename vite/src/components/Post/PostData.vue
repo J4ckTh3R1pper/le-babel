@@ -20,6 +20,8 @@
 <script setup>
 
 import {likePost} from '@/js/api/post.js'
+import useLoginUserStore from '@/js/module/login_user'
+import { storeToRefs } from 'pinia'
 
 
 const props = defineProps({
@@ -35,8 +37,15 @@ const commentCount = ref(props["commentCount"])
 const likeCount = ref(props["likeCount"])
 const liked = ref(props["liked"])
 const postId = props["postId"]
+const loginUserStore = useLoginUserStore()
+
+const {isLoggedIn} = storeToRefs(loginUserStore)
 
 function like() {
+  if (!isLoggedIn.value) {
+    ElMessage({message: '请先登录！', type: 'error'})
+    return
+  }
   likePost(postId).then(res => {
     liked.value = res.liked
     likeCount.value = res.count

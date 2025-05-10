@@ -34,9 +34,10 @@ import useLoginUserStore from '@/js/module/login_user';
 import useRecentCategoryStore from '@/js/module/recent_category';
 import useRecentPostStore from '@/js/module/recent_post';
 import useRouteHistoryStore from '@/js/module/route_history';
+import { translate } from 'i18n-jsautotranslate';
 import { find, initial, isEmpty, isUndefined } from 'lodash';
 import { storeToRefs } from 'pinia';
-import { onMounted, useTemplateRef } from 'vue';
+import { onActivated, onMounted, onUpdated, useTemplateRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter()
@@ -84,6 +85,15 @@ watch(id, async () => {
 
 watch (data, newData => {
     emit('category-change', newData['categoryId'])
+})
+
+onActivated(() => {
+    console.log('activated')
+    window.translate.execute()
+})
+
+onUpdated(() => {
+    window.translate.execute()
 })
 
 </script>
