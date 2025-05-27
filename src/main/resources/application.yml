@@ -31,8 +31,6 @@ spring:
         - classpath:/static/
         - classpath:/dist/
         - classpath:/public/
-        # - file:${dayp308.chatroom.fileStorePath}
-        # - file:${dayp308.chatroom.assetsPath}
   jpa:
     properties:
       hibernate:
@@ -49,5 +47,5 @@ spring:
     deserialization:
       read-unknown-enum-values-using-default-value: true
 lebabel:
-  img-path: ${IMG_PATH}
+  img-path: ${IMG_PATH:images/}
   vite-host: ${VITE_HOST:http://localhost:5173}
