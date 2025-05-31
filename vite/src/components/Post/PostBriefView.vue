@@ -9,6 +9,7 @@ import useCategoryCacheStore from "@/js/module/category_cache";
 import { storeToRefs } from "pinia";
 import { isEmpty } from "lodash";
 import { useRoute, useRouter } from "vue-router";
+import useLoginUserStore from "@/js/module/login_user";
 
 const {
   postId, title, userId, categoryId, showCategory = true, content, createTime, lastUpdateTime, tags, viewCount, likeCount, commentCount, thumbnails, liked, showUser = true
@@ -44,6 +45,10 @@ const userCacheStore = useUserCacheStore()
 const categoryStore = useCategoryCacheStore()
 const {getCategory} = storeToRefs(categoryStore)
 
+const loginUserStore = useLoginUserStore()
+
+const {isLoggedIn} = storeToRefs(loginUserStore)
+
 function onClicked() {
   router.push('/postDetail/' + postId)
 }
@@ -53,22 +58,48 @@ if (showCategory) {
   categoryName = (await categoryStore.fetchCategory(categoryId))['name']
 }
 
+const membership = async () => isLoggedIn.value ? await userCacheStore.fetchMember(categoryId, loginUserStore.userId, true) : defaultMember
+
+const hasDeletePermission = computed( async () => {
+  if (!isLoggedIn.value) return false;
+  return loginUserStore.userId === userId || await membership.role > 1
+})
+
+async function muteUser() {
+  if ( hasDeletePermission && loginUserStore.userId != userId)
+    ElMessage({message: '成功禁言用户', type: 'success'})
+}
+
 window.translate.execute();
 </script>
 
 <template>
   <div class="post-brief-view" @click="onClicked">
     <div class="top">
-      <template v-if="showUser">
-        <UserBriefView :user-id="userId" :category-id="categoryId"/>
-        <el-divider direction="vertical"/>
-      </template>
-      <Time :timestamp="createTime" class="time"/>
-      <!-- https://stackoverflow.com/questions/77397035/pinia-getter-undefined-if-used-with-filter -->
-      <template v-if="!isEmpty(categoryName)">
-        <el-divider direction="vertical"/>
-        <span class="category-name">{{ categoryName }}</span>
-      </template>
+      <span class="left">
+        <template v-if="showUser">
+          <UserBriefView :user-id="userId" :category-id="categoryId"/>
+          <el-divider direction="vertical"/>
+        </template>
+        <Time :timestamp="createTime" class="time"/>
+        <!-- https://stackoverflow.com/questions/77397035/pinia-getter-undefined-if-used-with-filter -->
+        <template v-if="!isEmpty(categoryName)">
+          <el-divider direction="vertical"/>
+          <span class="category-name">{{ categoryName }}</span>
+        </template>
+      </span>
+      <span class="right">
+        <el-dropdown v-if="hasDeletePermission && userId != loginUserStore.userId">
+          <el-icon><MoreFilled /></el-icon>
+          <template #dropdown >
+            <el-dropdown-menu>
+              <el-dropdown-item class="mute" @click="muteUser">
+                禁言
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </span>
     </div>
     <div>
       <el-link class="post-link" type="primary" @click.self.prevent>{{title}}</el-link>
@@ -103,7 +134,17 @@ window.translate.execute();
       display: flex;
       flex-direction: row;
       align-items: center;
+      justify-content: space-between;
     }
+
+    .top > .left{
+      display: flex;
+      align-items: center;
+    }
+    .mute * {
+      color: rgb(250, 81, 81)
+    }
+
     .time,.category-name {
       font-size: small;
       color: #646464;
