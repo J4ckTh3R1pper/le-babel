@@ -7,7 +7,7 @@
     <selectedOptions>
       <option name="environmentVariables" />
     </selectedOptions>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="dayp308.chatroom.ChatSpringbootApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="dayp308.lebabel.ChatSpringbootApplication" />
     <method v="2">
       <option name="Gradle.BeforeRunTask" enabled="true" tasks="compileScss" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
       <option name="Make" enabled="true" />

@@ -1,7 +1,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="dayp308.chatroom.deprecated.model.Identity" %>
-<%@ page import="dayp308.chatroom.deprecated.model.User" %>
+<%@ page import="dayp308.lebabel.deprecated.model.Identity" %>
+<%@ page import="dayp308.lebabel.deprecated.model.User" %>
 <%--
   Created by IntelliJ IDEA.
   User: dayp308
