@@ -46,6 +46,17 @@ spring:
       write-dates-as-timestamps: true
     deserialization:
       read-unknown-enum-values-using-default-value: true
+springdoc:
+  swagger-ui:
+    path: /doc.html
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match:
+        - '/api/**'
+      packages-to-scan:
+        - dayp308.lebabel.controller
 lebabel:
   img-path: ${IMG_PATH:images/}
   vite-host: ${VITE_HOST:http://localhost:5173}

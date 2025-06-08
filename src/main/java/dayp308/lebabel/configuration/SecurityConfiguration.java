@@ -46,7 +46,15 @@ public class SecurityConfiguration {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> {
-            web.ignoring().requestMatchers("/api/images/**", "/error", "/upload/**", "/docs.html", "/webjars/**");
+            web.ignoring().requestMatchers(
+                    "/api/images/**",
+                    "/error",
+                    "/upload/**",
+                    "/doc.html",
+                    "/webjars/**",
+                    "/swagger-ui/**",
+                    "/v3/**"
+            );
         };
     }
 
