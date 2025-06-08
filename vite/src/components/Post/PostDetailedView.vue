@@ -40,9 +40,9 @@ const userCacheStore = useUserCacheStore()
 const router = useRouter()
 const membership = async () => isLoggedIn.value ? await userCacheStore.fetchMember(categoryId, loginUserStore.userId, true) : defaultMember
 
-const hasDeletePermission = computed( () => {
+const hasDeletePermission = computed( async () => {
   if (!isLoggedIn.value) return false;
-  return loginUserStore.userId === userId || membership.role > 1
+  return loginUserStore.userId === userId || await membership().role > 1
 })
 
 async function onConfirmDelete() {

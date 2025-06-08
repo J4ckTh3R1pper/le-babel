@@ -5,6 +5,7 @@ import useUserCacheStore from "@/js/module/user_cache";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import useLoginUserStore from "@/js/module/login_user";
 
 const avatar = ref('');
 const router = useRouter()
@@ -25,8 +26,12 @@ const {categoryId, userId, full} = defineProps({
 })
 
 const userCacheStore = useUserCacheStore()
+const loginUserStore = useLoginUserStore()
+
+const {isLoggedIn} = storeToRefs(loginUserStore)
 
 const user = ref(await userCacheStore.fetchUserBriefView(categoryId, userId))
+const membership = async () => isLoggedIn.value ? await userCacheStore.fetchMember(categoryId, loginUserStore.userId, true) : defaultMember
 
 watchEffect(() => {
   avatar.value = isEmpty(user.value.headImgUrl) ? defaultAvatar : user.value.headImgUrl
@@ -35,6 +40,7 @@ watchEffect(() => {
 const avatarStyle = computed(() => ({
   'margin-right': full ? "1em" : "0.5em"
 }))
+
 
 </script>
 
@@ -62,6 +68,12 @@ const avatarStyle = computed(() => ({
   .user-brief-view {
     display: flex;
     align-items: center;
+
+    .top {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
 
     .location {
       font-size: small;
@@ -93,4 +105,8 @@ const avatarStyle = computed(() => ({
     color: #FFFFFF;
   }
   
+  .mute {
+    color: rgb(247, 79, 79)
+  }
+
 </style>

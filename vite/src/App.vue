@@ -10,6 +10,7 @@ translate.language.setLocal('chinese_simplified');
 translate.language.translateLocal = true;
 translate.ignore.class.push('nickname');
 translate.ignore.class.push('nickName');
+translate.ignore.class.push('time');
 // translate.selectLanguageTag.show = false;
 //页面渲染完毕后触发执行 translate.execute(); 
 

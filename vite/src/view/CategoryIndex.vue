@@ -30,7 +30,7 @@ const categoryCache = useCategoryCacheStore()
 const history = useRouteHistoryStore()
 const recentCategory = useRecentCategoryStore()
 
-const {userId} = storeToRefs(userStore)
+const {userId, isLoggedIn} = storeToRefs(userStore)
 const {historyList} = storeToRefs(history)
 const emit = defineEmits(['finish-load', 'category-change'])
 
@@ -70,6 +70,10 @@ async function subscribe() {
 }
 
 function createPost() {
+    if (!isLoggedIn.value) {
+        ElMessage({message: '请先登录！', type: 'error'})
+        return
+    }
     router.push({
         name: 'create_post',
         params: {
