@@ -69,9 +69,9 @@ public class SecurityConfiguration {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // .requestMatchers("/api/images/**").permitAll()
+                        .requestMatchers("/api/auth/**").authenticated()
                         .requestMatchers("/api/no_auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling( e -> {
                     e.disable();

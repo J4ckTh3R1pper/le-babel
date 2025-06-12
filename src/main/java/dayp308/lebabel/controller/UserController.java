@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
+@RequestMapping("/api/no_auth/user")
 @Tag(name = "用户接口")
 public class UserController {
 
@@ -67,7 +68,7 @@ public class UserController {
     @Parameters({
             @Parameter(name = "form", description = "包含用户注册所需信息的表单", required = true)
     })
-    @PostMapping(value = "/api/no_auth/register")
+    @PostMapping(value = "/register")
     public ResponseEntity<String> register(@Valid @RequestBody UserRegistrationForm form) throws InvalidFormException, EntityExistsException, JsonProcessingException {
         if ( !redisCaptchaRepository.checkCaptcha(form.getUuid(), form.getCaptcha()) )
             throw new InvalidFormException("Invalid captcha", InvalidFormException.ErrorCode.INVALID_CAPTCHA);
@@ -75,7 +76,7 @@ public class UserController {
     }
 
     @Operation(summary = "生成并获取图片验证码")
-    @GetMapping(value = "/api/no_auth/captcha")
+    @GetMapping(value = "/captcha")
     public ResponseEntity<String> getCaptchaGet() throws JsonProcessingException {
         Captcha cap = new GifCaptcha(130, 48, 5);
         String uuid = redisCaptchaRepository.saveCaptcha(cap);
@@ -88,7 +89,7 @@ public class UserController {
     @Parameters({
             @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY)
     })
-    @GetMapping(value = "/api/no_auth/user/get_full_info")
+    @GetMapping(value = "/get_full_info")
     public UserDetailedProj getFullInfo(
         @RequestParam("id") Long userId
     ) {
@@ -96,32 +97,11 @@ public class UserController {
         return user;
     }
 
-    @Operation(summary = "获取当前登录用户的id")
-    @Parameters({
-            @Parameter(name = Constants.JWT_HEADER_NAME, description = "请求的JWT Token", in = ParameterIn.HEADER)
-    })
-    @GetMapping("/api/user/authorize")
-    public UserDetailedProj attemptLogin(Authentication auth) {
-        return userService.findUserDetailedProjById(((User) auth.getPrincipal()).getId());
-    }
-
-    @Operation(summary = "获取当前登录用户是否关注目标用户")
-    @Parameters({
-            @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY),
-            @Parameter(name = Constants.JWT_HEADER_NAME, description = "请求的JWT Token", in = ParameterIn.HEADER)
-    })
-    @GetMapping("/api/user/get_followed")
-    public Boolean getFollowed(@RequestParam("id") long id,
-        Authentication auth
-    ) {
-        return userService.getFollowed(((User) auth.getPrincipal()).getId(), id);
-    }
-    
     @Operation(summary = "获取用户的基本信息，包括头像、用户名和登录地")
     @Parameters({
             @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY)
     })
-    @GetMapping(value = "/api/no_auth/user/get_minimal")
+    @GetMapping(value = "/get_minimal")
     public UserMinimal getMinimal(
             @RequestParam(value = "id", required = false) Long userId,
             Authentication auth
@@ -136,44 +116,11 @@ public class UserController {
         return user;
     }
 
-    @Operation(summary = "更换用户头像")
-    @Parameters({
-            @Parameter(name = "image", description = "用户上传的头像"),
-            @Parameter(name = Constants.JWT_HEADER_NAME, description = "请求的JWT Token", in = ParameterIn.HEADER)
-    })
-    @PostMapping(value = "/api/user/update_avatar")
-    public String updateAvatar(
-            @RequestPart("image") MultipartFile imageFile,
-            Authentication auth
-    ) throws FileUploadException {
-
-        User user = ((User) auth.getPrincipal());
-        String storeName = fileService.uploadImage(imageFile);
-        user.setHeadImgUrl("/api/images/" + storeName);
-        userRepository.saveAndFlush(user);
-        return user.getHeadImgUrl();
-    }
-
-    @Operation(summary = "更新用户信息")
-    @Parameters({
-            @Parameter(name = "form", description = "包含用户信息的表单"),
-            @Parameter(name = Constants.JWT_HEADER_NAME, description = "请求的JWT Token", in = ParameterIn.HEADER)
-    })
-    @PostMapping(value = "/api/user/update", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<String> updateUser(@Valid UserEditForm form, Authentication auth) {
-        User user = (User) auth.getPrincipal();
-        user.setNickName(form.getNickName());
-        user.setIntroduce(form.getIntroduce());
-        user.setGender(form.getGender());
-        userRepository.saveAndFlush(user);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @Operation(summary = "获取用户总经验")
     @Parameters({
             @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY)
     })
-    @GetMapping("/api/no_auth/user/get_overall_exp")
+    @GetMapping("/get_overall_exp")
     public Integer getOverallExp(@RequestParam("id") long userId) {
         int exp = userService.getOverallExp(userRepository.getReferenceById(userId));
         return exp;
@@ -183,22 +130,11 @@ public class UserController {
     @Parameters({
             @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY)
     })
-    @GetMapping("/api/no_auth/user/get_joined_category")
+    @GetMapping("/get_joined_category")
     public List<Integer> getJoinedCategory(
         @RequestParam("id") User user
     ) {
         return categoryMemberRepository.findCategoryIdsByJoinUserId(user.getId());
     }
-
-    @Operation(summary = "关注用户")
-    @Parameters({
-            @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY),
-            @Parameter(name = Constants.JWT_HEADER_NAME, description = "请求的JWT Token", in = ParameterIn.HEADER)
-    })
-    @PostMapping("/api/user/follow")
-    public Boolean followUser(@RequestParam("id") User targetUser, Authentication auth) {
-        return userService.followUser((User) auth.getPrincipal(), targetUser);
-    }
-    
 
 }

@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
+@RequestMapping("/api/no_auth/post")
 public class PostController {
 
     private final CommentRepository commentRepository;
@@ -74,59 +75,7 @@ public class PostController {
         this.searchService = searchService;
     }
 
-    @PostMapping("/api/post/create")
-    public ResponseEntity<Long> createPost(@Valid @RequestBody PostForm postForm, Authentication auth) throws EntityNotFoundException {
-        long id = postService.addPost(postForm, ( (User) auth.getPrincipal() )).getId();
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/api/comment/create")
-    public ResponseEntity<Long> createComment(@Valid @RequestBody CommentCreationForm commentCreationForm, Authentication auth) throws EntityNotFoundException {
-        long id = postService.addComment(commentCreationForm, ((User) auth.getPrincipal()) ).getId();
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/api/upload_image")
-    public String uploadImage(@RequestPart("image") MultipartFile image) {
-        String storeName = fileService.uploadImage(image);
-        return "/api/images/" + storeName;
-    }
-
-    @PreAuthorize(
-            "@authz.isPostOwner(#post) or @authz.hasAuthorityGe(#post, 'MODERATOR')")
-    @PutMapping("/api/post/delete")
-    public ResponseEntity<String> deletePost(@RequestParam("id") @P("post") Post post) {
-        postService.deletePost(post);
-        return new ResponseEntity<>("deleted thread: " + post.getId(), HttpStatus.OK);
-    }
-
-    @PreAuthorize(
-            "@authz.isCommentOwner(#comment) or @authz.hasAuthorityGe(#comment, 'MODERATOR')")
-    @PostMapping("/api/comment/delete")
-    public ResponseEntity<String> deleteComment(@RequestParam("id") PostComment comment) {
-        postService.deleteComment(comment);
-        return new ResponseEntity<>("deleted comment: " + comment.getId(), HttpStatus.OK);
-    }
-
-    @PutMapping("/api/post/like")
-    public LikeResponse likePost(@RequestParam("id") Post post, Authentication auth) throws EntityNotFoundException {
-        Boolean liked = postService.likePost(post, ( (User) auth.getPrincipal() ));
-        return new LikeResponse(
-            postLikeRepository.countByPostId(post.getId()),
-            liked
-        );
-    }
-
-    @PutMapping("/api/comment/like")
-    public LikeResponse likeComment(@RequestParam("id") PostComment comment, Authentication auth) throws EntityNotFoundException {
-        Boolean liked = postService.likeComment(comment, ( (User) auth.getPrincipal() ));
-        return new LikeResponse(
-            commentLikeRepository.countByCommentId(comment.getId()),
-            liked
-        );
-    }
-
-    @GetMapping("/api/no_auth/post/get_posts")
+    @GetMapping("/get_posts")
     public Slice<PostBriefView> getPostSlice(
             @RequestParam(value = "categoryId", required = false) PostCategory category,
             @RequestParam(value = "userId", required = false) User targetUser,
@@ -144,7 +93,7 @@ public class PostController {
         return postService.getPostSlice(category, user, targetUser, keyword, pageable, true);
     }
 
-    @GetMapping("/api/no_auth/post/get_comments")
+    @GetMapping("/get_comments")
     public Slice<CommentView> getCommentSlice(
             @RequestParam("id") Post post,
             Pageable pageable,
@@ -157,48 +106,7 @@ public class PostController {
         return postService.getBriefCommentSliceByPost(post, user, pageable);
     }
 
-    @GetMapping("/api/no_auth/comment/get_category_id")
-    public Integer getCategoryId(@RequestParam("id") PostComment comment) {
-        return comment.getPost().getCategory().getId();
-    }
-    
-
-    @GetMapping("/api/no_auth/comment/get_detail")
-    public CommentView getCommentDetail(
-            @RequestParam("id") int id,
-            Authentication auth
-    ) {
-        User user = null;
-        if ( auth != null && auth.isAuthenticated() )
-            user = (User) auth.getPrincipal();
-
-        CommentView view = postService.getCommentDetailedView(id, user);
-        return view;
-    }
-
-    @GetMapping("/api/no_auth/comment/get_single")
-    public CommentView getSingleComment(
-            @RequestParam("id") int id,
-            Authentication auth
-    ) {
-        User user = null;
-        if ( auth != null && auth.isAuthenticated() )
-            user = (User) auth.getPrincipal();
-
-        CommentView view = postService.getCommentBriefView(id, user);
-        return view;
-    }
-
-    @GetMapping("/api/no_auth/comment/get_data")
-    public CommentData getCommentData(@RequestParam("id") long id, Authentication auth) {
-        User user = null;
-        if ( auth != null && auth.isAuthenticated() )
-            user = (User) auth.getPrincipal();
-        return commentRepository.getCommentDataById(id, user);
-    }
-    
-
-    @GetMapping("/api/no_auth/post/thread")
+    @GetMapping("/thread")
     public PostDetailedView getThread(
             @RequestParam("id") long id, Authentication auth) throws JsonProcessingException {
         User user = null;
@@ -210,23 +118,22 @@ public class PostController {
         return view;
     }
 
-    @GetMapping("/api/no_auth/post/get_single")
+    @GetMapping("/get_single")
     public PostBriefView getSingle(@RequestParam("id") long id, Authentication auth) {
         User user = null;
         if ( auth != null && auth.isAuthenticated() )
             user = (User) auth.getPrincipal();
 
-
         return postService.getPostBriefView(id, user) ;
     }
     
 
-    @GetMapping("/api/no_auth/post/get_minimal_list")
+    @GetMapping("/get_minimal_list")
     public List<PostMinimalView> getMinimalList(@RequestParam("ids") List<Long> ids) {
         return postService.getPostMinimalViewList(ids);
     }
 
-    @GetMapping("/api/no_auth/post/search")
+    @GetMapping("/search")
     public List<Long> searchPost(@RequestParam("keyword") String keyword) {
         List<Long> ids = searchService.searchPost(keyword).stream().map(p -> p.getId()).toList();
         return ids;

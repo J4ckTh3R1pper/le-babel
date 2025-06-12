@@ -16,18 +16,4 @@ import java.util.Arrays;
 @RestController
 public class TestController {
 
-    @PostMapping("/api/omgwtfbbq")
-    public ResponseEntity<String> testLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        System.out.println(Arrays.toString(request.getCookies()));
-        System.out.println(authentication.getPrincipal());
-        return new ResponseEntity<>("success", HttpStatus.OK);
-    }
-
-    @PreAuthorize("hasMemberShip(#categoryId)")
-    @PostMapping("/api/test_moderator")
-    public ResponseEntity<String> testMembership(@RequestParam("categoryId") int categoryId, Authentication auth) {
-        String response =
-                ( (User) auth.getPrincipal() ).getUsername() + " has membership in category " + categoryId;
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
 }

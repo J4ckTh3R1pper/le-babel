@@ -17,6 +17,8 @@ import dayp308.lebabel.repository.CategoryRepository;
 import dayp308.lebabel.repository.PostRepository;
 import dayp308.lebabel.service.CategoryMemberService;
 import dayp308.lebabel.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Pageable;
@@ -26,16 +28,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/no_auth/category")
 public class CategoryController {
     private final CategoryMemberRepository categoryMemberRepository;
     private final CategoryMemberService categoryMemberService;
@@ -53,7 +52,13 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("/api/no_auth/category/get_user")
+    @Operation(summary = "获取用户板块内的基本信息",
+        parameters = {
+            @Parameter(name = "categoryId", description = "板块id"),
+            @Parameter(name = "userId", description = "用户id")
+        }
+    )
+    @GetMapping("/get_user")
     public ResponseEntity<String> getUserBriefView(
             @RequestParam("categoryId") int categoryId,
             @RequestParam("userId") long userId
@@ -64,12 +69,12 @@ public class CategoryController {
         );
     }
 
-    @GetMapping("/api/no_auth/category/get_info")
+    @GetMapping("/get_info")
     public CategoryProjection getCategoryInfo(@RequestParam("id") int id) {
         return categoryRepository.findProjectionById(id);
     }
 
-    @GetMapping("/api/no_auth/category/get_member")
+    @GetMapping("/get_member")
     public MemberMinimal getMemberCache(
             @RequestParam("categoryId") int categoryId,
             @RequestParam("userId") long userId
@@ -79,31 +84,12 @@ public class CategoryController {
 
     }
 
-    @GetMapping("/api/no_auth/category/get_cache")
+    @GetMapping("/get_cache")
     public CategoryMinimal getMinimal(@RequestParam("id") int id) {
         return categoryRepository.findById(id, CategoryMinimal.class);
     }
-    
 
-    @PostMapping("/api/category/create")
-    public ResponseEntity<Integer> createCategoryRequest(
-            @Valid CategoryCreationForm form,
-            Authentication auth
-    ) {
-        int id = categoryService.createCategory(form, (User) auth.getPrincipal());
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/api/category/join_category")
-    public ResponseEntity<CategoryMemberId> joinCategory(Authentication auth,
-                                               @RequestParam("id") PostCategory category) {
-        User user = (User) auth.getPrincipal();
-        CategoryMemberId id = categoryMemberService.addMember(
-                category, user, Role.SUBSCRIBER);
-        return new ResponseEntity<>(id, HttpStatus.OK);
-    }
-
-    @GetMapping("/api/no_auth/category/get_category_list")
+    @GetMapping("/get_category_list")
     public List<CategoryMinimal> getCategoryList(
             @PageableDefault(
                     sort = PostCategory_.RANK, direction = Sort.Direction.DESC
@@ -112,17 +98,4 @@ public class CategoryController {
         return categoryRepository.findBy(pageable, CategoryMinimal.class);
     }
 
-    @PreAuthorize("@authz.hasMembershipGe(#categoryId, 'MODERATOR')")
-    @PostMapping("/api/category/mute_user")
-    public ResponseEntity<String> muteUser(@RequestParam int categoryId, @RequestParam("userId") long userId, @RequestParam long seconds) {
-        Instant expirationDate = categoryMemberService.muteUser(categoryId, userId, seconds);
-        return new ResponseEntity<>( "expirationDate:" + expirationDate.getEpochSecond() + "000", HttpStatus.OK);
-    }
-
-    @PreAuthorize("@authz.hasMembershipGe(#categoryId, 'MODERATOR')")
-    @PostMapping("/api/category/unmute_user")
-    public ResponseEntity<String> unmuteUser(@RequestParam int categoryId, @RequestParam("userId") long userId) {
-        categoryMemberService.unmuteUser(categoryId, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 }

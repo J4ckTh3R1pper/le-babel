@@ -2,7 +2,7 @@ import service from "@/js/utils/request.js"
 
 export async function getPostDetails(id) {
     return service.get(
-        "/no_auth/post/thread", {
+        "/api/no_auth/post/thread", {
             params: {
                 id: id
             }
@@ -11,7 +11,7 @@ export async function getPostDetails(id) {
 
 export function getPostSlice(categoryId, userId, keyword, pageNum, pageSize, sort) {
     return service.get(
-        "/no_auth/post/get_posts", {
+        "/api/no_auth/post/get_posts", {
             params: {
                 categoryId: categoryId,
                 userId: userId,
@@ -25,7 +25,7 @@ export function getPostSlice(categoryId, userId, keyword, pageNum, pageSize, sor
 }
 
 export async function getPostMinimalList(ids) {
-    return service.get("/no_auth/post/get_minimal_list", {
+    return service.get("/api/no_auth/post/get_minimal_list", {
         params: {
             ids: ids
         },
@@ -36,19 +36,19 @@ export async function getPostMinimalList(ids) {
 }
 
 export async function likePost(postId) {
-    return service.put("/post/like?id=" + postId)
+    return service.put("/api/auth/post/like?id=" + postId)
 }
 
 export async function createPost(form) {
-    return service.post("/post/create", form, {})
+    return service.post("/api/auth/post/create", form, {})
 }
 
 export async function deletePost(id) {
-    return service.put("/post/delete?id=" + id);
+    return service.put("/api/auth/post/delete?id=" + id);
 }
 
 export async function searchPost(keyword) {
-    return service.get("/no_auth/post/search", {
+    return service.get("/api/no_auth/post/search", {
         params: {
             keyword: keyword
         }
@@ -57,7 +57,7 @@ export async function searchPost(keyword) {
 
 export async function getSingle(id) {
     return service.get(
-        "/no_auth/post/get_single", {
+        "/api/no_auth/post/get_single", {
             params: {
                 id: id
             }

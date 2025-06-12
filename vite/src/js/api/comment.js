@@ -1,7 +1,7 @@
 import service from "../utils/request";
 
 export async function getCommentByPostId(postId, page, size, sort) {
-    return service.get("/no_auth/post/get_comments", {
+    return service.get("/api/no_auth/post/get_comments", {
         params: {
             id: postId,
             page: page,
@@ -12,7 +12,7 @@ export async function getCommentByPostId(postId, page, size, sort) {
 }
 
 export async function getSingleComment(commentId) {
-    return service.get("/no_auth/comment/get_single", {
+    return service.get("/api/no_auth/comment/get_single", {
         params: {
             id: commentId
         }
@@ -20,7 +20,7 @@ export async function getSingleComment(commentId) {
 }
 
 export async function getCommentDetail(commentId) {
-    return service.get("/no_auth/comment/get_detail", {
+    return service.get("/api/no_auth/comment/get_detail", {
         params: {
             id: commentId
         }
@@ -28,7 +28,7 @@ export async function getCommentDetail(commentId) {
 }
 
 export async function getCommentData(commentId) {
-    return service.get("/no_auth/comment/get_data", {
+    return service.get("/api/no_auth/comment/get_data", {
         params: {
             id: commentId
         }
@@ -36,9 +36,9 @@ export async function getCommentData(commentId) {
 }
 
 export async function likeComment(commentId) {
-    return service.put("/comment/like?id=" + commentId)
+    return service.put("/api/auth/comment/like?id=" + commentId)
 }
 
 export async function postComment(form) {
-    return service.post("/comment/create", form, {})
+    return service.post("/api/auth/comment/create", form, {})
 }

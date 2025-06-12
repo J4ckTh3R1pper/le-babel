@@ -22,7 +22,7 @@ public class FileService {
     @Value("${lebabel.img-path}")
     private String imgPath;
 
-    private String thumbnailDirName = "thumbnails/";
+    private static final String THUMBNAIL_DIR_NAME = "thumbnails/";
 
     public String uploadImage(MultipartFile imageFile) throws FileUploadException {
         if (imageFile.isEmpty())
@@ -33,7 +33,7 @@ public class FileService {
             String md5 = DigestUtils.md5Hex(stream);
             String storeName = md5  + "." + extension;
             stream.reset();
-            File thumbnailDir = new File(imgPath, thumbnailDirName);
+            File thumbnailDir = new File(imgPath, THUMBNAIL_DIR_NAME);
             if (!thumbnailDir.exists())
                 thumbnailDir.mkdirs();
             Path path = Path.of(imgPath, storeName);

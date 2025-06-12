@@ -9,13 +9,13 @@ export function loginRequest(loginName, password, captcha, uuid, rememberMe) {
         uuid: uuid,
         rememberMe: rememberMe
     }
-    return request.postForm('/login', data)
+    return request.postForm('/api/login', data)
 }
 
 // 注册方法
 export function registerRequest(data) {
     return request({
-        url: '/no_auth/register',
+        url: '/api/no_auth/user/register',
         headers: {
             isToken: false
         },
@@ -27,7 +27,7 @@ export function registerRequest(data) {
 // 获取用户详细信息
 export async function getInfoRequest() {
     return request({
-        url: '/user/authorize',
+        url: '/api/auth/user/authorize',
         method: 'get'
     })
 }
@@ -40,7 +40,7 @@ export function logoutRequest() {
 // 获取验证码
 export function getCaptchaRequest() {
     return request({
-        url: '/no_auth/captcha',
+        url: '/api/no_auth/user/captcha',
         headers: {
             isToken: false
         },
