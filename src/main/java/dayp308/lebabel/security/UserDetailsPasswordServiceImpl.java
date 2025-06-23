@@ -1,7 +1,7 @@
 package dayp308.lebabel.security;
 
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;

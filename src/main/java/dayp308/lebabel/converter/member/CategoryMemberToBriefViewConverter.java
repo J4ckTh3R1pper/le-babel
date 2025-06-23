@@ -1,7 +1,7 @@
 package dayp308.lebabel.converter.member;
 
-import dayp308.lebabel.entity.member.CategoryMember;
-import dayp308.lebabel.entity.view.UserBriefView;
+import dayp308.lebabel.bean.entity.member.CategoryMember;
+import dayp308.lebabel.bean.view.UserBriefView;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

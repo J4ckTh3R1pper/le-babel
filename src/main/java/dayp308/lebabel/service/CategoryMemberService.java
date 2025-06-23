@@ -1,17 +1,18 @@
 package dayp308.lebabel.service;
 
-import dayp308.lebabel.entity.member.CategoryMember;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.id.CategoryMemberId;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.member.CategoryMemberDTO;
-import dayp308.lebabel.entity.enums.Role;
-import dayp308.lebabel.entity.view.UserBriefView;
+import dayp308.lebabel.bean.entity.member.CategoryMember;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.id.CategoryMemberId;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.entity.member.CategoryMemberDTO;
+import dayp308.lebabel.enumeration.Role;
+import dayp308.lebabel.bean.view.UserBriefView;
 import dayp308.lebabel.exception.CategoryDeletedException;
 import dayp308.lebabel.exception.CategoryPendingException;
-import dayp308.lebabel.repository.CategoryMemberRepository;
-import dayp308.lebabel.repository.CategoryRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
+import dayp308.lebabel.repository.jpa.CategoryRepository;
+import dayp308.lebabel.repository.redis.MemberMinimalRedisRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -29,7 +30,7 @@ public class CategoryMemberService {
     private final UserRepository userRepository;
 
     @Autowired
-    public CategoryMemberService(CategoryMemberRepository categoryMemberRepository, ConversionService conversionService, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public CategoryMemberService(CategoryMemberRepository categoryMemberRepository, ConversionService conversionService, CategoryRepository categoryRepository, UserRepository userRepository, MemberMinimalRedisRepository memberMinimalRedisRepository) {
         this.categoryMemberRepository = categoryMemberRepository;
         this.conversionService = conversionService;
         this.categoryRepository = categoryRepository;

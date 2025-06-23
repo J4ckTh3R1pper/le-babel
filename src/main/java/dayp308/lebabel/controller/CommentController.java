@@ -1,10 +1,10 @@
 package dayp308.lebabel.controller;
 
-import dayp308.lebabel.entity.comment.PostComment;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.view.comment.CommentView;
-import dayp308.lebabel.repository.CommentRepository;
-import dayp308.lebabel.repository.projection.CommentData;
+import dayp308.lebabel.bean.entity.comment.PostComment;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.view.comment.CommentView;
+import dayp308.lebabel.repository.jpa.CommentRepository;
+import dayp308.lebabel.bean.entity.projection.CommentData;
 import dayp308.lebabel.service.PostService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

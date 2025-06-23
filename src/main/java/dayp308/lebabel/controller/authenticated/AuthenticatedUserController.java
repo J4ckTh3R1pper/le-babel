@@ -1,11 +1,11 @@
 package dayp308.lebabel.controller.authenticated;
 
 import dayp308.lebabel.Constants;
-import dayp308.lebabel.entity.business.UserEditForm;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.user.UserDetailedProj;
+import dayp308.lebabel.bean.ao.UserEditForm;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
 import dayp308.lebabel.exception.FileUploadException;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import dayp308.lebabel.service.FileService;
 import dayp308.lebabel.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,7 +81,7 @@ public class AuthenticatedUserController {
             @Parameter(name = Constants.JWT_HEADER_NAME, description = "请求的JWT Token", in = ParameterIn.HEADER)
     })
     @GetMapping("/authorize")
-    public UserDetailedProj attemptLogin(Authentication auth) {
+    public UserDetailedProjection attemptLogin(Authentication auth) {
         return userService.findUserDetailedProjById(((User) auth.getPrincipal()).getId());
     }
 

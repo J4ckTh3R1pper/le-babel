@@ -1,10 +1,10 @@
 package dayp308.lebabel.controller.authenticated;
 
-import dayp308.lebabel.entity.business.LikeResponse;
-import dayp308.lebabel.entity.business.PostForm;
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.repository.PostLikeRepository;
+import dayp308.lebabel.bean.view.LikeResponse;
+import dayp308.lebabel.bean.ao.PostForm;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.repository.jpa.PostLikeRepository;
 import dayp308.lebabel.service.PostService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

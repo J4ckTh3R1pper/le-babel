@@ -1,20 +1,20 @@
 package dayp308.lebabel;
 
 import dayp308.lebabel.converter.post.PostToBriefView;
-import dayp308.lebabel.entity.business.CategoryCreationForm;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.comment.CommentDTO;
-import dayp308.lebabel.entity.enums.Role;
-import dayp308.lebabel.entity.id.CategoryMemberId;
-import dayp308.lebabel.entity.business.CommentCreationForm;
-import dayp308.lebabel.entity.business.PostForm;
-import dayp308.lebabel.entity.business.UserRegistrationForm;
-import dayp308.lebabel.entity.post.PostDTO;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.user.UserDTO;
-import dayp308.lebabel.entity.user.UserDetailedProj;
-import dayp308.lebabel.repository.*;
-import dayp308.lebabel.repository.projection.PostProjection;
+import dayp308.lebabel.bean.ao.CategoryCreationForm;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.entity.comment.CommentDTO;
+import dayp308.lebabel.enumeration.Role;
+import dayp308.lebabel.bean.entity.id.CategoryMemberId;
+import dayp308.lebabel.bean.ao.CommentCreationForm;
+import dayp308.lebabel.bean.ao.PostForm;
+import dayp308.lebabel.bean.ao.UserRegistrationForm;
+import dayp308.lebabel.bean.entity.post.PostDTO;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.user.UserDTO;
+import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
+import dayp308.lebabel.repository.jpa.*;
+import dayp308.lebabel.bean.entity.projection.PostProjection;
 import dayp308.lebabel.service.CategoryMemberService;
 import dayp308.lebabel.service.CategoryService;
 import dayp308.lebabel.service.PostService;
@@ -147,11 +147,11 @@ class MyTests {
 
     @Test
     void testUserDetail() {
-        UserDetailedProj proj = userRepository.findDetailById(126L);
+        UserDetailedProjection proj = userRepository.findDetailById(126L);
         System.out.println(proj.getFollowingCount());
         System.out.println(proj.getFollowerCount());
 
-        Slice<UserDetailedProj> projections = userRepository.findDetailsById(
+        Slice<UserDetailedProjection> projections = userRepository.findDetailsById(
                 PageRequest.of(0, 15, Sort.by(Sort.Direction.DESC, "followerCount"))
 
         );

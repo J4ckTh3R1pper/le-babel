@@ -1,7 +1,7 @@
 package dayp308.lebabel.converter.post;
 
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.business.CategoryCreationForm;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.ao.CategoryCreationForm;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

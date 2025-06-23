@@ -1,16 +1,16 @@
 package dayp308.lebabel.service;
 
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.user.UserDetailedProj;
-import dayp308.lebabel.entity.Subscription;
-import dayp308.lebabel.entity.business.UserRegistrationForm;
-import dayp308.lebabel.entity.id.SubscriptionId;
-import dayp308.lebabel.entity.user.UserDTO;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
+import dayp308.lebabel.bean.entity.Subscription;
+import dayp308.lebabel.bean.ao.UserRegistrationForm;
+import dayp308.lebabel.bean.entity.id.SubscriptionId;
+import dayp308.lebabel.bean.entity.user.UserDTO;
 import dayp308.lebabel.exception.InvalidFormException;
 import dayp308.lebabel.exception.UserExistsException;
-import dayp308.lebabel.repository.CategoryMemberRepository;
-import dayp308.lebabel.repository.SubscriptionRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
+import dayp308.lebabel.repository.jpa.SubscriptionRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +47,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetailedProj findUserDetailedProjById(Long id) {
+    public UserDetailedProjection findUserDetailedProjById(Long id) {
         return userRepository.findDetailById(id);
     }
 

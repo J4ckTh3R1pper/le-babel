@@ -1,11 +1,11 @@
 package dayp308.lebabel.repository.specification;
 
-import dayp308.lebabel.entity.member.CategoryMember_;
-import dayp308.lebabel.entity.category.PostCategory_;
-import dayp308.lebabel.entity.user.User_;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.member.CategoryMember;
-import dayp308.lebabel.entity.user.User;
+import dayp308.lebabel.bean.entity.member.CategoryMember_;
+import dayp308.lebabel.bean.entity.category.PostCategory_;
+import dayp308.lebabel.bean.entity.user.User_;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.entity.member.CategoryMember;
+import dayp308.lebabel.bean.entity.user.User;
 import dayp308.lebabel.util.QueryUtil;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Sort;

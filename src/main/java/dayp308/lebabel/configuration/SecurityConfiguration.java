@@ -1,6 +1,6 @@
 package dayp308.lebabel.configuration;
 
-import dayp308.lebabel.repository.RedisCaptchaRepository;
+import dayp308.lebabel.repository.redis.RedisCaptchaRepository;
 import dayp308.lebabel.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

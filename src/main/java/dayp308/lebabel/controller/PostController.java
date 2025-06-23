@@ -2,25 +2,19 @@ package dayp308.lebabel.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dayp308.lebabel.entity.comment.PostComment;
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.post.Post_;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.business.CommentCreationForm;
-import dayp308.lebabel.entity.business.LikeResponse;
-import dayp308.lebabel.entity.business.PostForm;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.view.comment.CommentView;
-import dayp308.lebabel.entity.view.post.PostBriefView;
-import dayp308.lebabel.entity.view.post.PostDetailedView;
-import dayp308.lebabel.repository.*;
-import dayp308.lebabel.repository.projection.CommentData;
+import dayp308.lebabel.bean.view.post.PostMinimalView;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.post.Post_;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.view.comment.CommentView;
+import dayp308.lebabel.bean.view.post.PostBriefView;
+import dayp308.lebabel.bean.view.post.PostDetailedView;
+import dayp308.lebabel.repository.jpa.*;
 import dayp308.lebabel.service.FileService;
 import dayp308.lebabel.service.PostService;
 import dayp308.lebabel.service.SearchService;
 import dayp308.lebabel.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -29,19 +23,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
-import dayp308.lebabel.entity.view.post.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController

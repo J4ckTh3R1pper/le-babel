@@ -1,11 +1,11 @@
 package dayp308.lebabel.converter.comment;
 
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.comment.PostComment;
-import dayp308.lebabel.entity.business.CommentCreationForm;
-import dayp308.lebabel.repository.CommentRepository;
-import dayp308.lebabel.repository.PostRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.comment.PostComment;
+import dayp308.lebabel.bean.ao.CommentCreationForm;
+import dayp308.lebabel.repository.jpa.CommentRepository;
+import dayp308.lebabel.repository.jpa.PostRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

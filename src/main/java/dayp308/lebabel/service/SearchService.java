@@ -8,8 +8,8 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.post.Post_;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.post.Post_;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 

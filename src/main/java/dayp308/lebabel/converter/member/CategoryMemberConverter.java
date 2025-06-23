@@ -1,10 +1,10 @@
 package dayp308.lebabel.converter.member;
 
-import dayp308.lebabel.entity.member.CategoryMember;
-import dayp308.lebabel.entity.id.CategoryMemberId;
-import dayp308.lebabel.entity.member.CategoryMemberDTO;
-import dayp308.lebabel.repository.CategoryRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.bean.entity.member.CategoryMember;
+import dayp308.lebabel.bean.entity.id.CategoryMemberId;
+import dayp308.lebabel.bean.entity.member.CategoryMemberDTO;
+import dayp308.lebabel.repository.jpa.CategoryRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;

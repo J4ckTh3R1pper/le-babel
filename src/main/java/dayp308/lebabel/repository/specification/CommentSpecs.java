@@ -1,9 +1,9 @@
 package dayp308.lebabel.repository.specification;
 
-import dayp308.lebabel.entity.comment.PostComment;
-import dayp308.lebabel.entity.comment.PostComment_;
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.post.Post_;
+import dayp308.lebabel.bean.entity.comment.PostComment;
+import dayp308.lebabel.bean.entity.comment.PostComment_;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.post.Post_;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;

@@ -1,10 +1,10 @@
 package dayp308.lebabel.repository.specification;
 
-import dayp308.lebabel.entity.*;
-import dayp308.lebabel.entity.member.CategoryMember;
-import dayp308.lebabel.entity.member.CategoryMember_;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.user.User_;
+import dayp308.lebabel.bean.entity.*;
+import dayp308.lebabel.bean.entity.member.CategoryMember;
+import dayp308.lebabel.bean.entity.member.CategoryMember_;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.user.User_;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 

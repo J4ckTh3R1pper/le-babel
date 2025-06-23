@@ -1,7 +1,7 @@
 package dayp308.lebabel.validator;
 
 import dayp308.lebabel.validator.annotation.UserIdExists;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;

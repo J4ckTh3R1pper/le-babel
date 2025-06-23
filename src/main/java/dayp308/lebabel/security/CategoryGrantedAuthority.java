@@ -1,6 +1,6 @@
 package dayp308.lebabel.security;
 
-import dayp308.lebabel.entity.enums.Role;
+import dayp308.lebabel.enumeration.Role;
 import org.springframework.security.core.GrantedAuthority;
 
 public class CategoryGrantedAuthority implements GrantedAuthority {

@@ -1,8 +1,8 @@
 package dayp308.lebabel.security;
 
 import dayp308.lebabel.Constants;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.repository.RedisCaptchaRepository;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.repository.redis.RedisCaptchaRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

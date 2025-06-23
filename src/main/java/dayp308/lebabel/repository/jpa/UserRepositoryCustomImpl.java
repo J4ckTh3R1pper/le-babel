@@ -1,0 +1,23 @@
+package dayp308.lebabel.repository.jpa;
+
+import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    /*** 以用户名关键词搜索用户
+     *
+     * @param id 用户名关键词
+     *
+     */
+
+    public UserDetailedProjection getUserDetailedProj(Long id) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        return null;
+    }
+}

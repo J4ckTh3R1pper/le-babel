@@ -1,7 +1,7 @@
 package dayp308.lebabel.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import dayp308.lebabel.entity.view.ErrorResponseBody;
+import dayp308.lebabel.bean.view.ErrorResponseBody;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.NoResultException;

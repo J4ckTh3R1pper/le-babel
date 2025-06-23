@@ -1,10 +1,10 @@
 package dayp308.lebabel.controller.authenticated;
 
-import dayp308.lebabel.entity.business.CategoryCreationForm;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.enums.Role;
-import dayp308.lebabel.entity.id.CategoryMemberId;
-import dayp308.lebabel.entity.user.User;
+import dayp308.lebabel.bean.ao.CategoryCreationForm;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.enumeration.Role;
+import dayp308.lebabel.bean.entity.id.CategoryMemberId;
+import dayp308.lebabel.bean.entity.user.User;
 import dayp308.lebabel.service.CategoryMemberService;
 import dayp308.lebabel.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;

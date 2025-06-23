@@ -3,34 +3,25 @@ package dayp308.lebabel.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dayp308.lebabel.entity.category.CategoryMinimal;
-import dayp308.lebabel.entity.category.CategoryProjection;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.category.PostCategory_;
-import dayp308.lebabel.entity.enums.Role;
-import dayp308.lebabel.entity.id.CategoryMemberId;
-import dayp308.lebabel.entity.member.MemberMinimal;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.business.CategoryCreationForm;
-import dayp308.lebabel.repository.CategoryMemberRepository;
-import dayp308.lebabel.repository.CategoryRepository;
-import dayp308.lebabel.repository.PostRepository;
+import dayp308.lebabel.bean.entity.category.CategoryMinimal;
+import dayp308.lebabel.bean.entity.projection.CategoryProjection;
+import dayp308.lebabel.bean.entity.category.PostCategory_;
+import dayp308.lebabel.bean.entity.member.MemberMinimal;
+import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
+import dayp308.lebabel.repository.jpa.CategoryRepository;
+import dayp308.lebabel.repository.jpa.PostRepository;
 import dayp308.lebabel.service.CategoryMemberService;
 import dayp308.lebabel.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -79,7 +70,7 @@ public class CategoryController {
             @RequestParam("categoryId") int categoryId,
             @RequestParam("userId") long userId
     ) {
-        MemberMinimal member = categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class);
+        MemberMinimal member = categoryMemberService.getMemberMinimal(categoryId, userId);
         return member;
 
     }

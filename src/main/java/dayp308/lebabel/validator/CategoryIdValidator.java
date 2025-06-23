@@ -1,7 +1,7 @@
 package dayp308.lebabel.validator;
 
 import dayp308.lebabel.validator.annotation.CategoryIdExists;
-import dayp308.lebabel.repository.CategoryRepository;
+import dayp308.lebabel.repository.jpa.CategoryRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;

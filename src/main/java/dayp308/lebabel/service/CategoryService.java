@@ -1,14 +1,14 @@
 package dayp308.lebabel.service;
 
-import dayp308.lebabel.entity.business.CategoryCreationForm;
-import dayp308.lebabel.entity.category.CategoryMinimal;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.enums.Role;
-import dayp308.lebabel.repository.CategoryMemberRepository;
-import dayp308.lebabel.repository.CategoryRepository;
-import dayp308.lebabel.repository.PostRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.bean.ao.CategoryCreationForm;
+import dayp308.lebabel.bean.entity.category.CategoryMinimal;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.enumeration.Role;
+import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
+import dayp308.lebabel.repository.jpa.CategoryRepository;
+import dayp308.lebabel.repository.jpa.PostRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import dayp308.lebabel.repository.specification.CategorySpecs;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;

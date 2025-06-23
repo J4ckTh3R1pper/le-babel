@@ -3,19 +3,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pig4cloud.captcha.GifCaptcha;
 import com.pig4cloud.captcha.base.Captcha;
-import dayp308.lebabel.Constants;
-import dayp308.lebabel.entity.business.CaptchaResponse;
-import dayp308.lebabel.entity.user.User;
-import dayp308.lebabel.entity.user.UserDetailedProj;
-import dayp308.lebabel.entity.business.UserEditForm;
-import dayp308.lebabel.entity.business.UserRegistrationForm;
-import dayp308.lebabel.entity.user.UserMinimal;
-import dayp308.lebabel.entity.user.UserMinimalImpl;
-import dayp308.lebabel.exception.FileUploadException;
+import dayp308.lebabel.bean.view.CaptchaResponse;
+import dayp308.lebabel.bean.entity.user.User;
+import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
+import dayp308.lebabel.bean.ao.UserRegistrationForm;
+import dayp308.lebabel.bean.entity.user.UserMinimal;
+import dayp308.lebabel.bean.entity.user.UserMinimalImpl;
 import dayp308.lebabel.exception.InvalidFormException;
-import dayp308.lebabel.repository.CategoryMemberRepository;
-import dayp308.lebabel.repository.RedisCaptchaRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
+import dayp308.lebabel.repository.redis.RedisCaptchaRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import dayp308.lebabel.service.FileService;
 import dayp308.lebabel.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,10 +29,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -90,10 +85,10 @@ public class UserController {
             @Parameter(name = "id", description = "用户id", in = ParameterIn.QUERY)
     })
     @GetMapping(value = "/get_full_info")
-    public UserDetailedProj getFullInfo(
+    public UserDetailedProjection getFullInfo(
         @RequestParam("id") Long userId
     ) {
-        UserDetailedProj user = userService.findUserDetailedProjById(userId);
+        UserDetailedProjection user = userService.findUserDetailedProjById(userId);
         return user;
     }
 

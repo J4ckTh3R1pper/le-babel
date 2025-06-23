@@ -1,8 +1,8 @@
 package dayp308.lebabel.repository.specification;
 
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.category.PostCategory_;
-import dayp308.lebabel.entity.post.Post_;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.category.PostCategory_;
+import dayp308.lebabel.bean.entity.post.Post_;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;

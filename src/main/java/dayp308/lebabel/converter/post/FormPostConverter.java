@@ -1,10 +1,10 @@
 package dayp308.lebabel.converter.post;
 
-import dayp308.lebabel.entity.post.Post;
-import dayp308.lebabel.entity.category.PostCategory;
-import dayp308.lebabel.entity.business.PostForm;
-import dayp308.lebabel.repository.CategoryRepository;
-import dayp308.lebabel.repository.UserRepository;
+import dayp308.lebabel.bean.entity.post.Post;
+import dayp308.lebabel.bean.entity.category.PostCategory;
+import dayp308.lebabel.bean.ao.PostForm;
+import dayp308.lebabel.repository.jpa.CategoryRepository;
+import dayp308.lebabel.repository.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

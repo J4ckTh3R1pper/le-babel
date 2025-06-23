@@ -6,8 +6,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import dayp308.lebabel.entity.view.post.PostMinimalView;
-import dayp308.lebabel.repository.projection.PostProjection;
+import dayp308.lebabel.bean.view.post.PostMinimalView;
+import dayp308.lebabel.bean.entity.projection.PostProjection;
 
 @Component
 public class PostToMinimalView implements Converter<PostProjection, PostMinimalView>{
