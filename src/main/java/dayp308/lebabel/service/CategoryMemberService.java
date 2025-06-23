@@ -1,6 +1,8 @@
 package dayp308.lebabel.service;
 
 import dayp308.lebabel.bean.entity.member.CategoryMember;
+import dayp308.lebabel.bean.entity.member.MemberMinimal;
+import dayp308.lebabel.bean.entity.member.MemberMinimalRedis;
 import dayp308.lebabel.bean.entity.user.User;
 import dayp308.lebabel.bean.entity.id.CategoryMemberId;
 import dayp308.lebabel.bean.entity.category.PostCategory;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class CategoryMemberService {
@@ -28,6 +31,7 @@ public class CategoryMemberService {
     private final ConversionService conversionService;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final MemberMinimalRedisRepository memberMinimalRedisRepository;
 
     @Autowired
     public CategoryMemberService(CategoryMemberRepository categoryMemberRepository, ConversionService conversionService, CategoryRepository categoryRepository, UserRepository userRepository, MemberMinimalRedisRepository memberMinimalRedisRepository) {
@@ -35,6 +39,7 @@ public class CategoryMemberService {
         this.conversionService = conversionService;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.memberMinimalRedisRepository = memberMinimalRedisRepository;
     }
 
     public CategoryMemberDTO getCategoryMemberById(int categoryId, long userId) {
@@ -45,6 +50,17 @@ public class CategoryMemberService {
     public UserBriefView getUserBriefView(int categoryId, long userId) {
         CategoryMember member = categoryMemberRepository.getReferenceById(new CategoryMemberId(categoryId, userId));
         return conversionService.convert(member, UserBriefView.class);
+    }
+
+    public MemberMinimal getMemberMinimal(int categoryId, long userId) {
+        MemberMinimal result;
+        Optional<MemberMinimal> cache = memberMinimalRedisRepository.findById(categoryId + ":" + userId, MemberMinimal.class);
+        if (cache.isPresent()) {result = cache.get();}
+        else {
+            result = categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class);
+            memberMinimalRedisRepository.save(new MemberMinimalRedis(categoryId, userId, result.getRole(), result.getExperience(), result.getTitle(), ThreadLocalRandom.current().nextInt(300, 360)));
+        }
+        return result;
     }
 
     public CategoryMemberId addMember(PostCategory category, User user, @Nullable Role role) {
