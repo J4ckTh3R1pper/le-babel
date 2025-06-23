@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import dayp308.lebabel.bean.entity.CommentClosure;
+import dayp308.lebabel.bean.entity.comment.CommentClosure;
 import dayp308.lebabel.bean.entity.comment.PostComment;
 import dayp308.lebabel.bean.entity.post.Post;
 

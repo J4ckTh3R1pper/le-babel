@@ -1,8 +1,8 @@
-package dayp308.lebabel.bean.entity;
+package dayp308.lebabel.bean.entity.comment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import dayp308.lebabel.bean.entity.comment.PostComment;
+import dayp308.lebabel.bean.entity.id.CommentClosureId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

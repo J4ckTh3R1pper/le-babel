@@ -1,8 +1,7 @@
-package dayp308.lebabel.bean.entity;
+package dayp308.lebabel.bean.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import dayp308.lebabel.bean.entity.id.SubscriptionId;
-import dayp308.lebabel.bean.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 

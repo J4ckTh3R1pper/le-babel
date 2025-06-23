@@ -2,7 +2,7 @@ package dayp308.lebabel.service;
 
 import dayp308.lebabel.bean.entity.user.User;
 import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
-import dayp308.lebabel.bean.entity.Subscription;
+import dayp308.lebabel.bean.entity.user.Subscription;
 import dayp308.lebabel.bean.ao.UserRegistrationForm;
 import dayp308.lebabel.bean.entity.id.SubscriptionId;
 import dayp308.lebabel.bean.entity.user.UserDTO;

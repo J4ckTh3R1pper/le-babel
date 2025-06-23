@@ -1,7 +1,7 @@
 package dayp308.lebabel.repository.jpa;
 
-import dayp308.lebabel.bean.entity.CommentClosure;
-import dayp308.lebabel.bean.entity.CommentClosure_;
+import dayp308.lebabel.bean.entity.comment.CommentClosure;
+import dayp308.lebabel.bean.entity.comment.CommentClosure_;
 import dayp308.lebabel.bean.entity.category.PostCategory;
 import dayp308.lebabel.bean.entity.category.PostCategory_;
 import dayp308.lebabel.bean.entity.comment.PostComment;

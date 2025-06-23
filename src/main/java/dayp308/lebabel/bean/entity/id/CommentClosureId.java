@@ -1,4 +1,4 @@
-package dayp308.lebabel.bean.entity;
+package dayp308.lebabel.bean.entity.id;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
