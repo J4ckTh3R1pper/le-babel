@@ -63,7 +63,7 @@ public class ControllerTests {
         form.setNickName(RandomString.make(8));
         form.setPassword(password);
         long id = userService.register(form);
-        return userRepository.findById(id, UserDTO.class);
+        return userRepository.findById(id, UserDTO.class).orElseThrow();
     }
 
     String formLoginAndGetToken(UserDTO user, String password) throws Exception {

@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     boolean existsByNickName(String nickName);
     <T> List<T> findByNickNameContainingIgnoreCase(String nickName, Class<T> clazz);
 
-    <T> T findById(Long id, Class<T> clazz);
+    <T> Optional<T> findById(Long id, Class<T> clazz);
 
     @Query("""
             SELECT  u.id AS id,

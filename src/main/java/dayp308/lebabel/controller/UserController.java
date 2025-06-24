@@ -8,7 +8,7 @@ import dayp308.lebabel.bean.entity.user.User;
 import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
 import dayp308.lebabel.bean.ao.UserRegistrationForm;
 import dayp308.lebabel.bean.entity.user.UserMinimal;
-import dayp308.lebabel.bean.entity.user.UserMinimalImpl;
+import dayp308.lebabel.bean.entity.user.UserMinimalRedis;
 import dayp308.lebabel.exception.InvalidFormException;
 import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
 import dayp308.lebabel.repository.redis.RedisCaptchaRepository;
@@ -98,16 +98,9 @@ public class UserController {
     })
     @GetMapping(value = "/get_minimal")
     public UserMinimal getMinimal(
-            @RequestParam(value = "id", required = false) Long userId,
-            Authentication auth
+            @RequestParam(value = "id") long userId
         ) {
-        UserMinimal user;
-        if (userId != null)
-            user = userRepository.findById(userId, UserMinimal.class);
-        else if (auth != null) {
-            User detail =  (User) auth.getPrincipal();
-            user = new UserMinimalImpl(detail.getNickName(), detail.getHeadImgUrl(), detail.getLocation());
-        } else throw new NoResultException();
+        UserMinimal user = userService.getUserCache(userId);
         return user;
     }
 

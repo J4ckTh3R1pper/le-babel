@@ -52,14 +52,12 @@ public class CategoryMemberService {
         return conversionService.convert(member, UserBriefView.class);
     }
 
-    public MemberMinimal getMemberMinimal(int categoryId, long userId) {
-        MemberMinimal result;
-        Optional<MemberMinimal> cache = memberMinimalRedisRepository.findById(categoryId + ":" + userId, MemberMinimal.class);
-        if (cache.isPresent()) {result = cache.get();}
-        else {
-            result = categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class);
-            memberMinimalRedisRepository.save(new MemberMinimalRedis(categoryId, userId, result.getRole(), result.getExperience(), result.getTitle(), ThreadLocalRandom.current().nextInt(300, 360)));
-        }
+    public MemberMinimal getMemberCache(int categoryId, long userId) {
+        MemberMinimal result = memberMinimalRedisRepository.findById(categoryId + ":" + userId, MemberMinimal.class).orElseGet(() -> {
+            MemberMinimal query = categoryMemberRepository.findById(new CategoryMemberId(categoryId, userId), MemberMinimal.class).orElseThrow();
+            memberMinimalRedisRepository.save(new MemberMinimalRedis(categoryId, userId, query.getRole(), query.getExperience(), query.getTitle(), ThreadLocalRandom.current().nextInt(300, 360)));
+            return query;
+        });
         return result;
     }
 

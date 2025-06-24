@@ -70,7 +70,7 @@ public class CategoryController {
             @RequestParam("categoryId") int categoryId,
             @RequestParam("userId") long userId
     ) {
-        MemberMinimal member = categoryMemberService.getMemberMinimal(categoryId, userId);
+        MemberMinimal member = categoryMemberService.getMemberCache(categoryId, userId);
         return member;
 
     }

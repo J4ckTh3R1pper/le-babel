@@ -69,14 +69,14 @@ public class SecurityConfiguration {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").authenticated()
+                        .requestMatchers("/api/auth/**", "/api/login").authenticated()
                         .requestMatchers("/api/no_auth/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling( e -> {
-                    e.disable();
-                    // e.accessDeniedPage(null)
-                    //         .authenticationEntryPoint(authenticationEntryPoint());
+                    // e.disable();
+                    e.accessDeniedPage(null)
+                            .authenticationEntryPoint(authenticationEntryPoint());
                 })
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

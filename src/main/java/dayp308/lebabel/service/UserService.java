@@ -1,16 +1,14 @@
 package dayp308.lebabel.service;
 
-import dayp308.lebabel.bean.entity.user.User;
-import dayp308.lebabel.bean.entity.user.UserDetailedProjection;
-import dayp308.lebabel.bean.entity.user.Subscription;
+import dayp308.lebabel.bean.entity.user.*;
 import dayp308.lebabel.bean.ao.UserRegistrationForm;
 import dayp308.lebabel.bean.entity.id.SubscriptionId;
-import dayp308.lebabel.bean.entity.user.UserDTO;
 import dayp308.lebabel.exception.InvalidFormException;
 import dayp308.lebabel.exception.UserExistsException;
 import dayp308.lebabel.repository.jpa.CategoryMemberRepository;
 import dayp308.lebabel.repository.jpa.SubscriptionRepository;
 import dayp308.lebabel.repository.jpa.UserRepository;
+import dayp308.lebabel.repository.redis.UserMinimalRedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,19 +29,21 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final CategoryMemberRepository categoryMemberRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final UserMinimalRedisRepository userMinimalRedisRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, ConversionService conversionService, PasswordEncoder passwordEncoder, CategoryMemberRepository categoryMemberRepository, SubscriptionRepository subscriptionRepository) {
+    public UserService(UserRepository userRepository, ConversionService conversionService, PasswordEncoder passwordEncoder, CategoryMemberRepository categoryMemberRepository, SubscriptionRepository subscriptionRepository, UserMinimalRedisRepository userMinimalRedisRepository) {
         this.userRepository = userRepository;
         this.conversionService = conversionService;
         this.passwordEncoder = passwordEncoder;
         this.categoryMemberRepository = categoryMemberRepository;
         this.subscriptionRepository = subscriptionRepository;
+        this.userMinimalRedisRepository = userMinimalRedisRepository;
     }
 
     @Transactional(readOnly = true)
     public UserDTO findById(Long id) {
-        return userRepository.findById(id, UserDTO.class);
+        return userRepository.findById(id, UserDTO.class).orElseThrow();
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +73,16 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<UserDTO> findByLoginName(String loginName) {
         return userRepository.findByLoginName(loginName, UserDTO.class);
+    }
+
+    public UserMinimal getUserCache(long userId) {
+        String id = String.valueOf(userId);
+        UserMinimal result = userMinimalRedisRepository.findById(id, UserMinimal.class).orElseGet(() -> {
+            UserMinimal query = userRepository.findById(userId, UserMinimal.class).orElseThrow();
+            userMinimalRedisRepository.save(new UserMinimalRedis(id, query.getNickName(), query.getHeadImgUrl(), query.getNickName()));
+            return query;
+        });
+        return result;
     }
 
     /***
