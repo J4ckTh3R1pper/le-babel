@@ -59,7 +59,7 @@ class MyTests {
         form.setNickName(RandomString.make(8));
         form.setPassword(password);
         long id = userService.register(form);
-        return userRepository.findById(id, UserDTO.class);
+        return userRepository.findById(id, UserDTO.class).orElseThrow();
     }
 
     @ParameterizedTest
@@ -91,7 +91,7 @@ class MyTests {
         UserDTO user = randomUser(password);
 
         try {
-            User user1 = userRepository.findById(user.id(), User.class);
+            User user1 = userRepository.findById(user.id(), User.class).orElseThrow();
             category = categoryService.createCategory(
                     new CategoryCreationForm(RandomString.make(8), RandomString.make(8), RandomString.make(8))
             );
