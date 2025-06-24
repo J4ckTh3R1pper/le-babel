@@ -26,7 +26,11 @@ export default defineConfig(({ mode}) => {
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/api': {
-          target: 'http://' + VITE_BACKEND_HOST + ":" + VITE_BACKEND_PORT,
+          target: `http://${VITE_BACKEND_HOST}:${VITE_BACKEND_PORT}`,
+          changeOrigin: true,
+        },
+        '/images': {
+          target: `http://${VITE_BACKEND_HOST}:${VITE_BACKEND_PORT}/api`,
           changeOrigin: true,
         }
       }

@@ -38,11 +38,13 @@ const loginUserStore = useLoginUserStore()
 const {isLoggedIn} = storeToRefs(loginUserStore)
 const userCacheStore = useUserCacheStore()
 const router = useRouter()
-const membership = async () => isLoggedIn.value ? await userCacheStore.fetchMember(categoryId, loginUserStore.userId, true) : defaultMember
+const getMembership = async () => isLoggedIn.value ? await userCacheStore.fetchMember(categoryId, loginUserStore.userId, true) : defaultMember
 
-const hasDeletePermission = computed( async () => {
-  if (!isLoggedIn.value) return false;
-  return loginUserStore.userId === userId || await membership().role > 1
+const hasDeletePermission = ref(false)
+
+onMounted(async () => {
+  if (isLoggedIn.value) hasDeletePermission.value = loginUserStore.userId === userId || await getMembership().role > 1
+  else hasDeletePermission.value = false
 })
 
 async function onConfirmDelete() {
@@ -75,8 +77,8 @@ async function onConfirmDelete() {
         :liked="liked"
       />
       <el-popconfirm v-if="hasDeletePermission" title="你确定要删除此帖子吗？" @confirm="onConfirmDelete">
-        <template #reference>
-          <el-button type="danger">
+        <template #reference  v-if="hasDeletePermission">
+          <el-button type="danger"  v-if="hasDeletePermission">
             <el-icon><Delete /></el-icon>
             删除
           </el-button>

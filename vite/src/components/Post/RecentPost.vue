@@ -20,13 +20,14 @@ import useRecentPostStore from '@/js/module/recent_post';
 import PostMinimal from './PostMinimal.vue';
 import { storeToRefs } from 'pinia';
 import { getPostMinimalList } from '@/js/api/post';
+import {isEmpty} from "lodash";
 
 const recentPostStore = useRecentPostStore()
 const {postList} = storeToRefs(recentPostStore)
 const dataList = ref([])
 
 watch(postList, async () => {
-    dataList.value = await getPostMinimalList(postList.value)
+    if (!isEmpty(postList.value)) dataList.value = await getPostMinimalList(postList.value)
     // console.log(dataList.value)
 }, {immediate: true})
 

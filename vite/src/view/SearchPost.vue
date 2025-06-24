@@ -15,8 +15,8 @@
             :comment-count="i.commentCount"
             :thumbnails="i.thumbnails"
             :liked="i.liked"
-            :show-category="showCategory"
-            :show-user="!isNumber(userId)"
+            show-category
+            show-user
             :key="i.id"
     />
 
