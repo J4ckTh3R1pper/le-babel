@@ -13,7 +13,7 @@ yarn dev
 ```shell
 yarn run vite build
 ```  
-后端：运行gradle任务jar后在build/libs中找到jar包
+后端：运行gradle任务bootJar后在build/libs中找到jar包
 # 项目截图（WIP）
 ![屏幕截图_20250625_023641.png](screenshots/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_20250625_023641.png)
 ![屏幕截图_20250625_023444.png](screenshots/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_20250625_023444.png)
